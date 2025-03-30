@@ -119,10 +119,27 @@
                 </div>
             </div>
 
+            <!-- Semester Selector -->
+            <div class="semester-selector-card">
+                <h3 class="section-title">Semester Results</h3>
+                <div class="semester-selector-container">
+                    <select id="semesterSelector" class="semester-select">
+                        <option value="" disabled selected>Select Semester</option>
+                        <!-- Semesters will be populated here via JavaScript -->
+                    </select>
+                </div>
+                <div id="semesterLoadingIndicator" class="semester-loading-container">
+                    <div class="spinner-sm"></div> Loading semester data...
+                </div>
+            </div>
+
             <!-- Subjects Table -->
             <div class="subjects-card">
                 <div class="card-header">
-                    <h3 class="section-title">Subject Details</h3>
+                    <h3 class="section-title">
+                        <span id="currentSemesterName">Subject Details</span>
+                        <div id="semesterSGPA" class="semester-sgpa">SGPA: <span id="sgpaValue">-</span></div>
+                    </h3>
                     <div class="subjects-count">
                         <i class="fas fa-graduation-cap"></i>
                         <span id="subjectCount">0</span> Subjects
@@ -132,7 +149,7 @@
                     <table class="subjects-table">
                         <thead>
                             <tr>
-                                <th>Subject ID</th>
+                                <th>Subject Code</th>
                                 <th>Subject Name</th>
                                 <th width="100">Grade</th>
                                 <th width="100">Credits</th>

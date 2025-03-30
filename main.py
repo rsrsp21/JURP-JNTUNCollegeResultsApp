@@ -1,6 +1,7 @@
 from flask import Flask, send_from_directory, jsonify
 import os
 import csv
+import glob
 
 app = Flask(__name__, static_folder='public')
 
@@ -49,6 +50,64 @@ STUDENT_DATA = parse_student_data()
 
 # Load CGPA data
 CGPA_DATA = parse_cgpa_data()
+
+# Function to get a list of available semesters
+def get_available_semesters():
+    semester_files = glob.glob('./data/semesters/semester*.csv')
+    semesters = []
+    
+    for file_path in semester_files:
+        # Extract semester number from filename
+        filename = os.path.basename(file_path)
+        semester_number = filename.replace('semester', '').replace('.csv', '')
+        
+        try:
+            semester_number = int(semester_number)
+            # Format for display
+            if semester_number <= 2:
+                year = "First Year"
+                sem = "First" if semester_number == 1 else "Second"
+            elif semester_number <= 4:
+                year = "Second Year"
+                sem = "First" if semester_number == 3 else "Second"
+            elif semester_number <= 6:
+                year = "Third Year"
+                sem = "First" if semester_number == 5 else "Second"
+            else:
+                year = "Fourth Year"
+                sem = "First" if semester_number == 7 else "Second"
+                
+            semesters.append({
+                "id": semester_number,
+                "name": f"{year} - {sem} Semester",
+                "file": filename
+            })
+        except ValueError:
+            continue
+    
+    # Sort by semester number
+    semesters.sort(key=lambda x: x["id"])
+    return semesters
+
+# Function to parse semester data from CSV
+def parse_semester_data(semester_id):
+    semester_data = {}
+    file_path = f'./data/semesters/semester{semester_id}.csv'
+    
+    if not os.path.exists(file_path):
+        return {}
+        
+    with open(file_path, 'r') as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            student_id = row['ID']
+            
+            if student_id not in semester_data:
+                semester_data[student_id] = []
+                
+            semester_data[student_id].append(row)
+            
+    return semester_data
 
 # Serve static files
 @app.route('/', defaults={'path': ''})
@@ -131,6 +190,26 @@ def get_toppers_by_category(category):
         return jsonify(toppers_data[category])
     else:
         return jsonify({'error': f'Category {category} not found'}), 404
+        
+# API endpoint to get available semesters
+@app.route('/api/semesters', methods=['GET'])
+def get_semesters():
+    semesters = get_available_semesters()
+    return jsonify(semesters)
+    
+# API endpoint to get student semester data
+@app.route('/api/semester/<semester_id>/<student_id>', methods=['GET'])
+def get_student_semester_data(semester_id, student_id):
+    semester_data = parse_semester_data(semester_id)
+    
+    if student_id in semester_data:
+        return jsonify({
+            'semester_id': semester_id,
+            'student_id': student_id,
+            'subjects': semester_data[student_id]
+        })
+    else:
+        return jsonify({'error': 'Student not found for the specified semester'}), 404
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

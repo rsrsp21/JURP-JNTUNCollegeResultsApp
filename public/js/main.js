@@ -15,9 +15,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const subjectsTableBody = document.getElementById('subjectsTableBody');
   const downloadPDFBtn = document.getElementById('downloadPDFBtn');
   const downloadCSVBtn = document.getElementById('downloadCSVBtn');
+  const semesterSelector = document.getElementById('semesterSelector');
+  const semesterLoadingIndicator = document.getElementById('semesterLoadingIndicator');
+  const currentSemesterName = document.getElementById('currentSemesterName');
+  const sgpaValue = document.getElementById('sgpaValue');
+  const subjectCount = document.getElementById('subjectCount');
 
-  // Store current student data
+  // Store current data
   let currentStudentData = null;
+  let currentStudentId = null;
+  let availableSemesters = [];
 
   // Initialize jsPDF
   const { jsPDF } = window.jspdf;
@@ -32,6 +39,9 @@ document.addEventListener('DOMContentLoaded', () => {
   searchAgainBtn.addEventListener('click', resetSearch);
   downloadPDFBtn.addEventListener('click', downloadPDF);
   downloadCSVBtn.addEventListener('click', downloadCSV);
+  if (semesterSelector) {
+    semesterSelector.addEventListener('change', handleSemesterSelection);
+  }
   
   // Add print functionality if the button exists
   const printResultsBtn = document.getElementById('printResultsBtn');
@@ -67,22 +77,206 @@ document.addEventListener('DOMContentLoaded', () => {
       if (response.ok && data.length > 0) {
         // Store student data
         currentStudentData = data[0];
+        currentStudentId = currentStudentData.rollNumber;
         
         // Display the student information
         displayStudentInfo(currentStudentData);
         
+        // Fetch available semesters
+        await fetchSemesters();
+        
         // Show results section
+        resultsSection.style.display = 'block';
         resultsSection.classList.remove('hidden');
-        resultsSection.classList.add('animate-fadeIn');
       } else {
         // Show no results section
+        noResultsSection.style.display = 'block';
         noResultsSection.classList.remove('hidden');
-        noResultsSection.classList.add('animate-fadeIn');
       }
     } catch (error) {
       console.error('Error fetching student results:', error);
       hideLoading();
       showError('Error connecting to server. Please try again later.');
+    }
+  }
+  
+  // Function to fetch available semesters
+  async function fetchSemesters() {
+    try {
+      // Clear semester selector
+      semesterSelector.innerHTML = '<option value="" disabled selected>Select Semester</option>';
+      
+      // Show loading indicator
+      semesterLoadingIndicator.style.display = 'flex';
+      
+      // Fetch semesters from API
+      const response = await fetch('/api/semesters');
+      const data = await response.json();
+      
+      if (response.ok && data.length > 0) {
+        // Store available semesters
+        availableSemesters = data;
+        
+        // Add options to semester selector
+        availableSemesters.forEach(semester => {
+          const option = document.createElement('option');
+          option.value = semester.id;
+          option.textContent = semester.name;
+          semesterSelector.appendChild(option);
+        });
+        
+        // Select first semester by default if available
+        if (availableSemesters.length > 0) {
+          semesterSelector.value = availableSemesters[0].id;
+          handleSemesterSelection();
+        }
+      } else {
+        // No semesters available
+        const option = document.createElement('option');
+        option.value = "";
+        option.textContent = "No semesters available";
+        option.disabled = true;
+        semesterSelector.appendChild(option);
+      }
+    } catch (error) {
+      console.error('Error fetching semesters:', error);
+      
+      // Add fallback option
+      const option = document.createElement('option');
+      option.value = "";
+      option.textContent = "Error loading semesters";
+      option.disabled = true;
+      semesterSelector.appendChild(option);
+    } finally {
+      // Hide loading indicator
+      semesterLoadingIndicator.style.display = 'none';
+    }
+  }
+  
+  // Function to handle semester selection
+  async function handleSemesterSelection() {
+    const semesterId = semesterSelector.value;
+    
+    if (!semesterId || !currentStudentId) return;
+    
+    try {
+      // Show loading indicator
+      semesterLoadingIndicator.style.display = 'flex';
+      
+      // Fetch semester data from API
+      const response = await fetch(`/api/semester/${semesterId}/${currentStudentId}`);
+      const data = await response.json();
+      
+      if (response.ok && data.subjects) {
+        // Display semester data
+        displaySemesterData(data, semesterId);
+      } else {
+        showError('No data found for the selected semester.');
+        clearSemesterData();
+      }
+    } catch (error) {
+      console.error('Error fetching semester data:', error);
+      showError('Error loading semester data. Please try again.');
+      clearSemesterData();
+    } finally {
+      // Hide loading indicator
+      semesterLoadingIndicator.style.display = 'none';
+    }
+  }
+  
+  // Function to display semester data
+  function displaySemesterData(data, semesterId) {
+    // Set current semester name
+    const semesterOption = semesterSelector.options[semesterSelector.selectedIndex];
+    currentSemesterName.textContent = semesterOption.textContent;
+    
+    // Clear existing table rows
+    subjectsTableBody.innerHTML = '';
+    
+    // Update subject count
+    if (subjectCount) {
+      subjectCount.textContent = data.subjects.length;
+    }
+    
+    // Calculate SGPA
+    const sgpa = calculateSGPA(data.subjects);
+    sgpaValue.textContent = sgpa;
+    
+    // Add subject rows to the table
+    data.subjects.forEach((subject, index) => {
+      const row = document.createElement('tr');
+      
+      // Create grade class based on grade value
+      let gradeClass = 'grade-';
+      const grade = subject.Grade.toLowerCase();
+      
+      if (grade === 'a+') gradeClass += 'a';
+      else if (grade === 'a') gradeClass += 'a';
+      else if (grade === 'b') gradeClass += 'b';
+      else if (grade === 'c') gradeClass += 'c';
+      else if (grade === 'd') gradeClass += 'd';
+      else if (grade === 'e') gradeClass += 'd';
+      else if (grade === 'f') gradeClass += 'f';
+      
+      row.innerHTML = `
+        <td class="subject-id">${subject['Subject Code']}</td>
+        <td class="subject-name">${subject['Subject Name']}</td>
+        <td class="grade-cell"><span class="grade-badge ${gradeClass}">${subject.Grade}</span></td>
+        <td class="credits-cell">${subject.Credits}</td>
+      `;
+      
+      subjectsTableBody.appendChild(row);
+    });
+  }
+  
+  // Function to calculate SGPA from semester data
+  function calculateSGPA(subjects) {
+    const grades = {
+      'A+': 10,
+      'A': 9,
+      'B': 8,
+      'C': 7,
+      'D': 6,
+      'E': 5,
+      'F': 0
+    };
+    
+    let totalCredits = 0;
+    let totalGradePoints = 0;
+    let hasFailed = false;
+    
+    subjects.forEach(subject => {
+      const grade = subject.Grade;
+      const credits = parseFloat(subject.Credits);
+      
+      if (grade === 'F') {
+        hasFailed = true;
+      }
+      
+      if (grades[grade] !== undefined) {
+        totalCredits += credits;
+        totalGradePoints += grades[grade] * credits;
+      }
+    });
+    
+    if (hasFailed) {
+      return 'Failed';
+    }
+    
+    if (totalCredits === 0) {
+      return 'N/A';
+    }
+    
+    return (totalGradePoints / totalCredits).toFixed(2);
+  }
+  
+  // Function to clear semester data
+  function clearSemesterData() {
+    currentSemesterName.textContent = 'Subject Details';
+    sgpaValue.textContent = '-';
+    subjectsTableBody.innerHTML = '';
+    if (subjectCount) {
+      subjectCount.textContent = '0';
     }
   }
 
