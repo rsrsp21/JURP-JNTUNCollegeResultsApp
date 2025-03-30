@@ -3,49 +3,6 @@
     display: none !important;
 }
 
-/* Header Styling */
-.page-header {
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    border-radius: 0 0 2rem 2rem;
-    padding: 3rem 1.5rem;
-    margin-bottom: 3rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    position: relative;
-    overflow: hidden;
-}
-
-.page-header::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB2aWV3Qm94PSIwIDAgMTAwMCAxMDAwIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogICAgPGcgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjA1KSI+CiAgICAgICAgPGNpcmNsZSBjeD0iMTAwIiBjeT0iMTAwIiByPSIyMCIgLz4KICAgICAgICA8Y2lyY2xlIGN4PSIzMDAiIGN5PSIxNTAiIHI9IjMwIiAvPgogICAgICAgIDxjaXJjbGUgY3g9IjUwMCIgY3k9IjMwMCIgcj0iMjUiIC8+CiAgICAgICAgPGNpcmNsZSBjeD0iNjUwIiBjeT0iMTAwIiByPSIxNSIgLz4KICAgICAgICA8Y2lyY2xlIGN4PSI3MDAiIGN5PSIzMDAiIHI9IjM1IiAvPgogICAgICAgIDxjaXJjbGUgY3g9IjgwMCIgY3k9IjQwMCIgcj0iMjAiIC8+CiAgICAgICAgPGNpcmNsZSBjeD0iOTAwIiBjeT0iMjAwIiByPSIyNSIgLz4KICAgICAgICA8Y2lyY2xlIGN4PSI5MDAiIGN5PSI0MDAiIHI9IjE1IiAvPgogICAgICAgIDxjaXJjbGUgY3g9IjIwMCIgY3k9IjUwMCIgcj0iMjAiIC8+CiAgICAgICAgPGNpcmNsZSBjeD0iMzAwIiBjeT0iNjAwIiByPSIxNSIgLz4KICAgICAgICA8Y2lyY2xlIGN4PSI0MDAiIGN5PSI3MDAiIHI9IjI1IiAvPgogICAgICAgIDxjaXJjbGUgY3g9IjYwMCIgY3k9IjUwMCIgcj0iMzAiIC8+CiAgICAgICAgPGNpcmNsZSBjeD0iNzAwIiBjeT0iNjAwIiByPSIyMCIgLz4KICAgICAgICA8Y2lyY2xlIGN4PSI4MDAiIGN5PSI3MDAiIHI9IjI1IiAvPgogICAgPC9nPgo8L3N2Zz4=');
-    opacity: 0.2;
-    z-index: 0;
-}
-
-.page-title {
-    font-size: 2.5rem;
-    font-weight: 700;
-    text-align: center;
-    margin-bottom: 0.5rem;
-    position: relative;
-    z-index: 1;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-}
-
-.page-subtitle {
-    font-size: 1.1rem;
-    color: rgba(255, 255, 255, 0.85);
-    text-align: center;
-    position: relative;
-    z-index: 1;
-    max-width: 700px;
-    margin: 0 auto;
-}
-
 /* Card Styling */
 .toppers-card {
     background: var(--card-bg);
@@ -393,13 +350,5 @@
         width: 100%;
         text-align: center;
     }
-    
-    .page-header {
-        padding: 2rem 1rem;
-        border-radius: 0 0 1.5rem 1.5rem;
-    }
-    
-    .page-title {
-        font-size: 2rem;
-    }
+
 }
