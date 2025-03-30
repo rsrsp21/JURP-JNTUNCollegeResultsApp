@@ -119,15 +119,10 @@ async function displayResults() {
     var idContainer = document.getElementById('id-container');
     idContainer.innerHTML = '';
 
-    var idHeading = document.createElement('h3');
-    idHeading.className = 'text-xl mb-2';
-    idHeading.innerHTML = '<span class="text-gray-300">Roll Number: </span><span class="roll-number">' + studentId + '</span>';
+    var idHeading = document.createElement('div');
+    idHeading.className = 'd-flex align-items-center';
+    idHeading.innerHTML = '<span class="roll-number">' + studentId + '</span><span class="mx-2 text-muted">|</span><span class="branch-name">' + branch + '</span>';
     idContainer.appendChild(idHeading);
-
-    var branchHeading = document.createElement('h3');
-    branchHeading.className = 'text-xl';
-    branchHeading.innerHTML = '<span class="text-gray-300">Branch: </span><span class="branch-name">' + branch + '</span>';
-    idContainer.appendChild(branchHeading);
 
     // Display CGPA
     var cgpaContainer = document.getElementById('cgpa-container');
@@ -148,13 +143,13 @@ async function displayResults() {
     
     // Set color based on CGPA
     if (cgpa >= 7.75) {
-        progressFill.className = 'progress-fill excellence';
+        progressFill.className = 'progress-bar-fill excellence';
     } else if (cgpa >= 6.75) {
-        progressFill.className = 'progress-fill first-class';
+        progressFill.className = 'progress-bar-fill first-class';
     } else if (cgpa >= 5.75) {
-        progressFill.className = 'progress-fill second-class';
+        progressFill.className = 'progress-bar-fill second-class';
     } else {
-        progressFill.className = 'progress-fill pass-class';
+        progressFill.className = 'progress-bar-fill pass-class';
     }
 
     // Display division message
@@ -252,7 +247,7 @@ async function displayResults() {
     tableContainer.innerHTML = '';
 
     var table = document.createElement('table');
-    table.className = 'semester-table';
+    table.className = 'table semester-table';
     tableContainer.appendChild(table);
 
     var tableHeader = document.createElement('thead');
