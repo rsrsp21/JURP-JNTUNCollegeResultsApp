@@ -31,8 +31,24 @@ def parse_student_data():
             
     return student_data
 
+# Parse CGPA data from CSV file
+def parse_cgpa_data():
+    cgpa_data = {}
+    csv_file = './data/cgpa_data.csv'
+    
+    with open(csv_file, 'r') as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            student_id = row['ID']
+            cgpa_data[student_id] = row
+            
+    return cgpa_data
+
 # Load student data
 STUDENT_DATA = parse_student_data()
+
+# Load CGPA data
+CGPA_DATA = parse_cgpa_data()
 
 # Serve static files
 @app.route('/', defaults={'path': ''})
@@ -49,6 +65,19 @@ def get_results(roll_number):
         return jsonify([STUDENT_DATA[roll_number]])
     else:
         return jsonify({'error': 'Student not found with provided roll number'}), 404
+
+# API endpoint to get CGPA data
+@app.route('/api/cgpa/<student_id>', methods=['GET'])
+def get_cgpa_data(student_id):
+    if student_id in CGPA_DATA:
+        return jsonify(CGPA_DATA[student_id])
+    else:
+        return jsonify({'error': 'Student not found with provided ID'}), 404
+        
+# API endpoint to get all CGPA data
+@app.route('/api/cgpa', methods=['GET'])
+def get_all_cgpa_data():
+    return jsonify(list(CGPA_DATA.values()))
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

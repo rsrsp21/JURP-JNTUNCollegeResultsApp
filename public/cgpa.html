@@ -1,29 +1,64 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CGPA Calculator - Student Portal</title>
-    <!-- Tailwind CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <!-- Bootstrap CSS Theme from Replit -->
+    <title>CGPA Calculator - Student Results Portal</title>
+    
+    <!-- Bootstrap CSS for dark theme -->
     <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
-    <!-- Font Awesome for icons -->
+    
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Custom CSS -->
+    
+    <!-- Custom Styles -->
     <link rel="stylesheet" href="css/styles.css">
+    
+    <style>
+        /* CGPA-specific styles */
+        .hidden {
+            display: none;
+        }
+        .shown {
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        #results-section:not(.shown) {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+        }
+        th {
+            background-color: #2d3748;
+            color: #a0aec0;
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+        }
+        td {
+            border-bottom: 1px solid #4a5568;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+    </style>
 </head>
-<body class="bg-gray-900 text-white min-h-screen">
+<body class="bg-gray-900 text-white">
     <!-- Header -->
-    <header class="bg-gradient-to-r from-blue-800 to-purple-800 py-8 shadow-lg">
-        <div class="container mx-auto px-4">
-            <div class="flex flex-col md:flex-row items-center justify-between">
+    <header class="bg-gray-800 shadow-lg">
+        <div class="container mx-auto">
+            <div class="flex flex-col md:flex-row items-center justify-between py-6 px-4">
                 <div class="mb-4 md:mb-0">
                     <h1 class="text-4xl font-bold">CGPA Calculator</h1>
-                    <p class="text-gray-200 mt-2">Check your semester-wise performance and calculate your CGPA</p>
+                    <p class="text-gray-200 mt-2">Check your semester-wise academic performance</p>
                 </div>
-                <div class="flex items-center space-x-4">
-                    <a href="/" class="text-white hover:text-gray-200 transition-colors">
+                <div class="flex items-center space-x-6">
+                    <a href="/index.html" class="text-white hover:text-gray-200 transition-colors flex items-center">
                         <i class="fas fa-home mr-2"></i> Home
                     </a>
                     <i class="fas fa-calculator text-3xl"></i>
@@ -35,58 +70,67 @@
     <!-- Main Content -->
     <main class="container mx-auto px-4 py-8">
         <!-- Search Section -->
-        <section class="bg-gradient-to-b from-gray-800 to-gray-900 rounded-xl shadow-xl p-6 mb-8 border border-gray-700">
+        <section class="bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
             <h2 class="text-2xl font-semibold mb-4">Find Your CGPA Details</h2>
             <div class="flex flex-col md:flex-row gap-4">
                 <div class="flex-grow">
-                    <input type="text" id="student-id" placeholder="Enter your Roll Number (e.g., 21031A0101)" 
+                    <input type="text" id="student-id" placeholder="Enter your Roll Number (e.g., 21031A0102)" 
                            class="w-full px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
-                <button onclick="displayResults()" class="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-3 px-6 rounded-lg transition duration-300 shadow-lg">
-                    <i class="fas fa-search mr-2"></i> Calculate
+                <button id="search-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300">
+                    <i class="fas fa-search mr-2"></i> Search
                 </button>
             </div>
         </section>
 
+        <!-- Loading Indicator -->
+        <div id="loading-indicator" class="hidden flex justify-center items-center py-12">
+            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        </div>
+
         <!-- Results Section (Hidden initially) -->
-        <section id="results-section" class="hidden animate-fadeIn">
-            <!-- Student Info Card -->
-            <div class="bg-gradient-to-b from-gray-800 to-gray-900 rounded-xl shadow-xl p-6 mb-8 border border-gray-700">
+        <section id="results-section" class="hidden bg-gradient-to-b from-gray-800 to-gray-900 rounded-xl shadow-xl p-6 mb-8 border border-gray-700">
+            <!-- Student Info -->
+            <div class="mb-6">
                 <div id="id-container" class="mb-4">
-                    <!-- Student ID will be displayed here -->
+                    <!-- Student ID and Branch will be populated here -->
                 </div>
                 
-                <div id="cgpa-container" class="bg-gradient-to-r from-indigo-800 to-purple-700 rounded-xl p-5 shadow-xl border border-indigo-500 pulse-glow mb-4">
-                    <!-- CGPA will be displayed here -->
+                <!-- CGPA Display Card -->
+                <div class="bg-gradient-to-r from-gray-700 to-gray-800 rounded-xl shadow-lg p-6 mb-6 border border-gray-600 pulse-glow">
+                    <div id="cgpa-container" class="text-center mb-4">
+                        <!-- CGPA will be populated here -->
+                    </div>
+                    
+                    <div id="message-container" class="mt-3">
+                        <!-- First Class/Distinction message will appear here -->
+                    </div>
                 </div>
                 
-                <div id="message-container" class="mb-4">
-                    <!-- Class Division Message will be displayed here -->
-                </div>
-                
+                <!-- Percentage and Credits -->
                 <div id="percentage-total-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <!-- Percentage and Total Credits will be displayed here -->
+                    <!-- Percentage and Total Credits will be populated here -->
                 </div>
                 
-                <div id="supplementary-container" class="mb-2">
-                    <!-- Supplementary info will be displayed here -->
+                <!-- Supplementary Appearances -->
+                <div id="supplementary-container" class="bg-gray-800 rounded-lg p-4 shadow-inner mb-4">
+                    <!-- Supplementary appearances will be populated here -->
                 </div>
             </div>
-
-            <!-- Semester Results Table -->
-            <div class="bg-gradient-to-b from-gray-800 to-gray-900 rounded-xl shadow-xl overflow-hidden border border-gray-700 mb-8">
-                <h3 class="text-xl font-semibold p-6 border-b border-gray-700">Semester-wise Performance</h3>
+            
+            <!-- Semester-wise Performance Table -->
+            <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-700">
+                <div class="p-4 border-b border-gray-700">
+                    <h3 class="text-xl font-semibold">Semester-wise Performance</h3>
+                </div>
                 <div id="table-container" class="overflow-x-auto">
-                    <!-- Table will be generated here -->
+                    <!-- Table will be populated here -->
                 </div>
             </div>
-
-            <!-- Download Section -->
-            <div class="flex flex-wrap gap-3 my-4">
-                <button id="downloadPDFBtn" class="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-3 px-5 rounded-lg flex items-center shadow-lg transition-all duration-300 flex-grow md:flex-grow-0">
-                    <i class="fas fa-file-pdf mr-2"></i> Download PDF
-                </button>
-                <button id="printResultsBtn" class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 px-5 rounded-lg flex items-center shadow-lg transition-all duration-300 flex-grow md:flex-grow-0">
+            
+            <!-- Download Buttons -->
+            <div class="flex flex-wrap gap-3 mt-6">
+                <button id="printResultsBtn" class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 px-5 rounded-lg flex items-center shadow-lg transition-all duration-300">
                     <i class="fas fa-print mr-2"></i> Print Results
                 </button>
             </div>
@@ -94,22 +138,22 @@
 
         <!-- How It Works Section -->
         <section class="mt-12 bg-gray-800 rounded-lg shadow-lg p-6">
-            <h2 class="text-2xl font-semibold mb-4">How to Calculate CGPA</h2>
+            <h2 class="text-2xl font-semibold mb-4">How to Use the CGPA Calculator</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="bg-gray-700 rounded-lg p-6 transition duration-300 hover:bg-gray-600">
-                    <div class="text-3xl text-blue-500 mb-4"><i class="fas fa-calculator"></i></div>
-                    <h3 class="text-xl font-semibold mb-2">CGPA Formula</h3>
-                    <p class="text-gray-300">CGPA is calculated as the weighted average of all semester SGPAs, with credits as weights.</p>
+                    <div class="text-3xl text-blue-500 mb-4"><i class="fas fa-search"></i></div>
+                    <h3 class="text-xl font-semibold mb-2">Enter Roll Number</h3>
+                    <p class="text-gray-300">Enter your roll number to retrieve your semester-wise CGPA details.</p>
                 </div>
                 <div class="bg-gray-700 rounded-lg p-6 transition duration-300 hover:bg-gray-600">
-                    <div class="text-3xl text-green-500 mb-4"><i class="fas fa-percentage"></i></div>
-                    <h3 class="text-xl font-semibold mb-2">Converting to Percentage</h3>
-                    <p class="text-gray-300">Percentage = (CGPA - 0.75) × 10</p>
+                    <div class="text-3xl text-green-500 mb-4"><i class="fas fa-chart-line"></i></div>
+                    <h3 class="text-xl font-semibold mb-2">View Performance</h3>
+                    <p class="text-gray-300">See your SGPA for each semester, total credits, and overall CGPA.</p>
                 </div>
                 <div class="bg-gray-700 rounded-lg p-6 transition duration-300 hover:bg-gray-600">
-                    <div class="text-3xl text-yellow-500 mb-4"><i class="fas fa-award"></i></div>
-                    <h3 class="text-xl font-semibold mb-2">Class Division</h3>
-                    <p class="text-gray-300">≥ 7.75: Distinction | ≥ 6.75: First Class | ≥ 5.75: Second Class | ≥ 5.0: Pass</p>
+                    <div class="text-3xl text-yellow-500 mb-4"><i class="fas fa-print"></i></div>
+                    <h3 class="text-xl font-semibold mb-2">Print Results</h3>
+                    <p class="text-gray-300">Print your CGPA report for your records with a clean, organized layout.</p>
                 </div>
             </div>
         </section>
@@ -120,12 +164,12 @@
         <div class="container mx-auto px-4">
             <div class="text-center">
                 <p class="text-gray-400">© 2023 Student Results Portal. All rights reserved.</p>
-                <p class="text-gray-500 text-sm mt-2">A secure platform to view and calculate your academic results.</p>
+                <p class="text-gray-500 text-sm mt-2">A secure platform to view and analyze your academic performance.</p>
             </div>
         </div>
     </footer>
 
-    <!-- JavaScript for CGPA calculation -->
+    <!-- Custom JavaScript -->
     <script src="js/cgpa.js"></script>
 </body>
 </html>

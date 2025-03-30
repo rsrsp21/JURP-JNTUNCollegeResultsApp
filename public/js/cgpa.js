@@ -1,16 +1,3 @@
-// CSV data for student results
-var csvData = `ID,1-1,Credits_1-1,1-2,Credits_1-2,2-1,Credits_2-1,2-2,Credits_2-2,3-1,Credits_3-1,3-2,Credits_3-2,4-1,Credits_4-1,Total Credits,CGPA,Supplementary Appearances
-21031A0101,0.0,13.5,0.0,13.5,0.0,22.5,0.0,12.5,0.0,15.5,0.0,12.5,0.0,20.0,110.0,0.0,*********************
-21031A0102,7.13,19.5,5.77,19.5,6.94,25.5,6.47,21.5,7.26,21.5,6.98,21.5,7.78,23.0,152.0,6.93,*******
-21031A0103,7.13,19.5,6.69,19.5,8.24,25.5,7.14,21.5,7.33,21.5,7.28,21.5,7.13,23.0,152.0,7.31,
-21031A0104,8.23,19.5,7.77,19.5,8.0,25.5,8.67,21.5,9.16,21.5,8.95,21.5,8.67,24.0,153.0,8.5,
-21031A0105,0.0,16.5,0.0,16.5,0.0,19.5,0.0,18.5,0.0,18.5,0.0,18.5,0.0,17.0,125.0,0.0,*********************
-21031A0106,7.41,19.5,6.29,21.0,7.76,25.5,7.37,21.5,7.47,21.5,7.74,21.5,7.13,23.0,153.5,7.32,**
-21031A0107,5.82,19.5,0.0,16.5,6.82,25.5,5.81,21.5,7.16,21.5,6.84,21.5,7.26,23.0,149.0,0.0,************
-21031A0108,0.0,13.5,0.0,16.5,0.0,22.5,0.0,18.5,6.37,21.5,6.63,21.5,6.48,23.0,137.0,0.0,*******************
-21031A0109,6.44,19.5,6.46,19.5,6.92,25.5,7.0,21.5,6.86,21.5,6.56,21.5,6.61,23.0,152.0,6.7,**
-21031A0110,6.51,19.5,5.71,21.0,6.67,25.5,5.95,21.5,6.51,21.5,6.93,21.5,0.0,20.0,150.5,0.0,*********`;
-
 // Wait for the DOM to be loaded
 document.addEventListener('DOMContentLoaded', function() {
     // Add event listener for the print button
@@ -29,35 +16,39 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('student-id').value = studentId;
         displayResults();
     }
+    
+    // Add event listener for the search button
+    const searchButton = document.getElementById('search-button');
+    if (searchButton) {
+        searchButton.addEventListener('click', function() {
+            displayResults();
+        });
+    }
+    
+    // Add event listener for Enter key in the input field
+    const studentIdInput = document.getElementById('student-id');
+    if (studentIdInput) {
+        studentIdInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                displayResults();
+            }
+        });
+    }
 });
 
-// Parse CSV data
-function parseCSV(csv) {
-    var lines = csv.split('\n');
-    var headers = lines[0].split(',');
-
-    var data = [];
-    for (var i = 1; i < lines.length; i++) {
-        var values = lines[i].split(',');
-        if (values.length === headers.length) {
-            var entry = {};
-            for (var j = 0; j < headers.length; j++) {
-                entry[headers[j].trim()] = values[j].trim();
-            }
-            data.push(entry);
+// Get student data from API
+async function fetchStudentData(id) {
+    try {
+        const response = await fetch(`/api/cgpa/${id}`);
+        if (!response.ok) {
+            throw new Error('Student not found');
         }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching student data:', error);
+        return null;
     }
-
-    return data;
-}
-
-// Get student data by ID
-function getStudentData(id, data) {
-    var studentData = data.filter(function(entry) {
-        return entry.ID === id;
-    });
-
-    return studentData;
 }
 
 // Get engineering branch based on the roll number
@@ -79,7 +70,7 @@ function getEngineeringBranch(branchCode) {
 }
 
 // Display student results
-function displayResults() {
+async function displayResults() {
     var studentId = document.getElementById('student-id').value.trim();
     if (!studentId) {
         alert('Please enter a valid Roll Number.');
@@ -91,19 +82,38 @@ function displayResults() {
     if (studentId.length >= 8) {
         branch = getEngineeringBranch(studentId.charAt(7));
     }
-
-    var studentData = getStudentData(studentId, parseCSV(csvData));
-    if (studentData.length === 0) {
-        alert('No data found for the given Roll Number.');
-        return;
+    
+    // Show loading indicator
+    const loadingIndicator = document.getElementById('loading-indicator');
+    if (loadingIndicator) {
+        loadingIndicator.classList.remove('hidden');
     }
-
-    // Show results section
+    
+    // Hide results section while loading
     const resultsSection = document.getElementById('results-section');
-    resultsSection.classList.remove('hidden');
-    setTimeout(() => {
-        resultsSection.classList.add('shown');
-    }, 10);
+    resultsSection.classList.add('hidden');
+    resultsSection.classList.remove('shown');
+
+    try {
+        const studentData = await fetchStudentData(studentId);
+        if (!studentData) {
+            alert('No data found for the given Roll Number.');
+            if (loadingIndicator) {
+                loadingIndicator.classList.add('hidden');
+            }
+            return;
+        }
+        
+        // Hide loading indicator
+        if (loadingIndicator) {
+            loadingIndicator.classList.add('hidden');
+        }
+
+        // Show results section
+        resultsSection.classList.remove('hidden');
+        setTimeout(() => {
+            resultsSection.classList.add('shown');
+        }, 10);
 
     // Display Roll Number and Branch
     var idContainer = document.getElementById('id-container');
@@ -125,11 +135,11 @@ function displayResults() {
 
     var cgpaHeading = document.createElement('h2');
     cgpaHeading.className = 'text-3xl font-bold flex items-center justify-center gap-3';
-    cgpaHeading.innerHTML = '<span class="text-white">CGPA:</span><span class="text-4xl text-white">' + studentData[0]['CGPA'] + '</span>';
+    cgpaHeading.innerHTML = '<span class="text-white">CGPA:</span><span class="text-4xl text-white">' + studentData['CGPA'] + '</span>';
     cgpaContainer.appendChild(cgpaHeading);
 
     // Set up progress bar for CGPA
-    var cgpa = parseFloat(studentData[0]['CGPA']);
+    var cgpa = parseFloat(studentData['CGPA']);
     var progressBar = document.createElement('div');
     progressBar.className = 'mt-4 h-3 bg-gray-200 rounded-full overflow-hidden';
     
@@ -154,7 +164,7 @@ function displayResults() {
 
     // Display division message
     var message = '';
-    var supplementaryAppearances = studentData[0]['Supplementary Appearances'];
+    var supplementaryAppearances = studentData['Supplementary Appearances'];
 
     if (cgpa >= 7.75 && (supplementaryAppearances === '' || !supplementaryAppearances.includes('*'))) {
         message = 'First Class with Distinction';
@@ -214,7 +224,7 @@ function displayResults() {
     
     var creditsValue = document.createElement('span');
     creditsValue.className = 'text-blue-400 font-bold text-xl';
-    creditsValue.textContent = studentData[0]['Total Credits'];
+    creditsValue.textContent = studentData['Total Credits'];
     
     creditsHeading.appendChild(creditsLabel);
     creditsHeading.appendChild(creditsValue);
@@ -222,7 +232,7 @@ function displayResults() {
     percentageTotalContainer.appendChild(creditsDiv);
 
     // Display Supplementary Appearances
-    var supplementaryAppearances = studentData[0]['Supplementary Appearances'];
+    var supplementaryAppearances = studentData['Supplementary Appearances'];
     var supplementaryContainer = document.getElementById('supplementary-container');
     supplementaryContainer.innerHTML = '';
 
@@ -292,8 +302,8 @@ function displayResults() {
 
     // Loop through the semesters
     semesterData.forEach(semester => {
-        const sgpa = studentData[0][semester.key];
-        const credits = studentData[0][`Credits_${semester.key}`];
+        const sgpa = studentData[semester.key];
+        const credits = studentData[`Credits_${semester.key}`];
         
         // Skip empty semesters
         if (sgpa === '' && credits === '') return;
@@ -330,6 +340,13 @@ function displayResults() {
 
         tableBody.appendChild(row);
     });
+    } catch (error) {
+        console.error('Error displaying results:', error);
+        alert('An error occurred while fetching data. Please try again.');
+        if (loadingIndicator) {
+            loadingIndicator.classList.add('hidden');
+        }
+    }
 }
 
 // Function to download results as PDF (can be implemented with jsPDF)
