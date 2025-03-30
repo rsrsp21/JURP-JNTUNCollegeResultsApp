@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Results Portal</title>
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Bootstrap CSS Theme from Replit -->
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- jsPDF for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-blue-800 to-purple-800 py-8 shadow-lg">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center justify-between">
+                <div class="mb-4 md:mb-0">
+                    <h1 class="text-4xl font-bold">Student Results Portal</h1>
+                    <p class="text-gray-200 mt-2">Check your academic performance with just your roll number</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-graduation-cap text-3xl"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Search Section -->
+        <section class="bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-2xl font-semibold mb-4">Find Your Results</h2>
+            <div class="flex flex-col md:flex-row gap-4">
+                <div class="flex-grow">
+                    <input type="text" id="rollNumberInput" placeholder="Enter your Roll Number (e.g., CS2001)" 
+                           class="w-full px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <button id="searchButton" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300">
+                    <i class="fas fa-search mr-2"></i> Search
+                </button>
+            </div>
+            <div id="errorMessage" class="mt-4 text-red-500 hidden">
+                <i class="fas fa-exclamation-circle mr-2"></i>
+                <span id="errorMessageText"></span>
+            </div>
+        </section>
+
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" class="hidden flex justify-center items-center py-12">
+            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        </div>
+
+        <!-- Results Section (Hidden initially) -->
+        <section id="resultsSection" class="hidden">
+            <!-- Student Info Card -->
+            <div class="bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
+                    <div>
+                        <h2 class="text-2xl font-bold" id="studentName">Student Name</h2>
+                        <p class="text-gray-400" id="studentRoll">Roll Number: -</p>
+                    </div>
+                    <div class="mt-4 md:mt-0">
+                        <div class="flex items-center">
+                            <span class="text-gray-400 mr-2">CGPA:</span>
+                            <span class="text-2xl font-bold text-yellow-500" id="studentCGPA">0.0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex space-x-2 mt-2">
+                    <button id="downloadPDFBtn" class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg flex items-center">
+                        <i class="fas fa-file-pdf mr-2"></i> Download PDF
+                    </button>
+                    <button id="downloadCSVBtn" class="bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg flex items-center">
+                        <i class="fas fa-file-csv mr-2"></i> Download CSV
+                    </button>
+                </div>
+            </div>
+
+            <!-- Subjects Table -->
+            <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+                <h3 class="text-xl font-semibold p-6 border-b border-gray-700">Subject Details</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-700">
+                        <thead class="bg-gray-700">
+                            <tr>
+                                <th class="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Subject ID</th>
+                                <th class="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Subject Name</th>
+                                <th class="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Grade</th>
+                                <th class="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Credits</th>
+                            </tr>
+                        </thead>
+                        <tbody id="subjectsTableBody" class="bg-gray-800 divide-y divide-gray-700">
+                            <!-- Subjects will be populated here via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- No Results Section (Hidden initially) -->
+        <section id="noResultsSection" class="hidden bg-gray-800 rounded-lg shadow-lg p-8 text-center">
+            <i class="fas fa-search text-5xl text-gray-600 mb-4"></i>
+            <h3 class="text-xl font-semibold mb-2">No Results Found</h3>
+            <p class="text-gray-400 mb-4">We couldn't find any results for the roll number you entered. Please check and try again.</p>
+            <button id="searchAgainBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300">
+                Search Again
+            </button>
+        </section>
+
+        <!-- How It Works Section -->
+        <section class="mt-12 bg-gray-800 rounded-lg shadow-lg p-6">
+            <h2 class="text-2xl font-semibold mb-4">How It Works</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-gray-700 rounded-lg p-6 transition duration-300 hover:bg-gray-600">
+                    <div class="text-3xl text-blue-500 mb-4"><i class="fas fa-keyboard"></i></div>
+                    <h3 class="text-xl font-semibold mb-2">Enter Roll Number</h3>
+                    <p class="text-gray-300">Simply enter your roll number in the search box above to begin.</p>
+                </div>
+                <div class="bg-gray-700 rounded-lg p-6 transition duration-300 hover:bg-gray-600">
+                    <div class="text-3xl text-green-500 mb-4"><i class="fas fa-list-alt"></i></div>
+                    <h3 class="text-xl font-semibold mb-2">View Your Results</h3>
+                    <p class="text-gray-300">See your grades, subject details, and overall CGPA in an easy-to-read format.</p>
+                </div>
+                <div class="bg-gray-700 rounded-lg p-6 transition duration-300 hover:bg-gray-600">
+                    <div class="text-3xl text-yellow-500 mb-4"><i class="fas fa-download"></i></div>
+                    <h3 class="text-xl font-semibold mb-2">Download Results</h3>
+                    <p class="text-gray-300">Save your results as a PDF or CSV file for your records or future reference.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 py-8 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="text-center">
+                <p class="text-gray-400">© 2023 Student Results Portal. All rights reserved.</p>
+                <p class="text-gray-500 text-sm mt-2">A secure platform to view and download your academic results.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Custom JavaScript -->
+    <script src="js/main.js"></script>
+</body>
+</html>

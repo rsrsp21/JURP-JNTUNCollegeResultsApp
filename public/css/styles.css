@@ -1,0 +1,131 @@
+/* Additional styles beyond Tailwind CSS */
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1f2937;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* Grade styling */
+.grade-a-plus {
+  color: #22c55e;
+  font-weight: bold;
+}
+
+.grade-a {
+  color: #22c55e;
+}
+
+.grade-a-minus {
+  color: #84cc16;
+}
+
+.grade-b-plus {
+  color: #84cc16;
+}
+
+.grade-b {
+  color: #facc15;
+}
+
+.grade-b-minus {
+  color: #fb923c;
+}
+
+.grade-c-plus {
+  color: #fb923c;
+}
+
+.grade-c {
+  color: #f87171;
+}
+
+.grade-c-minus {
+  color: #f87171;
+}
+
+.grade-d {
+  color: #ef4444;
+}
+
+.grade-f {
+  color: #dc2626;
+  font-weight: bold;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Print styles */
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+  
+  header, footer, #searchSection, #howItWorksSection {
+    display: none;
+  }
+  
+  #resultsSection {
+    display: block !important;
+    padding: 0;
+    margin: 0;
+  }
+}
+
+/* Make input fields and buttons more interactive */
+input:focus, button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+}
+
+button {
+  transition: all 0.2s ease-in-out;
+}
+
+button:hover {
+  transform: translateY(-2px);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+/* Background gradient pulse animation for header */
+@keyframes gradientAnimation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+header {
+  background-size: 200% 200%;
+  animation: gradientAnimation 10s ease infinite;
+}
