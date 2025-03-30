@@ -1,1 +1,7 @@
-.env
+# Ignore the resenv folder
+resenv/
+
+# Other common ignore patterns
+*.log
+*.tmp
+*.swp
