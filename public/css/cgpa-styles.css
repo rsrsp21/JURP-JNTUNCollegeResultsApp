@@ -1,0 +1,406 @@
+/* CGPA Calculator Specific Styles */
+.cgpa-header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    border-bottom: 1px solid #334155;
+}
+
+.main-title {
+    font-size: 2.5rem;
+    background: linear-gradient(to right, #60a5fa, #34d399);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-bottom: 0.5rem;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+}
+
+.subtitle {
+    color: #94a3b8;
+    font-size: 1.1rem;
+    font-weight: 400;
+}
+
+.search-container {
+    background: linear-gradient(145deg, #1e293b, #0f172a);
+    border: 1px solid #334155;
+    border-radius: 1rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.search-input {
+    background-color: #1e293b;
+    border: 1px solid #475569;
+    transition: all 0.3s ease;
+    box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+}
+
+.search-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+    outline: none;
+}
+
+.search-button {
+    background: linear-gradient(to right, #3b82f6, #2563eb);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.search-button:hover {
+    background: linear-gradient(to right, #2563eb, #1d4ed8);
+    transform: translateY(-1px);
+    box-shadow: 0 7px 14px rgba(0, 0, 0, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
+}
+
+.search-button:active {
+    transform: translateY(1px);
+}
+
+.loading-spinner {
+    border-radius: 50%;
+    width: 4rem;
+    height: 4rem;
+    animation: spin 1.5s linear infinite;
+    border: 4px solid #1e293b;
+    border-top: 4px solid #3b82f6;
+    border-bottom: 4px solid #3b82f6;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.results-container {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border: 1px solid #334155;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    transform: translateY(20px);
+    opacity: 0;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.results-container.shown {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.student-info {
+    border-bottom: 1px solid #334155;
+    padding: 1.5rem;
+}
+
+.roll-number {
+    color: #60a5fa;
+    font-weight: 600;
+}
+
+.branch-name {
+    color: #34d399;
+    font-weight: 600;
+}
+
+.cgpa-card {
+    background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+    border-radius: 1rem;
+    border: 1px solid #475569;
+    overflow: hidden;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    position: relative;
+}
+
+.cgpa-card::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(transparent, rgba(59, 130, 246, 0.3), transparent 30%);
+    animation: rotate 6s linear infinite;
+    z-index: 0;
+}
+
+@keyframes rotate {
+    100% {
+        transform: rotate(1turn);
+    }
+}
+
+.cgpa-inner {
+    position: relative;
+    z-index: 1;
+    background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+    border-radius: 1rem;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+}
+
+.cgpa-value {
+    font-size: 3.5rem;
+    font-weight: 800;
+    background: linear-gradient(to right, #60a5fa, #34d399);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    line-height: 1;
+    margin-bottom: 1rem;
+}
+
+.cgpa-label {
+    text-transform: uppercase;
+    font-weight: 600;
+    color: #94a3b8;
+    letter-spacing: 0.1em;
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+}
+
+.progress-container {
+    width: 100%;
+    height: 0.5rem;
+    background-color: #1e293b;
+    border-radius: 9999px;
+    overflow: hidden;
+    margin-top: 1.5rem;
+}
+
+.progress-fill {
+    height: 100%;
+    border-radius: 9999px;
+    transition: width 1s ease-out;
+}
+
+.excellence {
+    background: linear-gradient(to right, #34d399, #3b82f6);
+}
+
+.first-class {
+    background: linear-gradient(to right, #60a5fa, #818cf8);
+}
+
+.second-class {
+    background: linear-gradient(to right, #facc15, #f59e0b);
+}
+
+.pass-class {
+    background: linear-gradient(to right, #f59e0b, #ef4444);
+}
+
+.division-badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    margin-top: 1rem;
+}
+
+.distinction {
+    background-color: #059669;
+    color: white;
+}
+
+.first {
+    background-color: #2563eb;
+    color: white;
+}
+
+.second {
+    background-color: #d97706;
+    color: white;
+}
+
+.pass {
+    background-color: #b45309;
+    color: white;
+}
+
+.data-card {
+    background-color: #1e293b;
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    border: 1px solid #334155;
+    box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+}
+
+.data-label {
+    color: #94a3b8;
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.percentage-value {
+    color: #facc15;
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+.credits-value {
+    color: #60a5fa;
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+.supplementary-value {
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+.supplementary-none {
+    color: #34d399;
+}
+
+.supplementary-count {
+    color: #ef4444;
+}
+
+.semester-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.semester-table th {
+    background-color: #334155;
+    color: #94a3b8;
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #475569;
+}
+
+.semester-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #334155;
+    color: #e2e8f0;
+}
+
+.semester-table tr:last-child td {
+    border-bottom: none;
+}
+
+.semester-name {
+    font-weight: 500;
+    color: #e2e8f0;
+}
+
+.sgpa-value {
+    font-weight: 700;
+}
+
+.excellent-sgpa {
+    color: #34d399;
+}
+
+.good-sgpa {
+    color: #60a5fa;
+}
+
+.average-sgpa {
+    color: #facc15;
+}
+
+.poor-sgpa {
+    color: #ef4444;
+}
+
+.credits-badge {
+    display: inline-block;
+    background-color: #334155;
+    color: #e2e8f0;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.print-button {
+    background: linear-gradient(to right, #3b82f6, #2563eb);
+    color: white;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.print-button:hover {
+    background: linear-gradient(to right, #2563eb, #1d4ed8);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.print-button:active {
+    transform: translateY(0);
+}
+
+.print-icon {
+    margin-right: 0.5rem;
+}
+
+.info-card {
+    background-color: #1e293b;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: 1px solid #334155;
+}
+
+.info-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border-color: #475569;
+}
+
+.info-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.info-title {
+    color: #e2e8f0;
+    font-weight: 600;
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.info-text {
+    color: #94a3b8;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    color: #e2e8f0;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.nav-link:hover {
+    color: #3b82f6;
+}
+
+.nav-icon {
+    margin-right: 0.5rem;
+}

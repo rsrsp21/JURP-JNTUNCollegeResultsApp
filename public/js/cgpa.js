@@ -121,46 +121,41 @@ async function displayResults() {
 
     var idHeading = document.createElement('h3');
     idHeading.className = 'text-xl mb-2';
-    idHeading.innerHTML = '<span class="text-gray-300 font-semibold">Roll Number: </span><span class="text-blue-400 font-bold">' + studentId + '</span>';
+    idHeading.innerHTML = '<span class="text-gray-300">Roll Number: </span><span class="roll-number">' + studentId + '</span>';
     idContainer.appendChild(idHeading);
 
     var branchHeading = document.createElement('h3');
     branchHeading.className = 'text-xl';
-    branchHeading.innerHTML = '<span class="text-gray-300 font-semibold">Branch: </span><span class="text-green-400 font-bold">' + branch + '</span>';
+    branchHeading.innerHTML = '<span class="text-gray-300">Branch: </span><span class="branch-name">' + branch + '</span>';
     idContainer.appendChild(branchHeading);
 
     // Display CGPA
     var cgpaContainer = document.getElementById('cgpa-container');
     cgpaContainer.innerHTML = '';
 
-    var cgpaHeading = document.createElement('h2');
-    cgpaHeading.className = 'text-3xl font-bold flex items-center justify-center gap-3';
-    cgpaHeading.innerHTML = '<span class="text-white">CGPA:</span><span class="text-4xl text-white">' + studentData['CGPA'] + '</span>';
-    cgpaContainer.appendChild(cgpaHeading);
+    var cgpaValue = document.createElement('div');
+    cgpaValue.className = 'cgpa-value';
+    cgpaValue.textContent = studentData['CGPA'];
+    cgpaContainer.appendChild(cgpaValue);
 
     // Set up progress bar for CGPA
     var cgpa = parseFloat(studentData['CGPA']);
-    var progressBar = document.createElement('div');
-    progressBar.className = 'mt-4 h-3 bg-gray-200 rounded-full overflow-hidden';
-    
-    var progressFill = document.createElement('div');
     var progressPercentage = (cgpa / 10) * 100; // Assuming max CGPA is 10
-    progressFill.className = 'h-full rounded-full';
+    
+    // Set progress bar width and color
+    var progressFill = document.getElementById('progress-fill');
     progressFill.style.width = `${progressPercentage}%`;
     
     // Set color based on CGPA
     if (cgpa >= 7.75) {
-        progressFill.className += ' bg-gradient-to-r from-green-400 to-blue-500';
+        progressFill.className = 'progress-fill excellence';
     } else if (cgpa >= 6.75) {
-        progressFill.className += ' bg-gradient-to-r from-green-400 to-cyan-500';
+        progressFill.className = 'progress-fill first-class';
     } else if (cgpa >= 5.75) {
-        progressFill.className += ' bg-gradient-to-r from-yellow-400 to-orange-500';
+        progressFill.className = 'progress-fill second-class';
     } else {
-        progressFill.className += ' bg-gradient-to-r from-orange-400 to-red-500';
+        progressFill.className = 'progress-fill pass-class';
     }
-    
-    progressBar.appendChild(progressFill);
-    cgpaContainer.appendChild(progressBar);
 
     // Display division message
     var message = '';
@@ -182,90 +177,82 @@ async function displayResults() {
     messageContainer.innerHTML = '';
 
     if (message !== '') {
-        var messageElement = document.createElement('h3');
+        var messageElement = document.createElement('div');
         messageElement.textContent = message;
-        messageElement.className = 'text-center text-green-400 font-bold';
+        
+        // Add appropriate class based on division
+        if (message.includes('Distinction')) {
+            messageElement.className = 'division-badge distinction';
+        } else if (message.includes('First Class')) {
+            messageElement.className = 'division-badge first';
+        } else if (message.includes('Second Class')) {
+            messageElement.className = 'division-badge second';
+        } else if (message.includes('Pass Class')) {
+            messageElement.className = 'division-badge pass';
+        }
+        
         messageContainer.appendChild(messageElement);
     }
 
-    // Display Percentage and Total Credits
-    var percentageTotalContainer = document.getElementById('percentage-total-container');
-    percentageTotalContainer.innerHTML = '';
-
-    var percentageDiv = document.createElement('div');
-    percentageDiv.className = 'rounded-lg bg-gray-800 p-4 shadow-inner';
+    // Display Percentage
+    var percentageContainer = document.getElementById('percentage-container');
+    percentageContainer.innerHTML = '';
     
-    var percentageHeading = document.createElement('h3');
-    percentageHeading.className = 'flex items-center justify-between';
+    var percentageLabel = document.createElement('div');
+    percentageLabel.className = 'data-label';
+    percentageLabel.textContent = 'Percentage';
+    percentageContainer.appendChild(percentageLabel);
     
-    var percentageLabel = document.createElement('span');
-    percentageLabel.className = 'text-gray-300 font-semibold';
-    percentageLabel.textContent = 'Percentage:';
-    
-    var percentageValue = document.createElement('span');
-    percentageValue.className = 'text-yellow-400 font-bold text-xl';
+    var percentageValue = document.createElement('div');
+    percentageValue.className = 'percentage-value';
     var percentage = ((cgpa - 0.75) * 10).toFixed(2);
-    percentageValue.textContent = (percentage <= 0) ? '0' : percentage + '%';
-    
-    percentageHeading.appendChild(percentageLabel);
-    percentageHeading.appendChild(percentageValue);
-    percentageDiv.appendChild(percentageHeading);
-    percentageTotalContainer.appendChild(percentageDiv);
+    percentageValue.textContent = (percentage <= 0) ? '0%' : percentage + '%';
+    percentageContainer.appendChild(percentageValue);
 
-    var creditsDiv = document.createElement('div');
-    creditsDiv.className = 'rounded-lg bg-gray-800 p-4 shadow-inner';
+    // Display Total Credits
+    var creditsContainer = document.getElementById('credits-container');
+    creditsContainer.innerHTML = '';
     
-    var creditsHeading = document.createElement('h3');
-    creditsHeading.className = 'flex items-center justify-between';
+    var creditsLabel = document.createElement('div');
+    creditsLabel.className = 'data-label';
+    creditsLabel.textContent = 'Total Credits';
+    creditsContainer.appendChild(creditsLabel);
     
-    var creditsLabel = document.createElement('span');
-    creditsLabel.className = 'text-gray-300 font-semibold';
-    creditsLabel.textContent = 'Total Credits:';
-    
-    var creditsValue = document.createElement('span');
-    creditsValue.className = 'text-blue-400 font-bold text-xl';
+    var creditsValue = document.createElement('div');
+    creditsValue.className = 'credits-value';
     creditsValue.textContent = studentData['Total Credits'];
-    
-    creditsHeading.appendChild(creditsLabel);
-    creditsHeading.appendChild(creditsValue);
-    creditsDiv.appendChild(creditsHeading);
-    percentageTotalContainer.appendChild(creditsDiv);
+    creditsContainer.appendChild(creditsValue);
 
     // Display Supplementary Appearances
     var supplementaryAppearances = studentData['Supplementary Appearances'];
     var supplementaryContainer = document.getElementById('supplementary-container');
     supplementaryContainer.innerHTML = '';
-
-    var supplementaryHeading = document.createElement('h3');
-    supplementaryHeading.className = 'flex items-center justify-between';
     
-    var supplementaryLabel = document.createElement('span');
-    supplementaryLabel.className = 'text-gray-300 font-semibold';
-    supplementaryLabel.textContent = 'Supplementary Appearances:';
+    var supplementaryLabel = document.createElement('div');
+    supplementaryLabel.className = 'data-label';
+    supplementaryLabel.textContent = 'Supplementary Appearances';
+    supplementaryContainer.appendChild(supplementaryLabel);
     
-    var supplementaryValue = document.createElement('span');
     var suppCount = (supplementaryAppearances && supplementaryAppearances.includes('*')) 
         ? supplementaryAppearances.split('*').length - 1 
         : 0;
     
+    var supplementaryValue = document.createElement('div');
     if (suppCount > 0) {
-        supplementaryValue.className = 'text-red-400 font-bold';
+        supplementaryValue.className = 'supplementary-value supplementary-count';
         supplementaryValue.textContent = suppCount;
     } else {
-        supplementaryValue.className = 'text-green-400 font-bold';
+        supplementaryValue.className = 'supplementary-value supplementary-none';
         supplementaryValue.textContent = 'None';
     }
-    
-    supplementaryHeading.appendChild(supplementaryLabel);
-    supplementaryHeading.appendChild(supplementaryValue);
-    supplementaryContainer.appendChild(supplementaryHeading);
+    supplementaryContainer.appendChild(supplementaryValue);
 
     // Create and populate semester table
     var tableContainer = document.getElementById('table-container');
     tableContainer.innerHTML = '';
 
     var table = document.createElement('table');
-    table.className = 'min-w-full';
+    table.className = 'semester-table';
     tableContainer.appendChild(table);
 
     var tableHeader = document.createElement('thead');
@@ -313,29 +300,29 @@ async function displayResults() {
         // Semester label
         var labelCell = document.createElement('td');
         labelCell.textContent = semester.label;
-        labelCell.className = 'font-medium text-gray-200';
+        labelCell.className = 'semester-name';
         row.appendChild(labelCell);
 
         // SGPA with appropriate styling
         var sgpaCell = document.createElement('td');
         if (sgpa && sgpa !== '0.0') {
             const sgpaValue = parseFloat(sgpa);
-            let sgpaClass = 'font-semibold ';
+            let sgpaClass = 'sgpa-value ';
             
-            if (sgpaValue >= 7.75) sgpaClass += 'text-green-400';
-            else if (sgpaValue >= 6.75) sgpaClass += 'text-blue-400';
-            else if (sgpaValue >= 5.75) sgpaClass += 'text-yellow-400';
-            else sgpaClass += 'text-red-400';
+            if (sgpaValue >= 7.75) sgpaClass += 'excellent-sgpa';
+            else if (sgpaValue >= 6.75) sgpaClass += 'good-sgpa';
+            else if (sgpaValue >= 5.75) sgpaClass += 'average-sgpa';
+            else sgpaClass += 'poor-sgpa';
             
             sgpaCell.innerHTML = `<span class="${sgpaClass}">${sgpa}</span>`;
         } else {
-            sgpaCell.innerHTML = '<span class="text-red-500">NA</span>';
+            sgpaCell.innerHTML = '<span class="poor-sgpa">NA</span>';
         }
         row.appendChild(sgpaCell);
 
         // Credits
         var creditsCell = document.createElement('td');
-        creditsCell.innerHTML = `<span class="bg-gray-700 px-2 py-1 rounded text-white">${credits}</span>`;
+        creditsCell.innerHTML = `<span class="credits-badge">${credits}</span>`;
         row.appendChild(creditsCell);
 
         tableBody.appendChild(row);
