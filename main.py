@@ -90,5 +90,47 @@ def get_cgpa_data(student_id):
 def get_all_cgpa_data():
     return jsonify(list(CGPA_DATA.values()))
 
+# Function to parse toppers data
+def parse_toppers_data():
+    toppers_data = {
+        'overall': [],
+        'ce': [],
+        'eee': [],
+        'mec': [],
+        'ece': [],
+        'cse': []
+    }
+    
+    try:
+        with open('data/toppers.csv', 'r') as file:
+            csv_reader = csv.reader(file)
+            next(csv_reader)  # Skip header row
+            for row in csv_reader:
+                if len(row) >= 3:
+                    category, roll_number, cgpa = row
+                    toppers_data[category].append({
+                        'roll_number': roll_number,
+                        'cgpa': cgpa
+                    })
+        return toppers_data
+    except Exception as e:
+        print(f"Error parsing toppers data: {e}")
+        return toppers_data
+        
+# API endpoint to get toppers data
+@app.route('/api/toppers', methods=['GET'])
+def get_toppers():
+    toppers_data = parse_toppers_data()
+    return jsonify(toppers_data)
+
+# API endpoint to get toppers by category
+@app.route('/api/toppers/<category>', methods=['GET'])
+def get_toppers_by_category(category):
+    toppers_data = parse_toppers_data()
+    if category in toppers_data:
+        return jsonify(toppers_data[category])
+    else:
+        return jsonify({'error': f'Category {category} not found'}), 404
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

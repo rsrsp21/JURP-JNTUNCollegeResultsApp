@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toppers List (2021-25)</title>
+    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #131416;
+            color: #f0f0f0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        
+        .card {
+            background-color: #1c1e22;
+            border: 1px solid #2a2d36;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-header {
+            background-color: #0d6efd;
+            color: white;
+            font-weight: 600;
+            background: linear-gradient(to right, #0d6efd, #0dcaf0);
+            border-bottom: none;
+            padding: 1rem;
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+            position: relative;
+            background: rgba(13, 110, 253, 0.05);
+            padding: 2rem;
+            border-radius: 10px;
+            border-left: 4px solid #0d6efd;
+        }
+
+        .page-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #f8f9fa;
+            letter-spacing: -0.5px;
+        }
+
+        .page-subtitle {
+            font-size: 1.1rem;
+            color: #adb5bd;
+            font-weight: 400;
+        }
+
+        .navbar {
+            background-color: #1c1e22 !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-link {
+            color: #adb5bd;
+            font-weight: 500;
+            transition: color 0.2s ease;
+            padding: 0.75rem 1rem;
+        }
+
+        .nav-link:hover, .nav-link:focus {
+            color: #fff;
+        }
+
+        .nav-link.active {
+            color: #0d6efd;
+            border-bottom: 2px solid #0d6efd;
+        }
+
+        .cgpa-badge {
+            background: linear-gradient(to right, #0d6efd, #0dcaf0);
+            font-size: 0.9rem;
+            font-weight: 600;
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+        }
+
+        .footer {
+            background-color: #1c1e22;
+            border-top: 1px solid #2a2d36;
+            padding: 1.5rem 0;
+            margin-top: 3rem;
+        }
+
+        .top-badge {
+            position: absolute;
+            right: 8px;
+            top: 8px;
+            padding: 0.3rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #1c1e22;
+        }
+
+        .top-1 { background: linear-gradient(45deg, #ffd700, #ffaa00); }
+        .top-2 { background: linear-gradient(45deg, #c0c0c0, #a0a0a0); }
+        .top-3 { background: linear-gradient(45deg, #cd7f32, #a05a2c); }
+
+        .rank-badge {
+            background-color: #282a2d;
+            color: #adb5bd;
+            font-weight: 600;
+            font-size: 0.9rem;
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .roll-number {
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+
+        /* Glow effect for the first rank */
+        .table tr:first-child td {
+            position: relative;
+        }
+        
+        .table tr:first-child td:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+            border-radius: 4px;
+            animation: pulse 2s infinite;
+            opacity: 0.5;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0px rgba(13, 110, 253, 0.4); }
+            100% { box-shadow: 0 0 0 10px rgba(13, 110, 253, 0); }
+        }
+
+        /* Animation for cards */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+
+        .card:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .card:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        .card:nth-child(4) {
+            animation-delay: 0.3s;
+        }
+
+        .card:nth-child(5) {
+            animation-delay: 0.4s;
+        }
+
+        .card:nth-child(6) {
+            animation-delay: 0.5s;
+        }
+
+        #loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+
+        .department-name {
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-graduation-cap me-2"></i>
+                Student Portal
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/cgpa.html">CGPA Calculator</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/toppers.html">Toppers List</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header text-center">
+            <h1 class="page-title">Toppers List <span class="badge bg-primary">2021-25</span></h1>
+            <p class="page-subtitle">Top performing students based on CGPA (up to 4-1)</p>
+        </div>
+
+        <div id="loading-spinner">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+
+        <div id="toppers-content" class="row" style="display: none;">
+            <!-- Overall Toppers -->
+            <div class="col-12 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-trophy me-2"></i>
+                        Overall Toppers (All Branches)
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" width="80">Rank</th>
+                                        <th scope="col">Roll Number</th>
+                                        <th scope="col" width="120">CGPA</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="overall-toppers-list">
+                                    <!-- Will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Civil Engineering Toppers -->
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <i class="fas fa-building me-2"></i>
+                        Civil Engineering
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" width="80">Rank</th>
+                                        <th scope="col">Roll Number</th>
+                                        <th scope="col" width="120">CGPA</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ce-toppers-list">
+                                    <!-- Will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Electrical and Electronics Engineering Toppers -->
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <i class="fas fa-bolt me-2"></i>
+                        Electrical & Electronics Engineering
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" width="80">Rank</th>
+                                        <th scope="col">Roll Number</th>
+                                        <th scope="col" width="120">CGPA</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="eee-toppers-list">
+                                    <!-- Will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mechanical Engineering Toppers -->
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <i class="fas fa-cogs me-2"></i>
+                        Mechanical Engineering
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" width="80">Rank</th>
+                                        <th scope="col">Roll Number</th>
+                                        <th scope="col" width="120">CGPA</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="mec-toppers-list">
+                                    <!-- Will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Electronics and Communication Engineering Toppers -->
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <i class="fas fa-microchip me-2"></i>
+                        Electronics & Communication Engineering
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" width="80">Rank</th>
+                                        <th scope="col">Roll Number</th>
+                                        <th scope="col" width="120">CGPA</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ece-toppers-list">
+                                    <!-- Will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Computer Science Engineering Toppers -->
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <i class="fas fa-laptop-code me-2"></i>
+                        Computer Science Engineering
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" width="80">Rank</th>
+                                        <th scope="col">Roll Number</th>
+                                        <th scope="col" width="120">CGPA</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cse-toppers-list">
+                                    <!-- Will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-4 mb-5">
+            <a href="/" class="btn btn-primary">
+                <i class="fas fa-home me-2"></i>
+                Back to Home
+            </a>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0">© 2025 Student Results Portal</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <p class="mb-0">Created for <span class="text-primary">University</span> Students</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                // Fetch toppers data from API
+                const response = await fetch('/api/toppers');
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                
+                // Hide loading spinner and show content
+                document.getElementById('loading-spinner').style.display = 'none';
+                document.getElementById('toppers-content').style.display = 'block';
+                
+                // Populate tables with data
+                populateToppersList('overall-toppers-list', data.overall);
+                populateToppersList('ce-toppers-list', data.ce);
+                populateToppersList('eee-toppers-list', data.eee);
+                populateToppersList('mec-toppers-list', data.mec);
+                populateToppersList('ece-toppers-list', data.ece);
+                populateToppersList('cse-toppers-list', data.cse);
+                
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                document.getElementById('loading-spinner').innerHTML = `
+                    <div class="alert alert-danger" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Error loading toppers data. Please try again later.
+                    </div>
+                `;
+            }
+        });
+        
+        function populateToppersList(tableId, toppersList) {
+            const tableBody = document.getElementById(tableId);
+            tableBody.innerHTML = '';
+            
+            toppersList.forEach((topper, index) => {
+                const row = document.createElement('tr');
+                
+                // Add special class for top 3
+                if (index < 3) {
+                    row.classList.add(`top-${index + 1}-row`);
+                }
+                
+                // Create rank cell with badge
+                const rankCell = document.createElement('td');
+                const rankBadge = document.createElement('div');
+                rankBadge.className = 'rank-badge mx-auto';
+                rankBadge.textContent = (index + 1);
+                rankCell.appendChild(rankBadge);
+                
+                // Create roll number cell
+                const rollCell = document.createElement('td');
+                rollCell.className = 'roll-number';
+                rollCell.textContent = topper.roll_number;
+                
+                // Create CGPA cell with badge
+                const cgpaCell = document.createElement('td');
+                const cgpaBadge = document.createElement('span');
+                cgpaBadge.className = 'cgpa-badge';
+                cgpaBadge.textContent = topper.cgpa;
+                cgpaCell.appendChild(cgpaBadge);
+                
+                // Add top badge for first 3 ranks
+                if (index < 3) {
+                    const topBadge = document.createElement('span');
+                    topBadge.className = `top-badge top-${index + 1}`;
+                    topBadge.textContent = `#${index + 1}`;
+                    cgpaCell.appendChild(topBadge);
+                }
+                
+                // Append cells to row
+                row.appendChild(rankCell);
+                row.appendChild(rollCell);
+                row.appendChild(cgpaCell);
+                
+                // Append row to table
+                tableBody.appendChild(row);
+            });
+        }
+    </script>
+</body>
+</html>
