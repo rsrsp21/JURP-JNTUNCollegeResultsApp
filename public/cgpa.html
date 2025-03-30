@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,32 +11,47 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Common CSS -->
+    <link rel="stylesheet" href="css/common.css">
     <!-- Custom Styles -->
-    <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/cgpa-styles.css">
 </head>
 <body>
-    <!-- Header -->
-    <header class="navbar navbar-expand-lg navbar-dark sticky-top">
+    <!-- Navigation Bar -->
+    <nav class="navigation-bar">
         <div class="container">
-            <a class="navbar-brand me-auto" href="#">
-                <span class="header-title">CGPA Calculator</span>
-            </a>
-            <div class="nav-links">
-                <a href="/index.html" class="nav-item">
-                    <i class="fas fa-home"></i>
-                    <span>Home</span>
+            <div class="d-flex align-items-center justify-content-between">
+                <a href="/" class="nav-brand">
+                    <i class="fas fa-graduation-cap fs-4"></i>
+                    <span>Student Portal</span>
                 </a>
-                <a href="/toppers.html" class="nav-item">
-                    <i class="fas fa-trophy"></i>
-                    <span>Toppers</span>
-                </a>
+                <div class="d-flex">
+                    <a href="/" class="nav-link">
+                        <i class="fas fa-home"></i>Home
+                    </a>
+                    <a href="/cgpa.html" class="nav-link active">
+                        <i class="fas fa-calculator"></i>CGPA
+                    </a>
+                    <a href="/toppers.html" class="nav-link">
+                        <i class="fas fa-trophy"></i>Toppers
+                    </a>
+                </div>
             </div>
+        </div>
+    </nav>
+    
+    <!-- Page Header -->
+    <header class="page-header">
+        <div class="container">
+            <h1 class="page-title">CGPA Calculator</h1>
+            <p class="page-subtitle">
+                View your semester-wise performance and comprehensive CGPA breakdown with detailed metrics
+            </p>
         </div>
     </header>
 
@@ -216,8 +231,13 @@
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <div class="text-center">
-                <p>© 2023 Student Results Portal. All rights reserved.</p>
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="footer-text mb-0">© 2025 Student Results Portal</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <p class="footer-text mb-0">Created for <span class="footer-highlight">University</span> Students</p>
+                </div>
             </div>
         </div>
     </footer>

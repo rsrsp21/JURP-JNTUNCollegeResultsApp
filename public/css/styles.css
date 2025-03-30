@@ -1,377 +1,550 @@
-/* Additional styles beyond Tailwind CSS */
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+/* Styles for main page */
+:root {
+    --primary-color: #4361ee;
+    --secondary-color: #3a0ca3;
+    --accent-color: #4cc9f0;
+    --success-color: #4ade80;
+    --warning-color: #fb8500;
+    --danger-color: #ef476f;
+    --dark-color: #0f172a;
+    --card-bg: #1e293b;
+    --card-header: #334155;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
 }
 
-::-webkit-scrollbar-track {
-  background: #1f2937;
+/* Search Section */
+.search-section {
+    background: var(--card-bg);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    margin-bottom: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-::-webkit-scrollbar-thumb {
-  background: #4b5563;
-  border-radius: 5px;
+.search-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1.25rem;
+    color: var(--text-primary);
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #6b7280;
+.search-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }
 
-/* Grade styling - Enhanced with pill-like appearance */
-.grade-a-plus {
-  color: white;
-  font-weight: bold;
-  background-color: #22c55e;
-  padding: 4px 10px;
-  border-radius: 12px;
-  display: inline-block;
-  min-width: 42px;
-  text-align: center;
-  box-shadow: 0 2px 5px rgba(34, 197, 94, 0.4);
+@media (min-width: 768px) {
+    .search-form {
+        flex-direction: row;
+    }
+}
+
+.search-input {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.3);
+}
+
+.search-input::placeholder {
+    color: var(--text-secondary);
+}
+
+.search-button {
+    padding: 0.75rem 1.5rem;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.search-button:hover {
+    background: var(--secondary-color);
+}
+
+/* Results Section */
+.results-section {
+    display: none;
+}
+
+.student-card {
+    background: linear-gradient(135deg, var(--card-bg), var(--card-header));
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.student-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+@media (min-width: 768px) {
+    .student-info {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+}
+
+.student-details {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.avatar-container {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.student-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.student-roll {
+    font-size: 1rem;
+    color: var(--accent-color);
+    margin: 0;
+}
+
+.cgpa-display {
+    background: linear-gradient(135deg, rgba(67, 97, 238, 0.2), rgba(58, 12, 163, 0.2));
+    border-radius: 0.75rem;
+    padding: 1rem;
+    border: 1px solid rgba(67, 97, 238, 0.2);
+    text-align: center;
+    margin-top: 1rem;
+}
+
+@media (min-width: 768px) {
+    .cgpa-display {
+        margin-top: 0;
+    }
+}
+
+.cgpa-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.25rem;
+}
+
+.cgpa-value {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.cgpa-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.cgpa-max {
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+}
+
+.progress-bar {
+    height: 0.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    overflow: hidden;
+    margin-top: 0.5rem;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(to right, var(--primary-color), var(--accent-color));
+    border-radius: 1rem;
+    transition: width 0.8s ease;
+}
+
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+@media (min-width: 768px) {
+    .action-buttons {
+        flex-direction: row;
+    }
+}
+
+.action-button {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: white;
+}
+
+.download-pdf {
+    background: var(--success-color);
+}
+
+.download-pdf:hover {
+    background: var(--success-color);
+    filter: brightness(0.9);
+}
+
+.download-csv {
+    background: var(--dark-color);
+}
+
+.download-csv:hover {
+    background: var(--dark-color);
+    filter: brightness(1.2);
+}
+
+.print-results {
+    background: var(--primary-color);
+}
+
+.print-results:hover {
+    background: var(--secondary-color);
+}
+
+/* Subjects Table */
+.subjects-card {
+    background: var(--card-bg);
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.card-header {
+    background: var(--card-header);
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.subjects-count {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.subjects-table-container {
+    overflow-x: auto;
+}
+
+.subjects-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.subjects-table th {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-secondary);
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.subjects-table td {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.subjects-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.subjects-table tbody tr {
+    transition: background 0.2s;
+}
+
+.subjects-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.subject-id {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+}
+
+.subject-name {
+    max-width: 300px;
+}
+
+.grade-cell {
+    text-align: center;
+}
+
+.grade-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-weight: 600;
+    font-size: 0.85rem;
 }
 
 .grade-a {
-  color: white;
-  font-weight: bold;
-  background-color: #22c55e;
-  padding: 4px 10px;
-  border-radius: 12px;
-  display: inline-block;
-  min-width: 42px;
-  text-align: center;
-  box-shadow: 0 2px 5px rgba(34, 197, 94, 0.3);
-}
-
-.grade-a-minus {
-  color: white;
-  font-weight: bold;
-  background-color: #84cc16;
-  padding: 4px 10px;
-  border-radius: 12px;
-  display: inline-block;
-  min-width: 42px;
-  text-align: center;
-  box-shadow: 0 2px 5px rgba(132, 204, 22, 0.3);
-}
-
-.grade-b-plus {
-  color: white;
-  font-weight: bold;
-  background-color: #84cc16;
-  padding: 4px 10px;
-  border-radius: 12px;
-  display: inline-block;
-  min-width: 42px;
-  text-align: center;
-  box-shadow: 0 2px 5px rgba(132, 204, 22, 0.3);
+    background: rgba(78, 230, 112, 0.15);
+    color: #4ee670;
 }
 
 .grade-b {
-  color: white;
-  font-weight: bold;
-  background-color: #facc15;
-  padding: 4px 10px;
-  border-radius: 12px;
-  display: inline-block;
-  min-width: 42px;
-  text-align: center;
-  box-shadow: 0 2px 5px rgba(250, 204, 21, 0.3);
-}
-
-.grade-b-minus {
-  color: white;
-  font-weight: bold;
-  background-color: #fb923c;
-  padding: 4px 10px;
-  border-radius: 12px;
-  display: inline-block;
-  min-width: 42px;
-  text-align: center;
-  box-shadow: 0 2px 5px rgba(251, 146, 60, 0.3);
-}
-
-.grade-c-plus {
-  color: white;
-  font-weight: bold;
-  background-color: #fb923c;
-  padding: 4px 10px;
-  border-radius: 12px;
-  display: inline-block;
-  min-width: 42px;
-  text-align: center;
-  box-shadow: 0 2px 5px rgba(251, 146, 60, 0.3);
+    background: rgba(67, 97, 238, 0.15);
+    color: #4361ee;
 }
 
 .grade-c {
-  color: white;
-  font-weight: bold;
-  background-color: #f87171;
-  padding: 4px 10px;
-  border-radius: 12px;
-  display: inline-block;
-  min-width: 42px;
-  text-align: center;
-  box-shadow: 0 2px 5px rgba(248, 113, 113, 0.3);
-}
-
-.grade-c-minus {
-  color: white;
-  font-weight: bold;
-  background-color: #f87171;
-  padding: 4px 10px;
-  border-radius: 12px;
-  display: inline-block;
-  min-width: 42px;
-  text-align: center;
-  box-shadow: 0 2px 5px rgba(248, 113, 113, 0.3);
+    background: rgba(76, 201, 240, 0.15);
+    color: #4cc9f0;
 }
 
 .grade-d {
-  color: white;
-  font-weight: bold;
-  background-color: #ef4444;
-  padding: 4px 10px;
-  border-radius: 12px;
-  display: inline-block;
-  min-width: 42px;
-  text-align: center;
-  box-shadow: 0 2px 5px rgba(239, 68, 68, 0.3);
+    background: rgba(251, 133, 0, 0.15);
+    color: #fb8500;
 }
 
 .grade-f {
-  color: white;
-  font-weight: bold;
-  background-color: #dc2626;
-  padding: 4px 10px;
-  border-radius: 12px;
-  display: inline-block;
-  min-width: 42px;
-  text-align: center;
-  box-shadow: 0 2px 5px rgba(220, 38, 38, 0.4);
+    background: rgba(239, 71, 111, 0.15);
+    color: #ef476f;
 }
 
-/* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+.credits-cell {
+    text-align: center;
+    font-weight: 500;
 }
 
-.animate-fadeIn {
-  animation: fadeIn 0.5s ease-in-out;
-}
-
-/* Glowing effect for CGPA panel */
-.pulse-glow {
-  animation: pulse-glow 3s infinite alternate;
-  position: relative;
-}
-
-@keyframes pulse-glow {
-  0% {
-    box-shadow: 0 0 5px rgba(99, 102, 241, 0.3), 0 0 10px rgba(79, 70, 229, 0.2);
-  }
-  100% {
-    box-shadow: 0 0 15px rgba(99, 102, 241, 0.5), 0 0 20px rgba(79, 70, 229, 0.4);
-  }
-}
-
-/* Print styles */
-@media print {
-  body {
-    background: white;
-    color: black;
-  }
-  
-  header, footer, #searchSection, #howItWorksSection {
+/* No Results Section */
+.no-results {
     display: none;
-  }
-  
-  #resultsSection {
-    display: block !important;
-    padding: 0;
-    margin: 0;
-  }
+    background: var(--card-bg);
+    border-radius: 1rem;
+    padding: 3rem 1.5rem;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* Make input fields and buttons more interactive */
-input:focus, button:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+.no-results-icon {
+    font-size: 3rem;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
 }
 
-button {
-  transition: all 0.3s ease-in-out;
+.no-results-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
 }
 
-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+.no-results-text {
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-button:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+.search-again {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-/* Background gradient pulse animation for header */
-@keyframes gradientAnimation {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+.search-again:hover {
+    background: var(--secondary-color);
 }
 
-header {
-  background-size: 200% 200%;
-  animation: gradientAnimation 10s ease infinite;
+/* How It Works */
+.how-it-works {
+    background: var(--card-bg);
+    border-radius: 1rem;
+    padding: 2rem;
+    margin-top: 3rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* Table row hover effect */
-#subjectsTableBody tr {
-  transition: all 0.2s ease;
+.how-it-works-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
 }
 
-#subjectsTableBody tr:hover {
-  background-color: rgba(55, 65, 81, 0.5);
-  transform: scale(1.01);
+.steps-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
 }
 
-/* Credit badge styling */
-.credit-badge {
-  background-color: #4b5563;
-  color: white;
-  font-weight: bold;
-  padding: 3px 8px;
-  border-radius: 8px;
-  display: inline-block;
-  min-width: 30px;
-  text-align: center;
+@media (min-width: 768px) {
+    .steps-container {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }
 
-/* CGPA specific styles */
-.cgpa-container {
-  position: relative;
-  z-index: 1;
+.step-card {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    transition: transform 0.3s, background 0.3s;
 }
 
-.cgpa-rating {
-  font-size: 0.75rem;
-  margin-top: 0.25rem;
-  text-align: center;
-  color: rgba(255, 255, 255, 0.7);
+.step-card:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.05);
 }
 
-/* Enhanced search input appearance */
-#rollNumberInput {
-  transition: all 0.3s ease;
+.step-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
 }
 
-#rollNumberInput:focus {
-  transform: scale(1.02);
+.step-1 {
+    color: var(--primary-color);
 }
 
-/* Animation for progress bar */
-@keyframes progressFill {
-  from { width: 0%; }
-  to { width: var(--progress-width); }
+.step-2 {
+    color: var(--success-color);
 }
 
-#cgpaProgress {
-  animation: progressFill 1s ease-out forwards;
+.step-3 {
+    color: var(--warning-color);
 }
 
-/* CGPA Calculator page styles */
-#results-section {
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.5s ease, transform 0.5s ease;
+.step-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
 }
 
-#results-section.shown {
-  opacity: 1;
-  transform: translateY(0);
+.step-description {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.6;
 }
 
-#cgpa-container {
-  text-align: center;
-  padding: 20px;
+/* Loading Indicator */
+.loading-container {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
 }
 
-#cgpa-container h2 {
-  font-size: 1.8rem;
-  margin-bottom: 10px;
+.spinner {
+    width: 3rem;
+    height: 3rem;
+    border: 0.25rem solid rgba(67, 97, 238, 0.3);
+    border-radius: 50%;
+    border-top-color: var(--primary-color);
+    animation: spin 1s ease-in-out infinite;
 }
 
-#message-container h3 {
-  font-size: 1.5rem;
-  text-align: center;
-  padding: 10px;
-  border-radius: 8px;
-  background-color: rgba(34, 197, 94, 0.2);
-  margin: 10px 0;
+@keyframes spin {
+    to { transform: rotate(360deg); }
 }
 
-/* Table styles for CGPA */
-#table-container table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
+/* Pulse Animation for CGPA Card */
+.pulse-glow {
+    animation: pulse 2s infinite;
 }
 
-#table-container th {
-  background: linear-gradient(to right, #2563eb, #4f46e5);
-  color: white;
-  font-weight: bold;
-  padding: 12px 15px;
-  text-align: left;
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(67, 97, 238, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(67, 97, 238, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(67, 97, 238, 0);
+    }
 }
 
-#table-container th:first-child {
-  border-top-left-radius: 8px;
-}
-
-#table-container th:last-child {
-  border-top-right-radius: 8px;
-}
-
-#table-container td {
-  padding: 12px 15px;
-  border-bottom: 1px solid #374151;
-  font-size: 1rem;
-}
-
-#table-container tbody tr {
-  transition: all 0.3s ease;
-}
-
-#table-container tbody tr:hover {
-  background-color: rgba(55, 65, 81, 0.5);
-  transform: scale(1.01);
-}
-
-#table-container tbody tr:nth-child(odd) {
-  background-color: rgba(31, 41, 55, 0.4);
-}
-
-#percentage-total-container div {
-  padding: 10px 15px;
-  background-color: rgba(55, 65, 81, 0.3);
-  border-radius: 8px;
-  margin-bottom: 10px;
-}
-
-#supplementary-container {
-  padding: 10px 15px;
-  background-color: rgba(59, 130, 246, 0.2);
-  border-radius: 8px;
+/* Error Message */
+.error-message {
+    display: none;
+    color: var(--danger-color);
+    background: rgba(239, 71, 111, 0.1);
+    border-left: 3px solid var(--danger-color);
+    padding: 0.75rem 1rem;
+    border-radius: 0.25rem;
+    margin-top: 1rem;
+    align-items: center;
+    gap: 0.5rem;
 }
