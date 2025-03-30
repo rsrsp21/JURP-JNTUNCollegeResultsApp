@@ -32,6 +32,14 @@ document.addEventListener('DOMContentLoaded', () => {
   searchAgainBtn.addEventListener('click', resetSearch);
   downloadPDFBtn.addEventListener('click', downloadPDF);
   downloadCSVBtn.addEventListener('click', downloadCSV);
+  
+  // Add print functionality if the button exists
+  const printResultsBtn = document.getElementById('printResultsBtn');
+  if (printResultsBtn) {
+    printResultsBtn.addEventListener('click', () => {
+      window.print();
+    });
+  }
 
   // Function to search student results
   async function searchResults() {
@@ -84,13 +92,40 @@ document.addEventListener('DOMContentLoaded', () => {
     studentNameElement.textContent = studentData.name;
     studentRollElement.textContent = `Roll Number: ${studentData.rollNumber}`;
     studentCGPAElement.textContent = studentData.cgpa.toFixed(1);
+    
+    // Set CGPA progress bar width (assuming max CGPA is 4.0)
+    const progressPercentage = (studentData.cgpa / 4.0) * 100;
+    const cgpaProgress = document.getElementById('cgpaProgress');
+    if (cgpaProgress) {
+      cgpaProgress.style.setProperty('--progress-width', `${progressPercentage}%`);
+      cgpaProgress.style.width = `${progressPercentage}%`;
+      
+      // Set gradient color based on CGPA value
+      if (studentData.cgpa >= 3.7) {
+        cgpaProgress.className = 'h-full bg-gradient-to-r from-green-400 to-blue-500';
+      } else if (studentData.cgpa >= 3.0) {
+        cgpaProgress.className = 'h-full bg-gradient-to-r from-green-400 to-cyan-500';
+      } else if (studentData.cgpa >= 2.0) {
+        cgpaProgress.className = 'h-full bg-gradient-to-r from-yellow-400 to-orange-500';
+      } else {
+        cgpaProgress.className = 'h-full bg-gradient-to-r from-orange-400 to-red-500';
+      }
+    }
 
     // Clear existing table rows
     subjectsTableBody.innerHTML = '';
+    
+    // Update subject count
+    const subjectCount = document.getElementById('subjectCount');
+    if (subjectCount) {
+      subjectCount.textContent = studentData.subjects.length;
+    }
 
-    // Add subject rows to the table
-    studentData.subjects.forEach(subject => {
+    // Add subject rows to the table with animation delay
+    studentData.subjects.forEach((subject, index) => {
       const row = document.createElement('tr');
+      row.classList.add('animate-fadeIn');
+      row.style.animationDelay = `${index * 0.1}s`;
       
       // Create grade class based on grade value
       let gradeClass = 'grade-';
@@ -109,10 +144,10 @@ document.addEventListener('DOMContentLoaded', () => {
       else if (grade === 'f') gradeClass += 'f';
       
       row.innerHTML = `
-        <td class="px-6 py-4 whitespace-nowrap">${subject.subjectId}</td>
-        <td class="px-6 py-4 whitespace-nowrap">${subject.subjectName}</td>
-        <td class="px-6 py-4 whitespace-nowrap"><span class="${gradeClass}">${subject.grade}</span></td>
-        <td class="px-6 py-4 whitespace-nowrap">${subject.credits}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-blue-300">${subject.subjectId}</td>
+        <td class="px-6 py-4">${subject.subjectName}</td>
+        <td class="px-6 py-4 text-center"><span class="${gradeClass}">${subject.grade}</span></td>
+        <td class="px-6 py-4 text-center"><span class="credit-badge">${subject.credits}</span></td>
       `;
       
       subjectsTableBody.appendChild(row);

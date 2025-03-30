@@ -19,61 +19,162 @@
   background: #6b7280;
 }
 
-/* Grade styling */
+/* Grade styling - Enhanced with pill-like appearance */
 .grade-a-plus {
-  color: #22c55e;
+  color: white;
   font-weight: bold;
+  background-color: #22c55e;
+  padding: 4px 10px;
+  border-radius: 12px;
+  display: inline-block;
+  min-width: 42px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(34, 197, 94, 0.4);
 }
 
 .grade-a {
-  color: #22c55e;
+  color: white;
+  font-weight: bold;
+  background-color: #22c55e;
+  padding: 4px 10px;
+  border-radius: 12px;
+  display: inline-block;
+  min-width: 42px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(34, 197, 94, 0.3);
 }
 
 .grade-a-minus {
-  color: #84cc16;
+  color: white;
+  font-weight: bold;
+  background-color: #84cc16;
+  padding: 4px 10px;
+  border-radius: 12px;
+  display: inline-block;
+  min-width: 42px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(132, 204, 22, 0.3);
 }
 
 .grade-b-plus {
-  color: #84cc16;
+  color: white;
+  font-weight: bold;
+  background-color: #84cc16;
+  padding: 4px 10px;
+  border-radius: 12px;
+  display: inline-block;
+  min-width: 42px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(132, 204, 22, 0.3);
 }
 
 .grade-b {
-  color: #facc15;
+  color: white;
+  font-weight: bold;
+  background-color: #facc15;
+  padding: 4px 10px;
+  border-radius: 12px;
+  display: inline-block;
+  min-width: 42px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(250, 204, 21, 0.3);
 }
 
 .grade-b-minus {
-  color: #fb923c;
+  color: white;
+  font-weight: bold;
+  background-color: #fb923c;
+  padding: 4px 10px;
+  border-radius: 12px;
+  display: inline-block;
+  min-width: 42px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(251, 146, 60, 0.3);
 }
 
 .grade-c-plus {
-  color: #fb923c;
+  color: white;
+  font-weight: bold;
+  background-color: #fb923c;
+  padding: 4px 10px;
+  border-radius: 12px;
+  display: inline-block;
+  min-width: 42px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(251, 146, 60, 0.3);
 }
 
 .grade-c {
-  color: #f87171;
+  color: white;
+  font-weight: bold;
+  background-color: #f87171;
+  padding: 4px 10px;
+  border-radius: 12px;
+  display: inline-block;
+  min-width: 42px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(248, 113, 113, 0.3);
 }
 
 .grade-c-minus {
-  color: #f87171;
+  color: white;
+  font-weight: bold;
+  background-color: #f87171;
+  padding: 4px 10px;
+  border-radius: 12px;
+  display: inline-block;
+  min-width: 42px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(248, 113, 113, 0.3);
 }
 
 .grade-d {
-  color: #ef4444;
+  color: white;
+  font-weight: bold;
+  background-color: #ef4444;
+  padding: 4px 10px;
+  border-radius: 12px;
+  display: inline-block;
+  min-width: 42px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(239, 68, 68, 0.3);
 }
 
 .grade-f {
-  color: #dc2626;
+  color: white;
   font-weight: bold;
+  background-color: #dc2626;
+  padding: 4px 10px;
+  border-radius: 12px;
+  display: inline-block;
+  min-width: 42px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(220, 38, 38, 0.4);
 }
 
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .animate-fadeIn {
   animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Glowing effect for CGPA panel */
+.pulse-glow {
+  animation: pulse-glow 3s infinite alternate;
+  position: relative;
+}
+
+@keyframes pulse-glow {
+  0% {
+    box-shadow: 0 0 5px rgba(99, 102, 241, 0.3), 0 0 10px rgba(79, 70, 229, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.5), 0 0 20px rgba(79, 70, 229, 0.4);
+  }
 }
 
 /* Print styles */
@@ -101,15 +202,17 @@ input:focus, button:focus {
 }
 
 button {
-  transition: all 0.2s ease-in-out;
+  transition: all 0.3s ease-in-out;
 }
 
 button:hover {
   transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 button:active {
   transform: translateY(0);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 /* Background gradient pulse animation for header */
@@ -128,4 +231,58 @@ button:active {
 header {
   background-size: 200% 200%;
   animation: gradientAnimation 10s ease infinite;
+}
+
+/* Table row hover effect */
+#subjectsTableBody tr {
+  transition: all 0.2s ease;
+}
+
+#subjectsTableBody tr:hover {
+  background-color: rgba(55, 65, 81, 0.5);
+  transform: scale(1.01);
+}
+
+/* Credit badge styling */
+.credit-badge {
+  background-color: #4b5563;
+  color: white;
+  font-weight: bold;
+  padding: 3px 8px;
+  border-radius: 8px;
+  display: inline-block;
+  min-width: 30px;
+  text-align: center;
+}
+
+/* CGPA specific styles */
+.cgpa-container {
+  position: relative;
+  z-index: 1;
+}
+
+.cgpa-rating {
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Enhanced search input appearance */
+#rollNumberInput {
+  transition: all 0.3s ease;
+}
+
+#rollNumberInput:focus {
+  transform: scale(1.02);
+}
+
+/* Animation for progress bar */
+@keyframes progressFill {
+  from { width: 0%; }
+  to { width: var(--progress-width); }
+}
+
+#cgpaProgress {
+  animation: progressFill 1s ease-out forwards;
 }
