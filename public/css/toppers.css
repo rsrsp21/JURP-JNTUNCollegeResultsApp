@@ -1,37 +1,73 @@
-/* Simplified Toppers Page Styles */
-:root {
-    --gold: #ffd700;
-    --silver: #c0c0c0;
-    --bronze: #cd7f32;
+/* Toppers CSS - Styled to match home and cgpa pages */
+.hidden {
+    display: none !important;
 }
 
-/* Page Header */
+/* Header Styling */
 .page-header {
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    padding: 2rem 0;
-    margin-bottom: 2rem;
+    border-radius: 0 0 2rem 2rem;
+    padding: 3rem 1.5rem;
+    margin-bottom: 3rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
 }
 
-/* Clean Toppers Card */
+.page-header::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB2aWV3Qm94PSIwIDAgMTAwMCAxMDAwIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogICAgPGcgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjA1KSI+CiAgICAgICAgPGNpcmNsZSBjeD0iMTAwIiBjeT0iMTAwIiByPSIyMCIgLz4KICAgICAgICA8Y2lyY2xlIGN4PSIzMDAiIGN5PSIxNTAiIHI9IjMwIiAvPgogICAgICAgIDxjaXJjbGUgY3g9IjUwMCIgY3k9IjMwMCIgcj0iMjUiIC8+CiAgICAgICAgPGNpcmNsZSBjeD0iNjUwIiBjeT0iMTAwIiByPSIxNSIgLz4KICAgICAgICA8Y2lyY2xlIGN4PSI3MDAiIGN5PSIzMDAiIHI9IjM1IiAvPgogICAgICAgIDxjaXJjbGUgY3g9IjgwMCIgY3k9IjQwMCIgcj0iMjAiIC8+CiAgICAgICAgPGNpcmNsZSBjeD0iOTAwIiBjeT0iMjAwIiByPSIyNSIgLz4KICAgICAgICA8Y2lyY2xlIGN4PSI5MDAiIGN5PSI0MDAiIHI9IjE1IiAvPgogICAgICAgIDxjaXJjbGUgY3g9IjIwMCIgY3k9IjUwMCIgcj0iMjAiIC8+CiAgICAgICAgPGNpcmNsZSBjeD0iMzAwIiBjeT0iNjAwIiByPSIxNSIgLz4KICAgICAgICA8Y2lyY2xlIGN4PSI0MDAiIGN5PSI3MDAiIHI9IjI1IiAvPgogICAgICAgIDxjaXJjbGUgY3g9IjYwMCIgY3k9IjUwMCIgcj0iMzAiIC8+CiAgICAgICAgPGNpcmNsZSBjeD0iNzAwIiBjeT0iNjAwIiByPSIyMCIgLz4KICAgICAgICA8Y2lyY2xlIGN4PSI4MDAiIGN5PSI3MDAiIHI9IjI1IiAvPgogICAgPC9nPgo8L3N2Zz4=');
+    opacity: 0.2;
+    z-index: 0;
+}
+
+.page-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.page-subtitle {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.85);
+    text-align: center;
+    position: relative;
+    z-index: 1;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+/* Card Styling */
 .toppers-card {
-    background-color: var(--card-bg);
-    border-radius: 0.75rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    margin-bottom: 2rem;
+    background: var(--card-bg);
+    border-radius: 1rem;
     overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    margin-bottom: 2rem;
     border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .toppers-card-header {
-    background-color: var(--card-header);
-    padding: 1rem 1.5rem;
+    background: var(--card-header);
+    padding: 1.25rem 1.5rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .toppers-card-title {
     font-size: 1.25rem;
     font-weight: 600;
-    margin-bottom: 0;
+    margin: 0;
+    color: var(--text-primary);
     display: flex;
     align-items: center;
     gap: 0.75rem;
@@ -41,133 +77,145 @@
     padding: 1.5rem;
 }
 
-/* Medal Icons */
-.medal {
-    width: 2rem;
-    height: 2rem;
-    display: inline-flex;
+/* Top Three Positions */
+.top-three {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    padding: 1.5rem 0;
+}
+
+.top-position {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.25rem;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    transition: all 0.3s ease;
+    position: relative;
+    width: 150px;
+}
+
+.top-position:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.position-1 {
+    padding-top: 1.75rem;
+    padding-bottom: 1.75rem;
+    background: linear-gradient(to bottom, rgba(255, 215, 0, 0.1), rgba(255, 215, 0, 0.02));
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    z-index: 3;
+}
+
+.position-2 {
+    background: linear-gradient(to bottom, rgba(192, 192, 192, 0.1), rgba(192, 192, 192, 0.02));
+    border: 1px solid rgba(192, 192, 192, 0.2);
+    z-index: 2;
+}
+
+.position-3 {
+    background: linear-gradient(to bottom, rgba(205, 127, 50, 0.1), rgba(205, 127, 50, 0.02));
+    border: 1px solid rgba(205, 127, 50, 0.2);
+    z-index: 1;
+}
+
+.position-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
+    font-size: 1.25rem;
+    margin-bottom: 0.25rem;
+}
+
+.position-1 .position-icon {
+    background: linear-gradient(135deg, #ffd700, #ffaa33);
     color: var(--dark-color);
+}
+
+.position-2 .position-icon {
+    background: linear-gradient(135deg, #c0c0c0, #a8a8a8);
+    color: var(--dark-color);
+}
+
+.position-3 .position-icon {
+    background: linear-gradient(135deg, #cd7f32, #8d5524);
+    color: var(--dark-color);
+}
+
+.position-rank {
+    font-weight: 700;
     font-size: 1rem;
-    margin-right: 0.5rem;
+    margin-bottom: 0.25rem;
 }
 
-.medal-gold {
-    background: linear-gradient(135deg, var(--gold), #e5c100);
+.position-1 .position-rank {
+    color: #ffd700;
 }
 
-.medal-silver {
-    background: linear-gradient(135deg, var(--silver), #a8a8a8);
+.position-2 .position-rank {
+    color: #c0c0c0;
 }
 
-.medal-bronze {
-    background: linear-gradient(135deg, var(--bronze), #8d5524);
+.position-3 .position-rank {
+    color: #cd7f32;
 }
 
-/* Simplified Toppers Table */
-.toppers-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-}
-
-.toppers-table th {
-    background-color: rgba(255, 255, 255, 0.05);
-    padding: 0.75rem 1rem;
-    color: var(--text-secondary);
-    font-weight: 600;
-    text-align: left;
-    font-size: 0.9rem;
-}
-
-.toppers-table td {
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.toppers-table tr:last-child td {
-    border-bottom: none;
-}
-
-.toppers-table tbody tr:hover {
-    background-color: rgba(255, 255, 255, 0.03);
-}
-
-/* Rank Badge */
-.rank-badge {
-    width: 1.75rem;
-    height: 1.75rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    font-weight: 600;
-    font-size: 0.8rem;
-    background-color: rgba(255, 255, 255, 0.1);
-}
-
-.rank-badge-1 {
-    background-color: var(--gold);
-    color: #000;
-}
-
-.rank-badge-2 {
-    background-color: var(--silver);
-    color: #000;
-}
-
-.rank-badge-3 {
-    background-color: var(--bronze);
-    color: #000;
-}
-
-/* CGPA Badge */
-.cgpa-badge {
-    display: inline-block;
-    padding: 0.2rem 0.75rem;
-    border-radius: 50px;
-    background-color: rgba(67, 97, 238, 0.1);
-    color: var(--primary-color);
-    font-weight: 600;
-    font-size: 0.875rem;
-}
-
-/* Roll Number Style */
-.roll-number {
+.position-roll {
     font-family: 'Courier New', monospace;
-    font-weight: 500;
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+    color: var(--text-primary);
+    text-align: center;
 }
 
-/* Tab Navigation */
+.position-cgpa {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--primary-color);
+    padding: 0.25rem 0.75rem;
+    background: rgba(67, 97, 238, 0.1);
+    border-radius: 1rem;
+}
+
+/* Branch Tabs */
 .branch-tabs {
     display: flex;
-    overflow-x: auto;
+    flex-wrap: wrap;
+    gap: 0.5rem;
     margin-bottom: 1.5rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 1rem;
 }
 
 .branch-tab {
     padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
     cursor: pointer;
-    transition: all 0.2s ease;
+    font-weight: 500;
+    font-size: 0.9rem;
     color: var(--text-secondary);
-    border-radius: 0.5rem 0.5rem 0 0;
-    white-space: nowrap;
+    background: rgba(255, 255, 255, 0.05);
+    transition: all 0.2s ease;
+    user-select: none;
 }
 
 .branch-tab:hover {
+    background: rgba(255, 255, 255, 0.1);
     color: var(--text-primary);
-    background-color: rgba(255, 255, 255, 0.05);
 }
 
 .branch-tab.active {
-    color: var(--primary-color);
-    font-weight: 500;
-    border-bottom: 2px solid var(--primary-color);
-    background-color: rgba(67, 97, 238, 0.1);
+    background: var(--primary-color);
+    color: white;
 }
 
 .branch-content {
@@ -176,76 +224,109 @@
 
 .branch-content.active {
     display: block;
+    animation: fadeIn 0.3s ease-out forwards;
 }
 
-/* Top 3 Medal Styles */
-.top-three {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin-bottom: 2rem;
+/* Table Styling */
+.toppers-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 1rem;
 }
 
-.top-position {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 1rem;
-    background-color: rgba(255, 255, 255, 0.03);
-    border-radius: 0.75rem;
-    min-width: 8rem;
-    transition: transform 0.3s ease;
-}
-
-.top-position:hover {
-    transform: translateY(-5px);
-    background-color: rgba(255, 255, 255, 0.05);
-}
-
-.position-1 {
-    border-top: 3px solid var(--gold);
-}
-
-.position-2 {
-    border-top: 3px solid var(--silver);
-}
-
-.position-3 {
-    border-top: 3px solid var(--bronze);
-}
-
-.position-icon {
-    font-size: 1.75rem;
-    margin-bottom: 0.5rem;
-}
-
-.position-1 .position-icon {
-    color: var(--gold);
-}
-
-.position-2 .position-icon {
-    color: var(--silver);
-}
-
-.position-3 .position-icon {
-    color: var(--bronze);
-}
-
-.position-rank {
-    font-weight: 700;
-    font-size: 1.25rem;
-}
-
-.position-roll {
-    font-family: 'Courier New', monospace;
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-}
-
-.position-cgpa {
+.toppers-table th {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.75rem 1rem;
+    text-align: left;
     font-weight: 600;
+    color: var(--text-secondary);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.9rem;
+}
+
+.toppers-table th:first-child {
+    border-top-left-radius: 8px;
+}
+
+.toppers-table th:last-child {
+    border-top-right-radius: 8px;
+    text-align: right;
+}
+
+.toppers-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 0.95rem;
+}
+
+.toppers-table td:last-child {
+    text-align: right;
+}
+
+.toppers-table tr:last-child td {
+    border-bottom: none;
+}
+
+.toppers-table tr:last-child td:first-child {
+    border-bottom-left-radius: 8px;
+}
+
+.toppers-table tr:last-child td:last-child {
+    border-bottom-right-radius: 8px;
+}
+
+.toppers-table tbody tr {
+    transition: all 0.2s ease;
+}
+
+.toppers-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Badges */
+.rank-badge {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.8rem;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+}
+
+.rank-badge-1, .rank-badge-2, .rank-badge-3 {
+    color: var(--dark-color);
+}
+
+.rank-badge-1 {
+    background: linear-gradient(135deg, #ffd700, #ffaa33);
+}
+
+.rank-badge-2 {
+    background: linear-gradient(135deg, #c0c0c0, #a8a8a8);
+}
+
+.rank-badge-3 {
+    background: linear-gradient(135deg, #cd7f32, #8d5524);
+}
+
+.cgpa-badge {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    background: rgba(67, 97, 238, 0.15);
     color: var(--primary-color);
+}
+
+.roll-number {
+    font-family: 'Courier New', monospace;
+    font-weight: 500;
 }
 
 /* Loading Animation */
@@ -254,16 +335,16 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 300px;
+    min-height: 400px;
 }
 
 .loading-spinner {
-    width: 3rem;
-    height: 3rem;
-    border: 3px solid rgba(67, 97, 238, 0.3);
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(67, 97, 238, 0.3);
     border-radius: 50%;
     border-top-color: var(--primary-color);
-    animation: spin 1s linear infinite;
+    animation: spin 1s ease-in-out infinite;
     margin-bottom: 1rem;
 }
 
@@ -271,17 +352,23 @@
     to { transform: rotate(360deg); }
 }
 
-/* Responsive Adjustments */
+/* Animation for fade in */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+    opacity: 0;
+}
+
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.3s; }
+
+/* Responsive adjustments */
 @media (max-width: 768px) {
-    .branch-tabs {
-        padding-bottom: 0.25rem;
-    }
-    
-    .branch-tab {
-        padding: 0.5rem 0.75rem;
-        font-size: 0.9rem;
-    }
-    
     .top-three {
         flex-direction: column;
         align-items: center;
@@ -290,22 +377,29 @@
     
     .top-position {
         width: 100%;
-        max-width: 250px;
-        flex-direction: row;
-        justify-content: space-between;
+        max-width: 300px;
+    }
+    
+    .position-1, .position-2, .position-3 {
+        padding: 1rem;
+    }
+    
+    .branch-tabs {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .branch-tab {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .page-header {
+        padding: 2rem 1rem;
+        border-radius: 0 0 1.5rem 1.5rem;
+    }
+    
+    .page-title {
+        font-size: 2rem;
     }
 }
-
-/* Animation Classes */
-.fade-in {
-    animation: fadeIn 0.5s ease-out forwards;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.delay-1 { animation-delay: 0.1s; }
-.delay-2 { animation-delay: 0.2s; }
-.delay-3 { animation-delay: 0.3s; }
