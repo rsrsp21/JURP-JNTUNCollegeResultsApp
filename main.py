@@ -1,9 +1,38 @@
-from flask import Flask, render_template, redirect, request, send_from_directory
+from flask import Flask, send_from_directory, jsonify
 import os
-import json
-import subprocess
+import csv
 
 app = Flask(__name__, static_folder='public')
+
+# Parse student data from CSV file
+def parse_student_data():
+    student_data = {}
+    csv_file = './data/students.csv'
+    
+    with open(csv_file, 'r') as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            roll_number = row['rollNumber']
+            
+            if roll_number not in student_data:
+                student_data[roll_number] = {
+                    'rollNumber': roll_number,
+                    'name': row['name'],
+                    'cgpa': float(row['cgpa']),
+                    'subjects': []
+                }
+                
+            student_data[roll_number]['subjects'].append({
+                'subjectId': row['subjectId'],
+                'subjectName': row['subjectName'],
+                'grade': row['grade'],
+                'credits': float(row['credits'])
+            })
+            
+    return student_data
+
+# Load student data
+STUDENT_DATA = parse_student_data()
 
 # Serve static files
 @app.route('/', defaults={'path': ''})
@@ -13,28 +42,13 @@ def serve_static(path):
         return send_from_directory('public', 'index.html')
     return send_from_directory('public', path)
 
-# Proxy API requests to the Node.js server
+# API endpoint to get student results
 @app.route('/api/results/<roll_number>', methods=['GET'])
 def get_results(roll_number):
-    # Start the Node.js server if not already running
-    try:
-        # Execute the node server in the background
-        node_server = subprocess.Popen(["node", "server.js"], 
-                                     stdout=subprocess.PIPE, 
-                                     stderr=subprocess.PIPE)
-        
-        # Wait a bit for the server to start
-        import time
-        time.sleep(1)
-        
-        # Forward the request to the Node.js API
-        import requests
-        response = requests.get(f"http://localhost:8000/api/results/{roll_number}")
-        
-        # Return the response from the Node.js server
-        return json.loads(response.text), response.status_code
-    except Exception as e:
-        return {"error": str(e)}, 500
+    if roll_number in STUDENT_DATA:
+        return jsonify([STUDENT_DATA[roll_number]])
+    else:
+        return jsonify({'error': 'Student not found with provided roll number'}), 404
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
