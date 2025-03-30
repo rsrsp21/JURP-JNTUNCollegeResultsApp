@@ -286,3 +286,92 @@ header {
 #cgpaProgress {
   animation: progressFill 1s ease-out forwards;
 }
+
+/* CGPA Calculator page styles */
+#results-section {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+#results-section.shown {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#cgpa-container {
+  text-align: center;
+  padding: 20px;
+}
+
+#cgpa-container h2 {
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+}
+
+#message-container h3 {
+  font-size: 1.5rem;
+  text-align: center;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: rgba(34, 197, 94, 0.2);
+  margin: 10px 0;
+}
+
+/* Table styles for CGPA */
+#table-container table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+#table-container th {
+  background: linear-gradient(to right, #2563eb, #4f46e5);
+  color: white;
+  font-weight: bold;
+  padding: 12px 15px;
+  text-align: left;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+#table-container th:first-child {
+  border-top-left-radius: 8px;
+}
+
+#table-container th:last-child {
+  border-top-right-radius: 8px;
+}
+
+#table-container td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #374151;
+  font-size: 1rem;
+}
+
+#table-container tbody tr {
+  transition: all 0.3s ease;
+}
+
+#table-container tbody tr:hover {
+  background-color: rgba(55, 65, 81, 0.5);
+  transform: scale(1.01);
+}
+
+#table-container tbody tr:nth-child(odd) {
+  background-color: rgba(31, 41, 55, 0.4);
+}
+
+#percentage-total-container div {
+  padding: 10px 15px;
+  background-color: rgba(55, 65, 81, 0.3);
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+#supplementary-container {
+  padding: 10px 15px;
+  background-color: rgba(59, 130, 246, 0.2);
+  border-radius: 8px;
+}
