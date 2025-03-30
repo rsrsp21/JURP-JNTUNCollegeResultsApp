@@ -69,9 +69,20 @@ def get_results(roll_number):
 # API endpoint to get CGPA data
 @app.route('/api/cgpa/<student_id>', methods=['GET'])
 def get_cgpa_data(student_id):
+    print(f"Received request for student_id: {student_id}")
+    
+    # Print all available IDs for debugging
+    available_ids = list(CGPA_DATA.keys())
+    if len(available_ids) > 10:  # Print first 10 and count
+        print(f"Available IDs ({len(available_ids)} total): {available_ids[:10]}...")
+    else:
+        print(f"Available IDs: {available_ids}")
+    
     if student_id in CGPA_DATA:
+        print(f"Student found: {student_id}")
         return jsonify(CGPA_DATA[student_id])
     else:
+        print(f"Student NOT found: {student_id}")
         return jsonify({'error': 'Student not found with provided ID'}), 404
         
 # API endpoint to get all CGPA data

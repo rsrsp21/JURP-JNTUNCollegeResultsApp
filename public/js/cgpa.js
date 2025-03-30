@@ -39,11 +39,16 @@ document.addEventListener('DOMContentLoaded', function() {
 // Get student data from API
 async function fetchStudentData(id) {
     try {
+        console.log('Fetching data for:', id);
         const response = await fetch(`/api/cgpa/${id}`);
+        
         if (!response.ok) {
-            throw new Error('Student not found');
+            console.error('API Error:', response.status, response.statusText);
+            throw new Error(`Student not found (Status: ${response.status})`);
         }
+        
         const data = await response.json();
+        console.log('Data received:', data);
         return data;
     } catch (error) {
         console.error('Error fetching student data:', error);
