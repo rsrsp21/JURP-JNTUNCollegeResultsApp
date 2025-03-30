@@ -1,0 +1,311 @@
+/* Simplified Toppers Page Styles */
+:root {
+    --gold: #ffd700;
+    --silver: #c0c0c0;
+    --bronze: #cd7f32;
+}
+
+/* Page Header */
+.page-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+}
+
+/* Clean Toppers Card */
+.toppers-card {
+    background-color: var(--card-bg);
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.toppers-card-header {
+    background-color: var(--card-header);
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.toppers-card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.toppers-card-body {
+    padding: 1.5rem;
+}
+
+/* Medal Icons */
+.medal {
+    width: 2rem;
+    height: 2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: var(--dark-color);
+    font-size: 1rem;
+    margin-right: 0.5rem;
+}
+
+.medal-gold {
+    background: linear-gradient(135deg, var(--gold), #e5c100);
+}
+
+.medal-silver {
+    background: linear-gradient(135deg, var(--silver), #a8a8a8);
+}
+
+.medal-bronze {
+    background: linear-gradient(135deg, var(--bronze), #8d5524);
+}
+
+/* Simplified Toppers Table */
+.toppers-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.toppers-table th {
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 0.75rem 1rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-align: left;
+    font-size: 0.9rem;
+}
+
+.toppers-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.toppers-table tr:last-child td {
+    border-bottom: none;
+}
+
+.toppers-table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.03);
+}
+
+/* Rank Badge */
+.rank-badge {
+    width: 1.75rem;
+    height: 1.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-weight: 600;
+    font-size: 0.8rem;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.rank-badge-1 {
+    background-color: var(--gold);
+    color: #000;
+}
+
+.rank-badge-2 {
+    background-color: var(--silver);
+    color: #000;
+}
+
+.rank-badge-3 {
+    background-color: var(--bronze);
+    color: #000;
+}
+
+/* CGPA Badge */
+.cgpa-badge {
+    display: inline-block;
+    padding: 0.2rem 0.75rem;
+    border-radius: 50px;
+    background-color: rgba(67, 97, 238, 0.1);
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+/* Roll Number Style */
+.roll-number {
+    font-family: 'Courier New', monospace;
+    font-weight: 500;
+}
+
+/* Tab Navigation */
+.branch-tabs {
+    display: flex;
+    overflow-x: auto;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 0.5rem;
+}
+
+.branch-tab {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--text-secondary);
+    border-radius: 0.5rem 0.5rem 0 0;
+    white-space: nowrap;
+}
+
+.branch-tab:hover {
+    color: var(--text-primary);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.branch-tab.active {
+    color: var(--primary-color);
+    font-weight: 500;
+    border-bottom: 2px solid var(--primary-color);
+    background-color: rgba(67, 97, 238, 0.1);
+}
+
+.branch-content {
+    display: none;
+}
+
+.branch-content.active {
+    display: block;
+}
+
+/* Top 3 Medal Styles */
+.top-three {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.top-position {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background-color: rgba(255, 255, 255, 0.03);
+    border-radius: 0.75rem;
+    min-width: 8rem;
+    transition: transform 0.3s ease;
+}
+
+.top-position:hover {
+    transform: translateY(-5px);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.position-1 {
+    border-top: 3px solid var(--gold);
+}
+
+.position-2 {
+    border-top: 3px solid var(--silver);
+}
+
+.position-3 {
+    border-top: 3px solid var(--bronze);
+}
+
+.position-icon {
+    font-size: 1.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.position-1 .position-icon {
+    color: var(--gold);
+}
+
+.position-2 .position-icon {
+    color: var(--silver);
+}
+
+.position-3 .position-icon {
+    color: var(--bronze);
+}
+
+.position-rank {
+    font-weight: 700;
+    font-size: 1.25rem;
+}
+
+.position-roll {
+    font-family: 'Courier New', monospace;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.position-cgpa {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+/* Loading Animation */
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+}
+
+.loading-spinner {
+    width: 3rem;
+    height: 3rem;
+    border: 3px solid rgba(67, 97, 238, 0.3);
+    border-radius: 50%;
+    border-top-color: var(--primary-color);
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .branch-tabs {
+        padding-bottom: 0.25rem;
+    }
+    
+    .branch-tab {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.9rem;
+    }
+    
+    .top-three {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .top-position {
+        width: 100%;
+        max-width: 250px;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+}
+
+/* Animation Classes */
+.fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.3s; }

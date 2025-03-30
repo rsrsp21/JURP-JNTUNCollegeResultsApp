@@ -14,541 +14,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Common CSS -->
     <link rel="stylesheet" href="css/common.css">
-    <style>
-        :root {
-            --primary-color: #4361ee;
-            --secondary-color: #3a0ca3;
-            --accent-color: #4cc9f0;
-            --success-color: #4ade80;
-            --warning-color: #fb8500;
-            --danger-color: #ef476f;
-            --dark-color: #0f172a;
-            --card-bg: #1e293b;
-            --card-header: #334155;
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --gold: #ffd700;
-            --silver: #c0c0c0;
-            --bronze: #cd7f32;
-        }
+    <!-- Toppers CSS -->
+    <link rel="stylesheet" href="css/toppers.css">
 
-        body {
-            background-color: var(--dark-color);
-            color: var(--text-primary);
-            font-family: 'Poppins', sans-serif;
-            line-height: 1.6;
-        }
-
-        .page-header {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            border-radius: 0 0 2rem 2rem;
-            padding: 3rem 1.5rem;
-            margin-bottom: 3rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .page-header::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB2aWV3Qm94PSIwIDAgMTAwMCAxMDAwIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogICAgPGcgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjA1KSI+CiAgICAgICAgPGNpcmNsZSBjeD0iMTAwIiBjeT0iMTAwIiByPSIyMCIgLz4KICAgICAgICA8Y2lyY2xlIGN4PSIzMDAiIGN5PSIxNTAiIHI9IjMwIiAvPgogICAgICAgIDxjaXJjbGUgY3g9IjUwMCIgY3k9IjMwMCIgcj0iMjUiIC8+CiAgICAgICAgPGNpcmNsZSBjeD0iNjUwIiBjeT0iMTAwIiByPSIxNSIgLz4KICAgICAgICA8Y2lyY2xlIGN4PSI3MDAiIGN5PSIzMDAiIHI9IjM1IiAvPgogICAgICAgIDxjaXJjbGUgY3g9IjgwMCIgY3k9IjQwMCIgcj0iMjAiIC8+CiAgICAgICAgPGNpcmNsZSBjeD0iOTAwIiBjeT0iMjAwIiByPSIyNSIgLz4KICAgICAgICA8Y2lyY2xlIGN4PSI5MDAiIGN5PSI0MDAiIHI9IjE1IiAvPgogICAgICAgIDxjaXJjbGUgY3g9IjIwMCIgY3k9IjUwMCIgcj0iMjAiIC8+CiAgICAgICAgPGNpcmNsZSBjeD0iMzAwIiBjeT0iNjAwIiByPSIxNSIgLz4KICAgICAgICA8Y2lyY2xlIGN4PSI0MDAiIGN5PSI3MDAiIHI9IjI1IiAvPgogICAgICAgIDxjaXJjbGUgY3g9IjYwMCIgY3k9IjUwMCIgcj0iMzAiIC8+CiAgICAgICAgPGNpcmNsZSBjeD0iNzAwIiBjeT0iNjAwIiByPSIyMCIgLz4KICAgICAgICA8Y2lyY2xlIGN4PSI4MDAiIGN5PSI3MDAiIHI9IjI1IiAvPgogICAgPC9nPgo8L3N2Zz4=');
-            opacity: 0.2;
-            z-index: 0;
-        }
-
-        .page-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 0.5rem;
-            position: relative;
-            z-index: 1;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-        }
-
-        .page-subtitle {
-            font-size: 1.1rem;
-            color: rgba(255, 255, 255, 0.85);
-            text-align: center;
-            position: relative;
-            z-index: 1;
-            max-width: 700px;
-            margin: 0 auto;
-        }
-
-        .branch-title {
-            font-size: 1rem;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            position: relative;
-            display: inline-block;
-        }
-
-        .branch-title::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(to right, var(--primary-color), transparent);
-        }
-
-        .branch-card {
-            background: var(--card-bg);
-            border-radius: 1rem;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            height: 100%;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .branch-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-            border-color: rgba(67, 97, 238, 0.3);
-        }
-
-        .branch-card-header {
-            background: var(--card-header);
-            padding: 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .branch-card-header i {
-            font-size: 1.2rem;
-            color: var(--accent-color);
-        }
-
-        .branch-card-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin: 0;
-            color: var(--text-primary);
-        }
-
-        .overall-toppers {
-            background: linear-gradient(135deg, var(--card-bg), var(--card-header));
-            border-radius: 1.5rem;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .overall-toppers::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB2aWV3Qm94PSIwIDAgMTAwMCAxMDAwIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogICAgPHBhdHRlcm4gaWQ9InBvbHlnb25QYXR0ZXJuIiB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSgxMCkiPgogICAgICAgIDxwb2x5Z29uIHBvaW50cz0iMjUsMCAsMCwyNSwyNSw1MCw1MCwyNSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMDIpIiBzdHJva2Utd2lkdGg9IjEiIC8+CiAgICA8L3BhdHRlcm4+CiAgICA8cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI3BvbHlnb25QYXR0ZXJuKSIgLz4KPC9zdmc+');
-            opacity: 0.8;
-            z-index: 0;
-        }
-
-        .overall-toppers-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        .overall-toppers-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .overall-toppers-title i {
-            color: var(--gold);
-        }
-
-        .toppers-podium {
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
-            height: 250px;
-            margin-bottom: 2rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        .podium-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            transition: all 0.3s ease;
-        }
-
-        .podium-item:hover {
-            transform: translateY(-10px);
-        }
-
-        .podium-rank {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .podium-rank-1 {
-            color: var(--gold);
-        }
-
-        .podium-rank-2 {
-            color: var(--silver);
-        }
-
-        .podium-rank-3 {
-            color: var(--bronze);
-        }
-
-        .podium-avatar {
-            width: 75px;
-            height: 75px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 0.5rem;
-            font-size: 2rem;
-            color: var(--dark-color);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .podium-avatar-1 {
-            background: linear-gradient(135deg, var(--gold), #ffaa33);
-            width: 100px;
-            height: 100px;
-            font-size: 2.5rem;
-        }
-
-        .podium-avatar-2 {
-            background: linear-gradient(135deg, var(--silver), #a8a8a8);
-        }
-
-        .podium-avatar-3 {
-            background: linear-gradient(135deg, var(--bronze), #8d5524);
-        }
-
-        .podium-info {
-            text-align: center;
-            max-width: 120px;
-        }
-
-        .podium-roll {
-            font-family: 'Courier New', monospace;
-            font-weight: 500;
-            font-size: 0.9rem;
-            color: var(--text-primary);
-            margin-bottom: 0.25rem;
-        }
-
-        .podium-cgpa {
-            background: rgba(67, 97, 238, 0.2);
-            padding: 0.25rem 0.75rem;
-            border-radius: 100px;
-            color: var(--primary-color);
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .podium-platform {
-            display: flex;
-            width: 100%;
-            justify-content: center;
-            gap: 10px;
-            position: relative;
-        }
-
-        .platform-item {
-            height: 60px;
-            border-top-left-radius: 8px;
-            border-top-right-radius: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .platform-item-1 {
-            background: linear-gradient(to top, var(--gold), #ffaa33);
-            width: 120px;
-            height: 100px;
-            z-index: 3;
-        }
-
-        .platform-item-2 {
-            background: linear-gradient(to top, var(--silver), #a8a8a8);
-            width: 100px;
-            height: 70px;
-            z-index: 2;
-        }
-
-        .platform-item-3 {
-            background: linear-gradient(to top, var(--bronze), #8d5524);
-            width: 90px;
-            height: 50px;
-            z-index: 1;
-        }
-
-        .toppers-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            margin-top: 2rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        .toppers-table th {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 0.75rem 1rem;
-            text-align: left;
-            font-weight: 600;
-            color: var(--text-secondary);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 0.9rem;
-        }
-
-        .toppers-table th:first-child {
-            border-top-left-radius: 8px;
-        }
-
-        .toppers-table th:last-child {
-            border-top-right-radius: 8px;
-            text-align: right;
-        }
-
-        .toppers-table td {
-            padding: 0.75rem 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            font-size: 0.95rem;
-        }
-
-        .toppers-table td:last-child {
-            text-align: right;
-        }
-
-        .toppers-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .toppers-table tr:last-child td:first-child {
-            border-bottom-left-radius: 8px;
-        }
-
-        .toppers-table tr:last-child td:last-child {
-            border-bottom-right-radius: 8px;
-        }
-
-        .toppers-table tbody tr {
-            transition: all 0.2s ease;
-        }
-
-        .toppers-table tbody tr:hover {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .rank-badge {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 0.8rem;
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-primary);
-        }
-
-        .rank-badge-1, .rank-badge-2, .rank-badge-3 {
-            color: var(--dark-color);
-        }
-
-        .rank-badge-1 {
-            background: linear-gradient(135deg, var(--gold), #ffaa33);
-        }
-
-        .rank-badge-2 {
-            background: linear-gradient(135deg, var(--silver), #a8a8a8);
-        }
-
-        .rank-badge-3 {
-            background: linear-gradient(135deg, var(--bronze), #8d5524);
-        }
-
-        .cgpa-badge {
-            display: inline-block;
-            padding: 0.2rem 0.6rem;
-            border-radius: 4px;
-            font-weight: 600;
-            font-size: 0.85rem;
-            background: rgba(67, 97, 238, 0.15);
-            color: var(--primary-color);
-        }
-
-        .roll-number {
-            font-family: 'Courier New', monospace;
-            font-weight: 500;
-        }
-
-        .navigation-bar {
-            background: var(--card-bg);
-            padding: 1rem 0;
-            margin-bottom: 3rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .nav-link {
-            color: var(--text-secondary);
-            padding: 0.5rem 1rem;
-            text-decoration: none;
-            border-radius: 4px;
-            transition: all 0.2s ease;
-            font-weight: 500;
-        }
-
-        .nav-link:hover {
-            color: var(--text-primary);
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .nav-link.active {
-            color: var(--primary-color);
-            background: rgba(67, 97, 238, 0.1);
-        }
-
-        .nav-link i {
-            margin-right: 0.5rem;
-        }
-
-        .footer {
-            margin-top: 4rem;
-            padding: 2rem 0;
-            background: var(--card-bg);
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .footer-text {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        .footer-highlight {
-            color: var(--primary-color);
-            font-weight: 500;
-        }
-
-        .loading-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 400px;
-        }
-
-        .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid rgba(67, 97, 238, 0.3);
-            border-radius: 50%;
-            border-top-color: var(--primary-color);
-            animation: spin 1s ease-in-out infinite;
-            margin-bottom: 1rem;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-
-        .branch-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-            gap: 2rem;
-        }
-
-        @media (max-width: 767px) {
-            .branch-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .page-header {
-                padding: 2rem 1rem;
-                border-radius: 0 0 1.5rem 1.5rem;
-            }
-
-            .page-title {
-                font-size: 2rem;
-            }
-
-            .toppers-podium {
-                height: 200px;
-            }
-
-            .podium-avatar-1 {
-                width: 80px;
-                height: 80px;
-                font-size: 2rem;
-            }
-
-            .podium-avatar-2, .podium-avatar-3 {
-                width: 60px;
-                height: 60px;
-                font-size: 1.5rem;
-            }
-
-            .platform-item-1 {
-                height: 80px;
-            }
-
-            .platform-item-2 {
-                height: 50px;
-            }
-
-            .platform-item-3 {
-                height: 30px;
-            }
-        }
-
-        /* Animation for fade in */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .fade-in {
-            animation: fadeIn 0.5s ease-out forwards;
-            opacity: 0;
-        }
-
-        .delay-1 { animation-delay: 0.1s; }
-        .delay-2 { animation-delay: 0.2s; }
-        .delay-3 { animation-delay: 0.3s; }
-        .delay-4 { animation-delay: 0.4s; }
-        .delay-5 { animation-delay: 0.5s; }
-        .delay-6 { animation-delay: 0.6s; }
-    </style>
 </head>
 <body>
     <!-- Navigation Bar -->
@@ -577,238 +45,211 @@
     <!-- Page Header -->
     <header class="page-header">
         <div class="container">
-            <h1 class="page-title">
-                <i class="fas fa-crown me-2" style="color: var(--gold);"></i>
-                Toppers List <span class="badge bg-light text-dark">2021-25</span>
-            </h1>
+            <h1 class="page-title">Toppers List</h1>
             <p class="page-subtitle">
-                Celebrating academic excellence and recognizing our top-performing students based on CGPA up to the 4th year 1st semester.
+                Academic excellence rankings for the 2021-25 batch
             </p>
         </div>
     </header>
 
-    <div class="container" id="main-content" style="display:none;">
-        <!-- Overall Toppers Section -->
-        <section class="overall-toppers fade-in">
-            <div class="overall-toppers-header">
-                <h2 class="overall-toppers-title">
-                    <i class="fas fa-trophy"></i>
-                    Overall Toppers (All Branches)
-                </h2>
-            </div>
-            
-            <!-- Podium for top 3 -->
-            <div class="toppers-podium">
-                <div class="d-flex align-items-end justify-content-center w-100 gap-4">
-                    <!-- 2nd Place -->
-                    <div class="podium-item order-1">
-                        <div class="podium-rank podium-rank-2">2nd</div>
-                        <div class="podium-avatar podium-avatar-2">
-                            <i class="fas fa-user-graduate"></i>
-                        </div>
-                        <div class="podium-info">
-                            <div class="podium-roll" id="overall-2nd-roll"></div>
-                            <div class="podium-cgpa" id="overall-2nd-cgpa"></div>
-                        </div>
-                        <div class="platform-item platform-item-2 mt-3"></div>
-                    </div>
-                    
-                    <!-- 1st Place -->
-                    <div class="podium-item order-0">
-                        <div class="podium-rank podium-rank-1">1st</div>
-                        <div class="podium-avatar podium-avatar-1">
-                            <i class="fas fa-user-graduate"></i>
-                        </div>
-                        <div class="podium-info">
-                            <div class="podium-roll" id="overall-1st-roll"></div>
-                            <div class="podium-cgpa" id="overall-1st-cgpa"></div>
-                        </div>
-                        <div class="platform-item platform-item-1 mt-3"></div>
-                    </div>
-                    
-                    <!-- 3rd Place -->
-                    <div class="podium-item order-2">
-                        <div class="podium-rank podium-rank-3">3rd</div>
-                        <div class="podium-avatar podium-avatar-3">
-                            <i class="fas fa-user-graduate"></i>
-                        </div>
-                        <div class="podium-info">
-                            <div class="podium-roll" id="overall-3rd-roll"></div>
-                            <div class="podium-cgpa" id="overall-3rd-cgpa"></div>
-                        </div>
-                        <div class="platform-item platform-item-3 mt-3"></div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Top 10 Table -->
-            <div class="table-responsive">
-                <table class="toppers-table">
-                    <thead>
-                        <tr>
-                            <th width="80">Rank</th>
-                            <th>Roll Number</th>
-                            <th width="120">CGPA</th>
-                        </tr>
-                    </thead>
-                    <tbody id="overall-toppers-list">
-                        <!-- Will be populated by JavaScript -->
-                    </tbody>
-                </table>
-            </div>
-        </section>
-        
-        <!-- Branch-wise Toppers -->
-        <section class="mt-5">
-            <h3 class="mb-4 fade-in delay-1">Branch-wise Toppers</h3>
-            
-            <div class="branch-grid">
-                <!-- Civil Engineering -->
-                <div class="fade-in delay-2">
-                    <div class="branch-card">
-                        <div class="branch-card-header">
-                            <i class="fas fa-building"></i>
-                            <h4 class="branch-card-title">Civil Engineering</h4>
-                        </div>
-                        <div class="p-3">
-                            <div class="table-responsive">
-                                <table class="toppers-table">
-                                    <thead>
-                                        <tr>
-                                            <th width="80">Rank</th>
-                                            <th>Roll Number</th>
-                                            <th width="100">CGPA</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="ce-toppers-list">
-                                        <!-- Will be populated by JavaScript -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Electrical and Electronics Engineering -->
-                <div class="fade-in delay-3">
-                    <div class="branch-card">
-                        <div class="branch-card-header">
-                            <i class="fas fa-bolt"></i>
-                            <h4 class="branch-card-title">Electrical & Electronics Engineering</h4>
-                        </div>
-                        <div class="p-3">
-                            <div class="table-responsive">
-                                <table class="toppers-table">
-                                    <thead>
-                                        <tr>
-                                            <th width="80">Rank</th>
-                                            <th>Roll Number</th>
-                                            <th width="100">CGPA</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="eee-toppers-list">
-                                        <!-- Will be populated by JavaScript -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Mechanical Engineering -->
-                <div class="fade-in delay-4">
-                    <div class="branch-card">
-                        <div class="branch-card-header">
-                            <i class="fas fa-cogs"></i>
-                            <h4 class="branch-card-title">Mechanical Engineering</h4>
-                        </div>
-                        <div class="p-3">
-                            <div class="table-responsive">
-                                <table class="toppers-table">
-                                    <thead>
-                                        <tr>
-                                            <th width="80">Rank</th>
-                                            <th>Roll Number</th>
-                                            <th width="100">CGPA</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="mec-toppers-list">
-                                        <!-- Will be populated by JavaScript -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Electronics and Communication Engineering -->
-                <div class="fade-in delay-5">
-                    <div class="branch-card">
-                        <div class="branch-card-header">
-                            <i class="fas fa-microchip"></i>
-                            <h4 class="branch-card-title">Electronics & Communication Engineering</h4>
-                        </div>
-                        <div class="p-3">
-                            <div class="table-responsive">
-                                <table class="toppers-table">
-                                    <thead>
-                                        <tr>
-                                            <th width="80">Rank</th>
-                                            <th>Roll Number</th>
-                                            <th width="100">CGPA</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="ece-toppers-list">
-                                        <!-- Will be populated by JavaScript -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Computer Science Engineering -->
-                <div class="fade-in delay-6">
-                    <div class="branch-card">
-                        <div class="branch-card-header">
-                            <i class="fas fa-laptop-code"></i>
-                            <h4 class="branch-card-title">Computer Science Engineering</h4>
-                        </div>
-                        <div class="p-3">
-                            <div class="table-responsive">
-                                <table class="toppers-table">
-                                    <thead>
-                                        <tr>
-                                            <th width="80">Rank</th>
-                                            <th>Roll Number</th>
-                                            <th width="100">CGPA</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="cse-toppers-list">
-                                        <!-- Will be populated by JavaScript -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        
-        <div class="text-center mt-5">
-            <a href="/" class="btn btn-outline-primary">
-                <i class="fas fa-home me-2"></i> Back to Home
-            </a>
-        </div>
-    </div>
-    
-    <!-- Loading Spinner -->
-    <div class="container" id="loading-container">
-        <div class="loading-container">
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Loading Spinner -->
+        <div id="loading-container" class="loading-container fade-in">
             <div class="loading-spinner"></div>
-            <p class="loading-text">Loading toppers data...</p>
+            <p>Loading toppers data...</p>
         </div>
-    </div>
+
+        <!-- Toppers Content (initially hidden) -->
+        <div id="main-content" class="hidden">
+            
+            <!-- Overall Toppers Section -->
+            <div class="toppers-card fade-in">
+                <div class="toppers-card-header">
+                    <h2 class="toppers-card-title">
+                        <i class="fas fa-trophy text-warning"></i>
+                        Overall University Toppers
+                    </h2>
+                </div>
+                <div class="toppers-card-body">
+                    <!-- Top 3 Section -->
+                    <div class="top-three fade-in delay-1">
+                        <!-- Second Position -->
+                        <div class="top-position position-2">
+                            <div>
+                                <div class="position-icon">
+                                    <i class="fas fa-medal"></i>
+                                </div>
+                                <div class="position-rank">2nd</div>
+                            </div>
+                            <div>
+                                <div class="position-roll" id="overall-2nd-roll"></div>
+                                <div class="position-cgpa" id="overall-2nd-cgpa"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- First Position -->
+                        <div class="top-position position-1">
+                            <div>
+                                <div class="position-icon">
+                                    <i class="fas fa-medal"></i>
+                                </div>
+                                <div class="position-rank">1st</div>
+                            </div>
+                            <div>
+                                <div class="position-roll" id="overall-1st-roll"></div>
+                                <div class="position-cgpa" id="overall-1st-cgpa"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Third Position -->
+                        <div class="top-position position-3">
+                            <div>
+                                <div class="position-icon">
+                                    <i class="fas fa-medal"></i>
+                                </div>
+                                <div class="position-rank">3rd</div>
+                            </div>
+                            <div>
+                                <div class="position-roll" id="overall-3rd-roll"></div>
+                                <div class="position-cgpa" id="overall-3rd-cgpa"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Top 10 List -->
+                    <div class="fade-in delay-2">
+                        <div class="table-responsive">
+                            <table class="toppers-table">
+                                <thead>
+                                    <tr>
+                                        <th width="80">Rank</th>
+                                        <th>Roll Number</th>
+                                        <th width="100">CGPA</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="overall-toppers-list">
+                                    <!-- Will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Branch-wise Toppers Section -->
+            <div class="toppers-card mt-4 fade-in delay-3">
+                <div class="toppers-card-header">
+                    <h2 class="toppers-card-title">
+                        <i class="fas fa-graduation-cap text-primary"></i>
+                        Branch-wise Toppers
+                    </h2>
+                </div>
+                <div class="toppers-card-body">
+                    <!-- Branch Tabs -->
+                    <div class="branch-tabs">
+                        <div class="branch-tab active" data-branch="cse">Computer Science</div>
+                        <div class="branch-tab" data-branch="ece">Electronics & Communication</div>
+                        <div class="branch-tab" data-branch="eee">Electrical & Electronics</div>
+                        <div class="branch-tab" data-branch="mec">Mechanical</div>
+                        <div class="branch-tab" data-branch="ce">Civil</div>
+                    </div>
+                    
+                    <!-- Branch Content -->
+                    <div class="branch-content active" id="cse-content">
+                        <div class="table-responsive">
+                            <table class="toppers-table">
+                                <thead>
+                                    <tr>
+                                        <th width="80">Rank</th>
+                                        <th>Roll Number</th>
+                                        <th width="100">CGPA</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cse-toppers-list">
+                                    <!-- Will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="branch-content" id="ece-content">
+                        <div class="table-responsive">
+                            <table class="toppers-table">
+                                <thead>
+                                    <tr>
+                                        <th width="80">Rank</th>
+                                        <th>Roll Number</th>
+                                        <th width="100">CGPA</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ece-toppers-list">
+                                    <!-- Will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="branch-content" id="eee-content">
+                        <div class="table-responsive">
+                            <table class="toppers-table">
+                                <thead>
+                                    <tr>
+                                        <th width="80">Rank</th>
+                                        <th>Roll Number</th>
+                                        <th width="100">CGPA</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="eee-toppers-list">
+                                    <!-- Will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="branch-content" id="mec-content">
+                        <div class="table-responsive">
+                            <table class="toppers-table">
+                                <thead>
+                                    <tr>
+                                        <th width="80">Rank</th>
+                                        <th>Roll Number</th>
+                                        <th width="100">CGPA</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="mec-toppers-list">
+                                    <!-- Will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="branch-content" id="ce-content">
+                        <div class="table-responsive">
+                            <table class="toppers-table">
+                                <thead>
+                                    <tr>
+                                        <th width="80">Rank</th>
+                                        <th>Roll Number</th>
+                                        <th width="100">CGPA</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ce-toppers-list">
+                                    <!-- Will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center my-4">
+                <a href="/" class="btn btn-outline-primary">
+                    <i class="fas fa-home me-2"></i> Back to Home
+                </a>
+            </div>
+        </div>
+    </main>
     
     <!-- Footer -->
     <footer class="footer">
@@ -827,6 +268,26 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async function() {
+            // Set up branch tabs
+            const branchTabs = document.querySelectorAll('.branch-tab');
+            branchTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove active class from all tabs
+                    branchTabs.forEach(t => t.classList.remove('active'));
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+                    
+                    // Hide all content
+                    document.querySelectorAll('.branch-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    
+                    // Show selected content
+                    const branch = this.getAttribute('data-branch');
+                    document.getElementById(`${branch}-content`).classList.add('active');
+                });
+            });
+            
             try {
                 // Fetch toppers data from API
                 const response = await fetch('/api/toppers');
@@ -836,10 +297,10 @@
                 const data = await response.json();
                 
                 // Hide loading spinner and show content
-                document.getElementById('loading-container').style.display = 'none';
-                document.getElementById('main-content').style.display = 'block';
+                document.getElementById('loading-container').classList.add('hidden');
+                document.getElementById('main-content').classList.remove('hidden');
                 
-                // Populate the podium for overall toppers
+                // Populate the top 3 positions
                 if (data.overall.length >= 3) {
                     document.getElementById('overall-1st-roll').textContent = data.overall[0].roll_number;
                     document.getElementById('overall-1st-cgpa').textContent = data.overall[0].cgpa;
@@ -862,11 +323,9 @@
             } catch (error) {
                 console.error('Error fetching data:', error);
                 document.getElementById('loading-container').innerHTML = `
-                    <div class="loading-container">
-                        <div class="alert alert-danger" role="alert">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-                            Error loading toppers data. Please try again later.
-                        </div>
+                    <div class="alert alert-danger" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Error loading toppers data. Please try again later.
                     </div>
                 `;
             }
@@ -874,9 +333,32 @@
         
         function populateToppersList(tableId, toppersList) {
             const tableBody = document.getElementById(tableId);
+            if (!tableBody) {
+                console.error(`Table body with ID ${tableId} not found!`);
+                return;
+            }
+            
             tableBody.innerHTML = '';
             
+            // If no data, show a message
+            if (!toppersList || toppersList.length === 0) {
+                const row = document.createElement('tr');
+                const cell = document.createElement('td');
+                cell.colSpan = 3;
+                cell.className = 'text-center text-muted py-4';
+                cell.textContent = 'No data available';
+                row.appendChild(cell);
+                tableBody.appendChild(row);
+                return;
+            }
+            
+            // Create rows for each topper
             toppersList.forEach((topper, index) => {
+                // Skip students already shown in top 3 for overall
+                if (tableId === 'overall-toppers-list' && index < 3) {
+                    return;
+                }
+                
                 const row = document.createElement('tr');
                 
                 // Create rank cell with badge
