@@ -5,51 +5,21 @@ import glob
 
 app = Flask(__name__, static_folder='public')
 
-# Parse student data from CSV file
-def parse_student_data():
-    student_data = {}
-    csv_file = './data/students.csv'
-    
-    with open(csv_file, 'r') as file:
-        reader = csv.DictReader(file)
-        for row in reader:
-            roll_number = row['rollNumber']
-            
-            if roll_number not in student_data:
-                student_data[roll_number] = {
-                    'rollNumber': roll_number,
-                    'name': row['name'],
-                    'cgpa': float(row['cgpa']),
-                    'subjects': []
-                }
-                
-            student_data[roll_number]['subjects'].append({
-                'subjectId': row['subjectId'],
-                'subjectName': row['subjectName'],
-                'grade': row['grade'],
-                'credits': float(row['credits'])
-            })
-            
-    return student_data
-
-# Parse CGPA data from CSV file
-def parse_cgpa_data():
-    cgpa_data = {}
-    csv_file = './data/cgpa_data.csv'
-    
-    with open(csv_file, 'r') as file:
-        reader = csv.DictReader(file)
-        for row in reader:
-            student_id = row['ID']
-            cgpa_data[student_id] = row
-            
-    return cgpa_data
-
-# Load student data
-STUDENT_DATA = parse_student_data()
-
-# Load CGPA data
-CGPA_DATA = parse_cgpa_data()
+# Function to get student info from semester data
+def get_student_info_from_semester(student_id):
+    # Try to find student in any semester
+    for semester_id in range(1, 5):  # Assuming max 4 semesters
+        semester_data = parse_semester_data(semester_id)
+        if student_id in semester_data:
+            # Get the first subject entry to extract student info
+            subject = semester_data[student_id][0]
+            return {
+                'rollNumber': student_id,
+                'name': student_id,  # Using ID as name since it's not in the CSV
+                'cgpa': 0.0,  # We'll calculate this later if needed
+                'subjects': []
+            }
+    return None
 
 # Function to get a list of available semesters
 def get_available_semesters():
@@ -94,20 +64,40 @@ def parse_semester_data(semester_id):
     semester_data = {}
     file_path = f'./data/semesters/semester{semester_id}.csv'
     
+    print(f"Attempting to parse semester data from: {file_path}")
+    
     if not os.path.exists(file_path):
+        print(f"Error: Semester file not found: {file_path}")
         return {}
         
-    with open(file_path, 'r') as file:
-        reader = csv.DictReader(file)
-        for row in reader:
-            student_id = row['ID']
-            
-            if student_id not in semester_data:
-                semester_data[student_id] = []
+    try:
+        with open(file_path, 'r') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                student_id = row['ID']
                 
-            semester_data[student_id].append(row)
-            
-    return semester_data
+                if not student_id:
+                    print(f"Warning: Row missing student ID: {row}")
+                    continue
+                
+                if student_id not in semester_data:
+                    semester_data[student_id] = []
+                    
+                # Store the subject data
+                semester_data[student_id].append({
+                    'Subject Code': row['Subject Code'],
+                    'Subject Name': row['Subject Name'],
+                    'Grade': row['Grade'],
+                    'Credits': row['Credits']
+                })
+                
+        print(f"Successfully parsed semester {semester_id} data")
+        print(f"Found {len(semester_data)} students")
+        print(f"Student IDs: {list(semester_data.keys())}")
+        return semester_data
+    except Exception as e:
+        print(f"Error parsing semester data from {file_path}: {str(e)}")
+        return {}
 
 # Serve static files
 @app.route('/', defaults={'path': ''})
@@ -120,77 +110,13 @@ def serve_static(path):
 # API endpoint to get student results
 @app.route('/api/results/<roll_number>', methods=['GET'])
 def get_results(roll_number):
-    if roll_number in STUDENT_DATA:
-        return jsonify([STUDENT_DATA[roll_number]])
+    # Get student info from semester data
+    student_info = get_student_info_from_semester(roll_number)
+    if student_info:
+        return jsonify([student_info])
     else:
         return jsonify({'error': 'Student not found with provided roll number'}), 404
 
-# API endpoint to get CGPA data
-@app.route('/api/cgpa/<student_id>', methods=['GET'])
-def get_cgpa_data(student_id):
-    print(f"Received request for student_id: {student_id}")
-    
-    # Print all available IDs for debugging
-    available_ids = list(CGPA_DATA.keys())
-    if len(available_ids) > 10:  # Print first 10 and count
-        print(f"Available IDs ({len(available_ids)} total): {available_ids[:10]}...")
-    else:
-        print(f"Available IDs: {available_ids}")
-    
-    if student_id in CGPA_DATA:
-        print(f"Student found: {student_id}")
-        return jsonify(CGPA_DATA[student_id])
-    else:
-        print(f"Student NOT found: {student_id}")
-        return jsonify({'error': 'Student not found with provided ID'}), 404
-        
-# API endpoint to get all CGPA data
-@app.route('/api/cgpa', methods=['GET'])
-def get_all_cgpa_data():
-    return jsonify(list(CGPA_DATA.values()))
-
-# Function to parse toppers data
-def parse_toppers_data():
-    toppers_data = {
-        'overall': [],
-        'ce': [],
-        'eee': [],
-        'mec': [],
-        'ece': [],
-        'cse': []
-    }
-    
-    try:
-        with open('data/toppers.csv', 'r') as file:
-            csv_reader = csv.reader(file)
-            next(csv_reader)  # Skip header row
-            for row in csv_reader:
-                if len(row) >= 3:
-                    category, roll_number, cgpa = row
-                    toppers_data[category].append({
-                        'roll_number': roll_number,
-                        'cgpa': cgpa
-                    })
-        return toppers_data
-    except Exception as e:
-        print(f"Error parsing toppers data: {e}")
-        return toppers_data
-        
-# API endpoint to get toppers data
-@app.route('/api/toppers', methods=['GET'])
-def get_toppers():
-    toppers_data = parse_toppers_data()
-    return jsonify(toppers_data)
-
-# API endpoint to get toppers by category
-@app.route('/api/toppers/<category>', methods=['GET'])
-def get_toppers_by_category(category):
-    toppers_data = parse_toppers_data()
-    if category in toppers_data:
-        return jsonify(toppers_data[category])
-    else:
-        return jsonify({'error': f'Category {category} not found'}), 404
-        
 # API endpoint to get available semesters
 @app.route('/api/semesters', methods=['GET'])
 def get_semesters():
@@ -200,15 +126,24 @@ def get_semesters():
 # API endpoint to get student semester data
 @app.route('/api/semester/<semester_id>/<student_id>', methods=['GET'])
 def get_student_semester_data(semester_id, student_id):
+    print(f"Fetching semester {semester_id} data for student {student_id}")
     semester_data = parse_semester_data(semester_id)
     
+    if not semester_data:
+        print(f"No data found for semester {semester_id}")
+        return jsonify({'error': 'Semester data not found'}), 404
+        
     if student_id in semester_data:
+        print(f"Found {len(semester_data[student_id])} subjects for student {student_id}")
+        print(f"Subjects: {semester_data[student_id]}")
         return jsonify({
             'semester_id': semester_id,
             'student_id': student_id,
             'subjects': semester_data[student_id]
         })
     else:
+        print(f"Student {student_id} not found in semester {semester_id}")
+        print(f"Available student IDs in semester: {list(semester_data.keys())}")
         return jsonify({'error': 'Student not found for the specified semester'}), 404
 
 if __name__ == '__main__':
