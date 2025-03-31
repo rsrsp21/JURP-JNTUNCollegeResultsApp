@@ -897,56 +897,177 @@ main {
 
 /* Responsive table styles */
 @media screen and (max-width: 768px) {
-    .semester-table {
-        display: block;
-        overflow-x: auto;
-        white-space: nowrap;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .semester-table th,
-    .semester-table td {
-        min-width: 120px; /* Minimum width for cells */
-        padding: 1rem;
-    }
-
-    /* Make semester name column sticky */
-    .semester-table th:first-child,
-    .semester-table td:first-child {
-        position: sticky;
-        left: 0;
-        background: rgba(45, 45, 45, 0.5);
-        z-index: 1;
-    }
-
-    /* Add horizontal scroll indicator */
-    .table-responsive::after {
-        content: '';
-        position: absolute;
-        right: 0;
-        top: 0;
-        bottom: 0;
-        width: 30px;
-        background: linear-gradient(to right, transparent, rgba(30, 30, 30, 0.8));
-        pointer-events: none;
-    }
-}
-
-/* Additional responsive adjustments */
-@media screen and (max-width: 576px) {
     .semester-table th,
     .semester-table td {
         padding: 0.75rem;
         font-size: 0.9rem;
     }
 
+    .semester-name {
+        font-size: 0.85rem;
+    }
+
     .sgpa-value {
-        min-width: 60px;
-        padding: 0.4rem 0.8rem;
+        min-width: 50px;
+        padding: 0.4rem 0.6rem;
+        font-size: 0.85rem;
     }
 
     .credits-badge {
-        min-width: 40px;
+        min-width: 35px;
+        padding: 0.4rem 0.6rem;
+        font-size: 0.85rem;
+    }
+}
+
+@media screen and (max-width: 576px) {
+    .semester-table th,
+    .semester-table td {
+        padding: 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    .semester-name {
+        font-size: 0.8rem;
+    }
+
+    .sgpa-value {
+        min-width: 45px;
+        padding: 0.3rem 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    .credits-badge {
+        min-width: 30px;
+        padding: 0.3rem 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    /* Header adjustments */
+    .header-title {
+        font-size: 1.2rem;
+    }
+
+    .nav-item {
         padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+    }
+
+    /* Search panel adjustments */
+    .search-panel {
+        padding: 1.5rem;
+    }
+
+    .panel-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .panel-header .lead {
+        font-size: 0.9rem;
+    }
+
+    .search-input {
+        padding: 0.6rem 0.8rem 0.6rem 2.2rem;
+        font-size: 0.9rem;
+    }
+
+    .search-btn {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
+    }
+
+    /* Student info card adjustments */
+    .student-info-card {
+        padding: 1.5rem;
+    }
+
+    .roll-number {
+        font-size: 1.2rem;
+        margin-right: 1rem;
+    }
+
+    .branch-name {
+        font-size: 1rem;
+    }
+
+    .batch-name, .year-name, .batch-label, .batch-value, .regulation-label, .regulation-value {
+        font-size: 0.9rem;
+    }
+
+    /* CGPA card adjustments */
+    .card-content {
+        padding: 1.5rem;
+    }
+
+    .section-title {
+        font-size: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .cgpa-value {
+        font-size: 3rem;
+    }
+
+    /* Stats card adjustments */
+    .stat-card {
+        padding: 1rem;
+    }
+
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+        margin-right: 1rem;
+    }
+
+    .data-label {
+        font-size: 0.8rem;
+    }
+
+    .percentage-value, .credits-value, .supplementary-value {
+        font-size: 1.2rem;
+    }
+
+    /* Division badge adjustments */
+    .division-badge {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+    }
+
+    /* Info badge adjustments */
+    .info-badge {
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
+    }
+
+    .student-info-badges {
+        gap: 1rem;
+    }
+
+    /* Step card adjustments */
+    .step-card {
+        padding: 1.5rem 1rem;
+    }
+
+    .step-number {
+        width: 2rem;
+        height: 2rem;
+        font-size: 1rem;
+    }
+
+    .step-icon {
+        width: 3rem;
+        height: 3rem;
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+    }
+
+    .step-card h3 {
+        font-size: 1rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .step-card p {
+        font-size: 0.8rem;
     }
 }
