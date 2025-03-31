@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const printButton = document.getElementById('printResultsBtn');
     if (printButton) {
         printButton.addEventListener('click', function() {
-            window.print();
+            downloadPDF();
         });
     }
     
@@ -393,7 +393,97 @@ semesterData.forEach(semester => {
     }
 }
 
-// Function to download results as PDF (can be implemented with jsPDF)
+// Function to download results as PDF
 function downloadPDF() {
-    alert('PDF download functionality will be implemented soon.');
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    // Get student data
+    const studentId = document.getElementById('student-id')?.value.trim() || 'Unknown';
+    const branch = document.querySelector('.branch-name')?.textContent?.trim() || 'Unknown Branch';
+    const cgpa = document.querySelector('.cgpa-value')?.textContent?.trim() || 'N/A';
+    const division = document.querySelector('.division-badge')?.textContent?.trim() || 'N/A';
+    const percentage = document.querySelector('.percentage-value')?.textContent?.trim() || 'N/A';
+    const totalCredits = document.querySelector('.credits-value')?.textContent?.trim() || 'N/A';
+    const supplementaryCount = document.querySelector('.supplementary-value')?.textContent?.trim() || 'None';
+    const batch = document.querySelector('.batch-badge .info-value')?.textContent?.trim() || 'N/A';
+    const regulation = document.querySelector('.regulation-badge .info-value')?.textContent?.trim() || 'N/A';
+    
+    // Title and Header
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(20);
+    doc.text('JNTUK UCEN', 105, 20, { align: 'center' });
+    doc.setFontSize(16);
+    doc.text('Student Academic Record', 105, 30, { align: 'center' });
+    
+    // Add university logo if available
+    const logo = document.querySelector('link[rel="icon"]')?.href;
+    if (logo) {
+        doc.addImage(logo, 'PNG', 15, 10, 30, 30);
+    }
+    
+    // Student Information
+    doc.setFontSize(12);
+    doc.text('Student Information', 20, 50);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Roll Number:', 20, 60);
+    doc.text('Branch:', 20, 70);
+    doc.text('Batch:', 20, 80);
+    doc.text('Regulation:', 20, 90);
+    
+    doc.setFont('helvetica', 'normal');
+    doc.text(studentId, 60, 60);
+    doc.text(branch, 60, 70);
+    doc.text(batch, 60, 80);
+    doc.text(regulation, 60, 90);
+    
+    // Academic Performance
+    doc.setFont('helvetica', 'bold');
+    doc.text('Academic Performance', 20, 110);
+    doc.setFont('helvetica', 'bold');
+    doc.text('CGPA:', 20, 120);
+    doc.text('Percentage:', 20, 130);
+    doc.text('Division:', 20, 140);
+    doc.text('Total Credits:', 20, 150);
+    
+    doc.setFont('helvetica', 'normal');
+    doc.text(cgpa, 60, 120);
+    doc.text(percentage, 60, 130);
+    doc.text(division, 60, 140);
+    doc.text(totalCredits, 60, 150);
+    
+    // Semester-wise Performance Table
+    doc.setFont('helvetica', 'bold');
+    doc.text('Semester-wise Performance', 20, 170);
+    
+    const tableData = [];
+    document.querySelectorAll('.semester-table tbody tr').forEach(row => {
+        tableData.push([
+            row.querySelector('.semester-name')?.textContent.trim() || '',
+            row.querySelector('.sgpa-value')?.textContent.trim() || '',
+            row.querySelector('.credits-badge')?.textContent.trim() || ''
+        ]);
+    });
+    
+    doc.autoTable({
+        startY: 180,
+        head: [['Semester', 'SGPA', 'Credits']],
+        body: tableData,
+        theme: 'grid',
+        headStyles: { fillColor: [0, 102, 204], textColor: [255, 255, 255], halign: 'center' },
+        bodyStyles: { fontSize: 11, halign: 'center' },
+        alternateRowStyles: { fillColor: [240, 240, 240] },
+        margin: { top: 20 }
+    });
+    
+    // Footer with Date
+    const pageCount = doc.internal.getNumberOfPages();
+    const date = new Date().toLocaleDateString('en-GB'); // Format as dd/mm/yyyy
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(8);
+    doc.text('This is a computer-generated document.', 105, doc.internal.pageSize.height - 10, { align: 'center' });
+    doc.text(`Generated on: ${date}`, 105, doc.internal.pageSize.height - 5, { align: 'center' });  // | Page ${pageCount}`
+    
+    // Save PDF
+    doc.save(`Student_Result_${studentId}.pdf`);
 }
