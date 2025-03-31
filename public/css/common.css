@@ -34,8 +34,10 @@ main {
 .navigation-bar {
     background: var(--card-bg);
     padding: 1rem 0;
-    margin-bottom: 2rem;
+    /* margin-bottom: 2rem; */
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    position: relative;
+    z-index: 1000;
 }
 
 .nav-brand {
@@ -77,6 +79,26 @@ main {
 
 .nav-link i {
     font-size: 0.9rem;
+}
+
+.nav-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    transition: color 0.2s ease;
+}
+
+.nav-toggle:hover {
+    color: var(--primary-color);
+}
+
+.nav-menu {
+    display: flex;
+    gap: 0.5rem;
 }
 
 /* Footer */
@@ -186,33 +208,51 @@ main {
 
 /* Page Header Styling */
 .page-header {
-    background: var(--card-bg);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    padding: 3rem 1.5rem;
-    margin-bottom: 2rem;
+    /* margin-bottom: 2rem; */
     position: relative;
     overflow: hidden;
     text-align: center;
+    padding: 2rem 1.5rem;
+    padding-bottom: 1rem;
+    background: linear-gradient(180deg, rgba(67, 97, 238, 0.1), transparent);
+    border-radius: 0 0 2rem 2rem;
 }
 
 .page-title {
-    font-size: 2.5rem;
-    font-weight: 700;
+    font-size: 3rem;
+    font-weight: 800;
     text-align: center;
-    margin-bottom: 0.5rem;
+    margin-bottom: 1rem;
     position: relative;
     z-index: 1;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(135deg, #fff, rgba(255,255,255,0.8));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    letter-spacing: -0.5px;
+    /* animation: titleFloat 3s ease-in-out infinite; */
 }
 
 .page-subtitle {
-    font-size: 1.1rem;
-    color: rgba(255, 255, 255, 0.85);
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.9);
     text-align: center;
     position: relative;
     z-index: 1;
-    max-width: 700px;
+    max-width: 800px;
     margin: 0 auto;
+    line-height: 1.6;
+    font-weight: 400;
+    letter-spacing: 0.2px;
+    backdrop-filter: blur(5px);
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+@keyframes titleFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
 }
 
 /* Responsive adjustments */
@@ -221,17 +261,49 @@ main {
         padding: 0.75rem 0;
     }
     
+    .nav-toggle {
+        display: block;
+    }
+
+    .nav-menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--card-bg);
+        padding: 1rem;
+        flex-direction: column;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+    }
+
+    .nav-menu.active {
+        display: flex !important;
+    }
+
     .nav-link {
-        padding: 0.4rem 0.75rem;
-        font-size: 0.9rem;
+        width: 100%;
+        padding: 0.75rem 1rem;
+        justify-content: flex-start;
+        color: var(--text-primary);
     }
     
-    .page-header {
-        padding: 2rem 1rem;
+    .nav-link:hover {
+        background: rgba(255, 255, 255, 0.1);
     }
+    
+    /* .page-header {
+        padding: 2rem 1rem;
+    } */
     
     .page-title {
-        font-size: 2rem;
+        font-size: 2.5rem;
+    }
+    
+    .page-subtitle {
+        font-size: 1.1rem;
     }
     
     .footer {

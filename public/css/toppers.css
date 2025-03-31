@@ -112,6 +112,7 @@
     font-weight: 700;
     font-size: 1rem;
     margin-bottom: 0.25rem;
+    text-align: center;
 }
 
 .position-1 .position-rank {
@@ -141,6 +142,7 @@
     padding: 0.25rem 0.75rem;
     background: rgba(67, 97, 238, 0.1);
     border-radius: 1rem;
+    text-align: center;
 }
 
 /* Branch Tabs */

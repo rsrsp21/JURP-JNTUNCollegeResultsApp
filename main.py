@@ -13,50 +13,60 @@ def serve_static(path):
         return send_from_directory('public', 'index.html')
     return send_from_directory('public', path)
 
-# Endpoint to get CGPA data for a given student ID
+# Endpoint to get CGPA data
 @app.route('/api/cgpa/<student_id>')
 def get_cgpa_data(student_id):
-    # Define the path to the CSV file
-    csv_file_path = 'data/cgpa_data.csv'  # Update this path to your CSV file
-
-    # Initialize a variable to store the student data
+    csv_files = ['data/cgpa_data_2021.csv', 'data/cgpa_data_2022.csv', 'data/cgpa_data_2023.csv', 'data/cgpa_data_2024.csv']
     student_data = None
+    batch = None
+    regulation = None
 
-    # Open the CSV file and read the data
-    with open(csv_file_path, mode='r', encoding='utf-8') as file:
-        reader = csv.DictReader(file)
-        for row in reader:
-            if row['ID'] == student_id:
-                student_data = row
-                break
+    for csv_file_path in csv_files:
+        with open(csv_file_path, mode='r', encoding='utf-8') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                if row['ID'] == student_id:
+                    student_data = row
+                    # Extract batch and regulation from filename
+                    if '2021' in csv_file_path:
+                        batch = '2021-25'
+                        regulation = 'R20'
+                    elif '2022' in csv_file_path:
+                        batch = '2022-26'
+                        regulation = 'R20'
+                    elif '2023' in csv_file_path:
+                        batch = '2023-27'
+                        regulation = 'R23'
+                    elif '2024' in csv_file_path:
+                        batch = '2024-28'
+                        regulation = 'R23'
+                    break
+        if student_data:
+            break  # Stop searching once found
 
-    # If student data is found, return it as JSON
     if student_data:
-        # Convert the data to the expected format
+        # Dynamically build the response by excluding missing semester data
         formatted_data = {
             'ID': student_data['ID'],
-            '1-1': student_data['1-1'],
-            'Credits_1-1': student_data['Credits_1-1'],
-            '1-2': student_data['1-2'],
-            'Credits_1-2': student_data['Credits_1-2'],
-            '2-1': student_data['2-1'],
-            'Credits_2-1': student_data['Credits_2-1'],
-            '2-2': student_data['2-2'],
-            'Credits_2-2': student_data['Credits_2-2'],
-            '3-1': student_data['3-1'],
-            'Credits_3-1': student_data['Credits_3-1'],
-            '3-2': student_data['3-2'],
-            'Credits_3-2': student_data['Credits_3-2'],
-            '4-1': student_data['4-1'],
-            'Credits_4-1': student_data['Credits_4-1'],
-            'Total Credits': student_data['Total Credits'],
-            'CGPA': student_data['CGPA'],
-            'Supplementary Appearances': student_data['Supplementary Appearances']
+            'Total Credits': student_data.get('Total Credits', 'N/A'),
+            'CGPA': student_data.get('CGPA', 'N/A'),
+            'Supplementary Appearances': student_data.get('Supplementary Appearances', 'N/A'),
+            'Batch': batch,
+            'Regulation': regulation
         }
+
+        # Dynamically add semester data if available
+        semesters = ['1-1', '1-2', '2-1', '2-2', '3-1', '3-2', '4-1']
+        for sem in semesters:
+            if sem in student_data and student_data[sem].strip():  # Only add non-empty data
+                formatted_data[sem] = student_data[sem]
+                formatted_data[f'Credits_{sem}'] = student_data.get(f'Credits_{sem}', 'N/A')
+
         return jsonify(formatted_data)
-    else:
-        # If student data is not found, return an error message
-        return jsonify({'error': 'Student not found'}), 404
+    
+    return jsonify({'error': 'Student not found'}), 404
+
+
     
 # Endpoint to get toppers data
 @app.route('/api/toppers')

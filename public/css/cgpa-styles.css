@@ -48,7 +48,7 @@ main {
 
 /* Main container */
 .main-container {
-    padding-top: 2rem;
+    /* padding-top: 2rem; */
     padding-bottom: 3rem;
 }
 
@@ -58,7 +58,7 @@ main {
     border-radius: 8px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     padding: 2rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
     transition: all 0.3s ease;
     border: 1px solid #333;
 }
@@ -160,30 +160,141 @@ main {
 
 /* Results container */
 .results-container {
-    margin-top: 2rem;
+    margin-top: 0rem;
 }
 
+/* Modern Glassmorphism Card Styles */
 .student-info-card {
-    background-color: #1e1e1e;
-    border-radius: 8px;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    border: 1px solid #333;
+    background: rgba(30, 30, 30, 0.7);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
 }
 
+.student-info-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+    border-color: rgba(96, 165, 250, 0.2);
+}
+
+/* Enhanced Roll Number and Branch Display */
 .roll-number {
-    font-size: 1.25rem;
-    font-weight: 600;
+    font-size: 1.5rem;
+    font-weight: 700;
     color: #60a5fa;
-    margin-right: 1rem;
-    text-shadow: 0 0 10px rgba(96, 165, 250, 0.3);
+    margin-right: 1.5rem;
+    text-shadow: 0 0 20px rgba(96, 165, 250, 0.4);
+    position: relative;
+    padding-right: 1.5rem;
+}
+
+.roll-number::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 2px;
+    height: 70%;
+    background: linear-gradient(to bottom, transparent, #60a5fa, transparent);
 }
 
 .branch-name {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     font-weight: 500;
     color: #e0e0e0;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+.batch-name {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #60a5fa;  /* Blue color for batch */
+    text-shadow: 0 0 10px rgba(96, 165, 250, 0.3);
+}
+
+.year-name {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #f87171;  /* Red color for years */
+    text-shadow: 0 0 10px rgba(248, 113, 113, 0.3);
+}
+
+.batch-label {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #60a5fa;  /* Blue color for "Batch:" */
+    text-shadow: 0 0 10px rgba(96, 165, 250, 0.3);
+}
+
+.batch-value {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #4ade80;  /* Green color for year range */
+    text-shadow: 0 0 10px rgba(74, 222, 128, 0.3);
+    margin-left: 0.5rem;  /* Add space between label and value */
+}
+
+.regulation-label {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #60a5fa;  /* Blue color for "Regulation:" */
+    text-shadow: 0 0 10px rgba(96, 165, 250, 0.3);
+    padding: 0.25rem 0.75rem;
+    background-color: rgba(96, 165, 250, 0.1);
+    border-radius: 4px;
+    border: 1px solid rgba(96, 165, 250, 0.2);
+    transition: all 0.3s ease;
+}
+
+.regulation-value {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #f87171;  /* Red color for regulation value */
+    text-shadow: 0 0 10px rgba(248, 113, 113, 0.3);
+    margin-left: 0.5rem;
+    padding: 0.25rem 0.75rem;
+    background-color: rgba(248, 113, 113, 0.1);
+    border-radius: 4px;
+    border: 1px solid rgba(248, 113, 113, 0.2);
+    transition: all 0.3s ease;
+}
+
+/* Add hover effects */
+.regulation-label:hover {
+    background-color: rgba(96, 165, 250, 0.15);
+    border-color: rgba(96, 165, 250, 0.3);
+    transform: translateY(-1px);
+}
+
+.regulation-value:hover {
+    background-color: rgba(248, 113, 113, 0.15);
+    border-color: rgba(248, 113, 113, 0.3);
+    transform: translateY(-1px);
+}
+
+/* Add a subtle animation for the regulation display */
+@keyframes fadeInRegulation {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.regulation-label, .regulation-value {
+    animation: fadeInRegulation 0.5s ease-out forwards;
+}
+
+.regulation-value {
+    animation-delay: 0.1s;
 }
 
 /* CGPA Overview */
@@ -201,15 +312,23 @@ main {
     padding-right: 0.75rem;
 }
 
-/* CGPA Card */
+/* Modern CGPA Card */
 .cgpa-card {
-    background-color: #1e1e1e;
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    background: rgba(30, 30, 30, 0.7);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     height: 100%;
     overflow: hidden;
     position: relative;
-    border: 1px solid #333;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.cgpa-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+    border-color: rgba(96, 165, 250, 0.2);
 }
 
 .cgpa-card::before {
@@ -219,7 +338,14 @@ main {
     left: 0;
     width: 100%;
     height: 4px;
-    background: linear-gradient(to right, #3b82f6, #60a5fa);
+    background: linear-gradient(90deg, #3b82f6, #60a5fa, #3b82f6);
+    background-size: 200% 100%;
+    animation: gradientFlow 3s linear infinite;
+}
+
+@keyframes gradientFlow {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 200% 0%; }
 }
 
 .card-content {
@@ -241,24 +367,54 @@ main {
 }
 
 .cgpa-value {
-    font-size: 3.5rem;
-    font-weight: 700;
+    font-size: 4rem;
+    font-weight: 800;
     color: #60a5fa;
     line-height: 1;
-    text-shadow: 0 0 15px rgba(96, 165, 250, 0.3);
+    text-shadow: 0 0 20px rgba(96, 165, 250, 0.4);
+    background: linear-gradient(45deg, #60a5fa, #3b82f6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: valuePulse 2s ease-in-out infinite;
 }
 
+@keyframes valuePulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Enhanced Progress Bar */
 .progress-bar-container {
-    height: 8px;
-    background-color: #333;
-    border-radius: 4px;
+    height: 10px;
+    background: rgba(51, 51, 51, 0.5);
+    border-radius: 5px;
     overflow: hidden;
-    margin-bottom: 1.5rem;
+    margin: 2rem 0;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .progress-bar-fill {
     height: 100%;
-    transition: width 1s ease-out;
+    transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-bar-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
 }
 
 .excellence {
@@ -285,36 +441,103 @@ main {
     margin-top: 1rem;
 }
 
+/* Modern Division Badge */
 .division-badge {
     display: inline-block;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    font-weight: 500;
-    font-size: 0.875rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .distinction {
-    background-color: rgba(52, 211, 153, 0.2);
+    background: linear-gradient(45deg, rgba(52, 211, 153, 0.2), rgba(52, 211, 153, 0.1));
     color: #34d399;
     border: 1px solid rgba(52, 211, 153, 0.3);
 }
 
 .first {
-    background-color: rgba(59, 130, 246, 0.2);
+    background: linear-gradient(45deg, rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0.1));
     color: #60a5fa;
     border: 1px solid rgba(59, 130, 246, 0.3);
 }
 
 .second {
-    background-color: rgba(250, 204, 21, 0.2);
+    background: linear-gradient(45deg, rgba(250, 204, 21, 0.2), rgba(250, 204, 21, 0.1));
     color: #facc15;
     border: 1px solid rgba(250, 204, 21, 0.3);
 }
 
 .pass {
-    background-color: rgba(239, 68, 68, 0.2);
+    background: linear-gradient(45deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.1));
     color: #ef4444;
     border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* Enhanced Info Badges */
+.student-info-badges {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.info-badge {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1.25rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.batch-badge {
+    background: linear-gradient(45deg, rgba(74, 222, 128, 0.1), rgba(74, 222, 128, 0.05));
+    border: 1px solid rgba(74, 222, 128, 0.2);
+}
+
+.regulation-badge {
+    background: linear-gradient(45deg, rgba(248, 113, 113, 0.1), rgba(248, 113, 113, 0.05));
+    border: 1px solid rgba(248, 113, 113, 0.2);
+}
+
+.info-label {
+    color: #adb5bd;
+    margin-right: 0.75rem;
+    font-weight: 500;
+}
+
+.batch-badge .info-value {
+    color: #4ade80;
+    text-shadow: 0 0 15px rgba(74, 222, 128, 0.4);
+    font-weight: 600;
+}
+
+.regulation-badge .info-value {
+    color: #f87171;
+    text-shadow: 0 0 15px rgba(248, 113, 113, 0.4);
+    font-weight: 600;
+}
+
+.info-badge:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.batch-badge:hover {
+    background: linear-gradient(45deg, rgba(74, 222, 128, 0.15), rgba(74, 222, 128, 0.1));
+    border-color: rgba(74, 222, 128, 0.3);
+}
+
+.regulation-badge:hover {
+    background: linear-gradient(45deg, rgba(248, 113, 113, 0.15), rgba(248, 113, 113, 0.1));
+    border-color: rgba(248, 113, 113, 0.3);
 }
 
 /* Stats Container */
@@ -323,44 +546,66 @@ main {
     flex-direction: column;
     gap: 1rem;
     height: 100%;
+    margin-top: 1rem;
 }
 
+@media (min-width: 768px) {
+    .stats-container {
+        margin-top: 0;
+    }
+}
+
+/* Enhanced Stats Cards */
 .stat-card {
-    background-color: #1e1e1e;
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    padding: 1.25rem;
+    background: rgba(30, 30, 30, 0.7);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    padding: 1.5rem;
     display: flex;
     align-items: center;
     flex: 1;
-    border: 1px solid #333;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+    border-color: rgba(96, 165, 250, 0.2);
 }
 
 .stat-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 1rem;
-    font-size: 1.25rem;
+    margin-right: 1.25rem;
+    font-size: 1.5rem;
     color: #121212;
+    transition: all 0.3s ease;
 }
 
+/* Restore specific colors for stat icons */
 .stat-card:nth-child(1) .stat-icon {
     background-color: #facc15;
-    box-shadow: 0 0 10px rgba(250, 204, 21, 0.3);
+    box-shadow: 0 0 15px rgba(250, 204, 21, 0.4);
 }
 
 .stat-card:nth-child(2) .stat-icon {
     background-color: #3b82f6;
-    box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
 }
 
 .stat-card:nth-child(3) .stat-icon {
     background-color: #ef4444;
-    box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+}
+
+.stat-card:hover .stat-icon {
+    transform: scale(1.1) rotate(5deg);
 }
 
 .stat-content {
@@ -405,18 +650,19 @@ main {
 
 /* Semester Performance Section */
 .semester-performance-section {
-    background-color: #1e1e1e;
-    border-radius: 8px;
-    padding: 1.5rem;
+    background: rgba(30, 30, 30, 0.7);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 2rem;
     margin-bottom: 2rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    border: 1px solid #333;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .semester-performance-section .section-title {
     margin-bottom: 1.5rem;
     padding-bottom: 1rem;
-    border-bottom: 1px solid #333;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .table-responsive {
@@ -432,28 +678,24 @@ main {
 }
 
 .semester-table th {
-    background-color: #2d2d2d;
+    background: rgba(45, 45, 45, 0.5);
     color: #adb5bd;
     font-weight: 600;
     text-transform: uppercase;
-    font-size: 0.75rem;
-    letter-spacing: 0.5px;
-    padding: 1rem;
-    border-bottom: 1px solid #333;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    padding: 1.25rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .semester-table td {
-    padding: 1rem;
-    border-bottom: 1px solid #333;
-    vertical-align: middle;
+    padding: 1.25rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
 }
 
-.semester-table tr:last-child td {
-    border-bottom: none;
-}
-
-.semester-table tr:hover {
-    background-color: #2d2d2d;
+.semester-table tr:hover td {
+    background: rgba(45, 45, 45, 0.3);
 }
 
 .semester-name {
@@ -464,47 +706,62 @@ main {
 .sgpa-value {
     font-weight: 700;
     display: inline-block;
-    min-width: 60px;
-    padding: 0.25rem 0.75rem;
-    border-radius: 4px;
+    min-width: 70px;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
     text-align: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .excellent-sgpa {
-    background-color: rgba(52, 211, 153, 0.2);
+    background: linear-gradient(45deg, rgba(52, 211, 153, 0.2), rgba(52, 211, 153, 0.1));
     color: #34d399;
     border: 1px solid rgba(52, 211, 153, 0.3);
 }
 
 .good-sgpa {
-    background-color: rgba(59, 130, 246, 0.2);
+    background: linear-gradient(45deg, rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0.1));
     color: #60a5fa;
     border: 1px solid rgba(59, 130, 246, 0.3);
 }
 
 .average-sgpa {
-    background-color: rgba(250, 204, 21, 0.2);
+    background: linear-gradient(45deg, rgba(250, 204, 21, 0.2), rgba(250, 204, 21, 0.1));
     color: #facc15;
     border: 1px solid rgba(250, 204, 21, 0.3);
 }
 
 .poor-sgpa {
-    background-color: rgba(239, 68, 68, 0.2);
+    background: linear-gradient(45deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.1));
     color: #ef4444;
     border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
+.sgpa-value:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* Enhanced Credits Badge */
 .credits-badge {
     display: inline-block;
-    background-color: #2d2d2d;
+    background: rgba(45, 45, 45, 0.5);
     color: #e0e0e0;
-    padding: 0.25rem 0.75rem;
-    border-radius: 4px;
-    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
     font-weight: 500;
-    min-width: 45px;
+    min-width: 50px;
     text-align: center;
-    border: 1px solid #444;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.credits-badge:hover {
+    background: rgba(45, 45, 45, 0.7);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 /* Action Buttons */

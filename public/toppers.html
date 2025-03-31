@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="images/university_logo.png">
     <title>Toppers List (2021-25)</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
@@ -24,10 +25,13 @@
         <div class="container">
             <div class="d-flex align-items-center justify-content-between">
                 <a href="/" class="nav-brand">
-                    <i class="fas fa-graduation-cap fs-4"></i>
+                    <img src="images/university_logo.png" alt="University Logo" class="nav-logo" style="width: 50px;">
                     <span>JNTUK UCEN Results Portal</span>
                 </a>
-                <div class="d-flex">
+                <button class="nav-toggle d-md-none" aria-label="Toggle navigation">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="nav-menu">
                     <a href="/" class="nav-link">
                         <i class="fas fa-home"></i>Home
                     </a>
@@ -45,9 +49,9 @@
     <!-- Page Header -->
     <header class="page-header">
         <div class="container">
-            <h1 class="page-title">Toppers List</h1>
+            <h1 class="page-title">Toppers List (2021-25 Batch)</h1>
             <p class="page-subtitle">
-                Academic excellence rankings for the 2021-25 batch
+                Academic excellence rankings
             </p>
         </div>
     </header>
@@ -68,7 +72,7 @@
                 <div class="toppers-card-header">
                     <h2 class="toppers-card-title">
                         <i class="fas fa-trophy text-warning"></i>
-                        Overall University Toppers
+                        Overall College Toppers
                     </h2>
                 </div>
                 <div class="toppers-card-body">
@@ -256,15 +260,17 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-6 text-center text-md-start">
-                    <p class="footer-text mb-0">© 2025 Student Results Portal</p>
+                    <p class="footer-text mb-0">© 2025 JNTUK UCEN Results Portal</p>
                 </div>
                 <div class="col-md-6 text-center text-md-end">
-                    <p class="footer-text mb-0">Created for <span class="footer-highlight">University</span> Students</p>
+                    <p class="footer-text mb-0">Created for <span class="footer-highlight">JNTUK UCEN</span> Students</p>
                 </div>
             </div>
         </div>
     </footer>
 
+    <!-- Custom JavaScript -->
+    <script src="js/main.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async function() {

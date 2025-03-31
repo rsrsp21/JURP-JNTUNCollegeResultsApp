@@ -126,7 +126,7 @@ async function displayResults() {
 
     var idHeading = document.createElement('div');
     idHeading.className = 'd-flex align-items-center';
-    idHeading.innerHTML = '<span class="roll-number">' + studentId + '</span><span class="mx-2 text-muted">|</span><span class="branch-name">' + branch + '</span>';
+    idHeading.innerHTML = '<span class="roll-number">' + studentId + '</span><span class="mx-2 text-muted"></span><span class="branch-name">' + branch + '</span>';
     idContainer.appendChild(idHeading);
 
     // Display CGPA
@@ -146,31 +146,59 @@ async function displayResults() {
     var progressFill = document.getElementById('progress-fill');
     progressFill.style.width = `${progressPercentage}%`;
     
-    // Set color based on CGPA
-    if (cgpa >= 7.75) {
-        progressFill.className = 'progress-bar-fill excellence';
-    } else if (cgpa >= 6.75) {
-        progressFill.className = 'progress-bar-fill first-class';
-    } else if (cgpa >= 5.75) {
-        progressFill.className = 'progress-bar-fill second-class';
+    // Set color based on CGPA and regulation
+    var regulation = studentData['Regulation'];
+    if (regulation === 'R23') {
+        if (cgpa >= 7.5) {
+            progressFill.className = 'progress-bar-fill excellence';
+        } else if (cgpa >= 6.5) {
+            progressFill.className = 'progress-bar-fill first-class';
+        } else if (cgpa >= 5.5) {
+            progressFill.className = 'progress-bar-fill second-class';
+        } else {
+            progressFill.className = 'progress-bar-fill pass-class';
+        }
     } else {
-        progressFill.className = 'progress-bar-fill pass-class';
+        if (cgpa >= 7.75) {
+            progressFill.className = 'progress-bar-fill excellence';
+        } else if (cgpa >= 6.75) {
+            progressFill.className = 'progress-bar-fill first-class';
+        } else if (cgpa >= 5.75) {
+            progressFill.className = 'progress-bar-fill second-class';
+        } else {
+            progressFill.className = 'progress-bar-fill pass-class';
+        }
     }
 
     // Display division message
     var message = '';
     var supplementaryAppearances = studentData['Supplementary Appearances'];
 
-    if (cgpa >= 7.75 && (supplementaryAppearances === '' || !supplementaryAppearances.includes('*'))) {
-        message = 'First Class with Distinction';
-    } else if (cgpa >= 6.75) {
-        message = 'First Class';
-    } else if (cgpa >= 5.75) {
-        message = 'Second Class';
-    } else if (cgpa >= 5) {
-        message = 'Pass Class';
+    // Different conditions based on regulation
+    if (regulation === 'R23') {
+        if (cgpa >= 7.5) {
+            message = 'First Class with Distinction';
+        } else if (cgpa >= 6.5) {
+            message = 'First Class';
+        } else if (cgpa >= 5.5) {
+            message = 'Second Class';
+        } else if (cgpa >= 5) {
+            message = 'Pass Class';
+        } else {
+            message = 'Not Applicable';
+        }
     } else {
-        message = 'Not Applicable';
+        if (cgpa >= 7.75 && (supplementaryAppearances === '' || !supplementaryAppearances.includes('*'))) {
+            message = 'First Class with Distinction';
+        } else if (cgpa >= 6.75) {
+            message = 'First Class';
+        } else if (cgpa >= 5.75) {
+            message = 'Second Class';
+        } else if (cgpa >= 5) {
+            message = 'Pass Class';
+        } else {
+            message = 'Not Applicable';
+        }
     }
 
     var messageContainer = document.getElementById('message-container');
@@ -192,6 +220,22 @@ async function displayResults() {
         }
         
         messageContainer.appendChild(messageElement);
+
+        // Add batch and regulation info below message
+        var infoContainer = document.createElement('div');
+        infoContainer.className = 'student-info-badges';
+        
+        var batchBadge = document.createElement('div');
+        batchBadge.className = 'info-badge batch-badge';
+        batchBadge.innerHTML = '<span class="info-label">Batch:</span><span class="info-value">' + studentData['Batch'] + '</span>';
+        
+        var regulationBadge = document.createElement('div');
+        regulationBadge.className = 'info-badge regulation-badge';
+        regulationBadge.innerHTML = '<span class="info-label">Regulation:</span><span class="info-value">' + studentData['Regulation'] + '</span>';
+        
+        infoContainer.appendChild(batchBadge);
+        infoContainer.appendChild(regulationBadge);
+        messageContainer.appendChild(infoContainer);
     }
 
     // Display Percentage
@@ -205,7 +249,12 @@ async function displayResults() {
     
     var percentageValue = document.createElement('div');
     percentageValue.className = 'percentage-value';
-    var percentage = ((cgpa - 0.75) * 10).toFixed(2);
+    var percentage;
+    if (regulation === 'R23') {
+        percentage = ((cgpa - 0.5) * 10).toFixed(2);
+    } else {
+        percentage = ((cgpa - 0.75) * 10).toFixed(2);
+    }
     percentageValue.textContent = (percentage <= 0) ? '0%' : percentage + '%';
     percentageContainer.appendChild(percentageValue);
 
@@ -277,56 +326,64 @@ async function displayResults() {
     table.appendChild(tableBody);
 
     // Define the semester keys and labels
-    const semesterData = [
-        { key: '1-1', label: 'First Year - First Semester' },
-        { key: '1-2', label: 'First Year - Second Semester' },
-        { key: '2-1', label: 'Second Year - First Semester' },
-        { key: '2-2', label: 'Second Year - Second Semester' },
-        { key: '3-1', label: 'Third Year - First Semester' },
-        { key: '3-2', label: 'Third Year - Second Semester' },
-        { key: '4-1', label: 'Fourth Year - First Semester' }
-    ];
+    // Define the semester keys and labels
+const semesterData = [
+    { key: '1-1', label: 'First Year - First Semester' },
+    { key: '1-2', label: 'First Year - Second Semester' },
+    { key: '2-1', label: 'Second Year - First Semester' },
+    { key: '2-2', label: 'Second Year - Second Semester' },
+    { key: '3-1', label: 'Third Year - First Semester' },
+    { key: '3-2', label: 'Third Year - Second Semester' },
+    { key: '4-1', label: 'Fourth Year - First Semester' }
+];
 
-    // Loop through the semesters
-    semesterData.forEach(semester => {
-        const sgpa = studentData[semester.key];
-        const credits = studentData[`Credits_${semester.key}`];
-        
-        // Skip empty semesters
-        if (sgpa === '' && credits === '') return;
-        
-        var row = document.createElement('tr');
-        
-        // Semester label
-        var labelCell = document.createElement('td');
-        labelCell.textContent = semester.label;
-        labelCell.className = 'semester-name';
-        row.appendChild(labelCell);
+// Loop through the semesters and display only available ones
+semesterData.forEach(semester => {
+    const sgpa = studentData[semester.key];
+    const credits = studentData[`Credits_${semester.key}`];
 
-        // SGPA with appropriate styling
-        var sgpaCell = document.createElement('td');
-        if (sgpa && sgpa !== '0.0') {
-            const sgpaValue = parseFloat(sgpa);
-            let sgpaClass = 'sgpa-value ';
-            
+    // Skip missing semesters
+    if (!sgpa || sgpa === 'N/A') return;
+
+    var row = document.createElement('tr');
+
+    // Semester label
+    var labelCell = document.createElement('td');
+    labelCell.textContent = semester.label;
+    labelCell.className = 'semester-name';
+    row.appendChild(labelCell);
+
+    // SGPA with appropriate styling
+    var sgpaCell = document.createElement('td');
+    if (sgpa && sgpa !== '0.0') {
+        const sgpaValue = parseFloat(sgpa);
+        let sgpaClass = 'sgpa-value ';
+        
+        if (regulation === 'R23') {
+            if (sgpaValue >= 7.5) sgpaClass += 'excellent-sgpa';
+            else if (sgpaValue >= 6.5) sgpaClass += 'good-sgpa';
+            else if (sgpaValue >= 5.5) sgpaClass += 'average-sgpa';
+            else sgpaClass += 'poor-sgpa';
+        } else {
             if (sgpaValue >= 7.75) sgpaClass += 'excellent-sgpa';
             else if (sgpaValue >= 6.75) sgpaClass += 'good-sgpa';
             else if (sgpaValue >= 5.75) sgpaClass += 'average-sgpa';
             else sgpaClass += 'poor-sgpa';
-            
-            sgpaCell.innerHTML = `<span class="${sgpaClass}">${sgpa}</span>`;
-        } else {
-            sgpaCell.innerHTML = '<span class="poor-sgpa">NA</span>';
         }
-        row.appendChild(sgpaCell);
+        
+        sgpaCell.innerHTML = `<span class="${sgpaClass}">${sgpa}</span>`;
+    } else {
+        sgpaCell.innerHTML = '<span class="poor-sgpa">NA</span>';
+    }
+    row.appendChild(sgpaCell);
 
-        // Credits
-        var creditsCell = document.createElement('td');
-        creditsCell.innerHTML = `<span class="credits-badge">${credits}</span>`;
-        row.appendChild(creditsCell);
+    // Credits
+    var creditsCell = document.createElement('td');
+    creditsCell.innerHTML = `<span class="credits-badge">${credits || 'N/A'}</span>`;
+    row.appendChild(creditsCell);
 
-        tableBody.appendChild(row);
-    });
+    tableBody.appendChild(row);
+});
     } catch (error) {
         console.error('Error displaying results:', error);
         alert('An error occurred while fetching data. Please try again.');
