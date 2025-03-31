@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="images/university_logo.png">
-    <title>Toppers List (2021-25)</title>
+    <title>Toppers List</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
     <!-- Google Fonts -->
@@ -17,7 +17,6 @@
     <link rel="stylesheet" href="css/common.css">
     <!-- Toppers CSS -->
     <link rel="stylesheet" href="css/toppers.css">
-
 </head>
 <body>
     <!-- Navigation Bar -->
@@ -35,10 +34,10 @@
                     <a href="/" class="nav-link">
                         <i class="fas fa-home"></i>Home
                     </a>
-                    <a href="/cgpa.html" class="nav-link">
+                    <a href="/cgpa" class="nav-link">
                         <i class="fas fa-calculator"></i>CGPA
                     </a>
-                    <a href="/toppers.html" class="nav-link active">
+                    <a href="/toppers" class="nav-link active">
                         <i class="fas fa-trophy"></i>Toppers
                     </a>
                 </div>
@@ -49,10 +48,17 @@
     <!-- Page Header -->
     <header class="page-header">
         <div class="container">
-            <h1 class="page-title">Toppers List (2021-25 Batch)</h1>
+            <h1 class="page-title">Toppers List</h1>
             <p class="page-subtitle">
                 Academic excellence rankings
             </p>
+            <!-- Year Tabs -->
+            <div class="year-tabs">
+                <div class="year-tab" data-year="2021">2021-25 Batch</div>
+                <div class="year-tab" data-year="2022">2022-26 Batch</div>
+                <div class="year-tab" data-year="2023">2023-27 Batch</div>
+                <div class="year-tab" data-year="2024">2024-28 Batch</div>
+            </div>
         </div>
     </header>
 
@@ -78,20 +84,6 @@
                 <div class="toppers-card-body">
                     <!-- Top 3 Section -->
                     <div class="top-three fade-in delay-1">
-                        <!-- Second Position -->
-                        <div class="top-position position-2">
-                            <div>
-                                <div class="position-icon">
-                                    <i class="fas fa-medal"></i>
-                                </div>
-                                <div class="position-rank">2nd</div>
-                            </div>
-                            <div>
-                                <div class="position-roll" id="overall-2nd-roll"></div>
-                                <div class="position-cgpa" id="overall-2nd-cgpa"></div>
-                            </div>
-                        </div>
-                        
                         <!-- First Position -->
                         <div class="top-position position-1">
                             <div>
@@ -103,6 +95,20 @@
                             <div>
                                 <div class="position-roll" id="overall-1st-roll"></div>
                                 <div class="position-cgpa" id="overall-1st-cgpa"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Second Position -->
+                        <div class="top-position position-2">
+                            <div>
+                                <div class="position-icon">
+                                    <i class="fas fa-medal"></i>
+                                </div>
+                                <div class="position-rank">2nd</div>
+                            </div>
+                            <div>
+                                <div class="position-roll" id="overall-2nd-roll"></div>
+                                <div class="position-cgpa" id="overall-2nd-cgpa"></div>
                             </div>
                         </div>
                         
@@ -273,7 +279,21 @@
     <script src="js/main.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', async function() {
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up year tabs
+            const yearTabs = document.querySelectorAll('.year-tab');
+            yearTabs.forEach(tab => {
+                tab.addEventListener('click', async function() {
+                    // Remove active class from all tabs
+                    yearTabs.forEach(t => t.classList.remove('active'));
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+                    
+                    // Fetch and display data for selected year
+                    await fetchToppersData(this.getAttribute('data-year'));
+                });
+            });
+            
             // Set up branch tabs
             const branchTabs = document.querySelectorAll('.branch-tab');
             branchTabs.forEach(tab => {
@@ -294,9 +314,23 @@
                 });
             });
             
+            // Show initial message instead of loading data
+            document.getElementById('loading-container').innerHTML = `
+                <div class="text-center">
+                    <i class="fas fa-calendar-alt fa-3x mb-3 text-primary"></i>
+                    <p>Select a year to view toppers list</p>
+                </div>
+            `;
+        });
+        
+        async function fetchToppersData(year) {
             try {
-                // Fetch toppers data from API
-                const response = await fetch('/api/toppers');
+                // Show loading spinner
+                document.getElementById('loading-container').classList.remove('hidden');
+                document.getElementById('main-content').classList.add('hidden');
+                
+                // Fetch toppers data from API with year parameter
+                const response = await fetch(`/api/toppers?year=${year}`);
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
@@ -335,63 +369,32 @@
                     </div>
                 `;
             }
-        });
+        }
         
         function populateToppersList(tableId, toppersList) {
             const tableBody = document.getElementById(tableId);
             if (!tableBody) {
-                console.error(`Table body with ID ${tableId} not found!`);
+                console.error(`Table body with id ${tableId} not found`);
                 return;
             }
             
+            // Clear existing content
             tableBody.innerHTML = '';
             
-            // If no data, show a message
-            if (!toppersList || toppersList.length === 0) {
-                const row = document.createElement('tr');
-                const cell = document.createElement('td');
-                cell.colSpan = 3;
-                cell.className = 'text-center text-muted py-4';
-                cell.textContent = 'No data available';
-                row.appendChild(cell);
-                tableBody.appendChild(row);
-                return;
-            }
-            
-            // Create rows for each topper
+            // Add rows for each topper
             toppersList.forEach((topper, index) => {
-                // Skip students already shown in top 3 for overall
-                if (tableId === 'overall-toppers-list' && index < 3) {
-                    return;
-                }
-                
                 const row = document.createElement('tr');
-                
-                // Create rank cell with badge
-                const rankCell = document.createElement('td');
-                const rankBadge = document.createElement('div');
-                rankBadge.className = `rank-badge rank-badge-${index + 1 <= 3 ? index + 1 : ''}`;
-                rankBadge.textContent = (index + 1);
-                rankCell.appendChild(rankBadge);
-                
-                // Create roll number cell
-                const rollCell = document.createElement('td');
-                rollCell.className = 'roll-number';
-                rollCell.textContent = topper.roll_number;
-                
-                // Create CGPA cell with badge
-                const cgpaCell = document.createElement('td');
-                const cgpaBadge = document.createElement('span');
-                cgpaBadge.className = 'cgpa-badge';
-                cgpaBadge.textContent = topper.cgpa;
-                cgpaCell.appendChild(cgpaBadge);
-                
-                // Append cells to row
-                row.appendChild(rankCell);
-                row.appendChild(rollCell);
-                row.appendChild(cgpaCell);
-                
-                // Append row to table
+                row.innerHTML = `
+                    <td>
+                        <span class="rank-badge rank-badge-${index < 3 ? index + 1 : ''}">${index + 1}</span>
+                    </td>
+                    <td>
+                        <span class="roll-number">${topper.roll_number}</span>
+                    </td>
+                    <td>
+                        <span class="cgpa-badge">${topper.cgpa}</span>
+                    </td>
+                `;
                 tableBody.appendChild(row);
             });
         }

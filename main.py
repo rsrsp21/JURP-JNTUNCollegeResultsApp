@@ -2,10 +2,20 @@ from flask import Flask, send_from_directory, jsonify, request
 import os
 import csv
 import glob
+import pandas as pd
 
 app = Flask(__name__, static_folder='public')
 
-# Serve static files
+# Clean URL routes (must come before catch-all route)
+@app.route('/cgpa')
+def serve_cgpa():
+    return send_from_directory('public', 'cgpa.html')
+
+@app.route('/toppers')
+def serve_toppers():
+    return send_from_directory('public', 'toppers.html')
+
+# Serve static files (catch-all route should be last)
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve_static(path):
@@ -70,37 +80,65 @@ def get_cgpa_data(student_id):
     
 # Endpoint to get toppers data
 @app.route('/api/toppers')
-def get_toppers_data():
-    # Define the path to the CSV file
-    csv_file_path = 'data/toppers.csv'  # Update this path to your toppers CSV file
-
-    # Initialize a dictionary to store the toppers data
-    toppers_data = {
-        'overall': [],
-        'ce': [],
-        'eee': [],
-        'mec': [],
-        'ece': [],
-        'cse': []
-    }
-
-    # Open the CSV file and read the data
-    with open(csv_file_path, mode='r', encoding='utf-8') as file:
-        reader = csv.DictReader(file)
-        for row in reader:
-            category = row['category']
-            roll_number = row['roll_number']
-            cgpa = float(row['cgpa'])
-
-            # Append the data to the corresponding category
-            if category in toppers_data:
-                toppers_data[category].append({
-                    'roll_number': roll_number,
-                    'cgpa': cgpa
+def get_toppers():
+    try:
+        # Get year parameter from query string, default to 2021
+        year = request.args.get('year', '2021')
+        csv_file = f'data/toppers_{year}.csv'
+        
+        # Check if file exists
+        if not os.path.exists(csv_file):
+            return jsonify({
+                'error': f'No data available for {year} batch'
+            }), 404
+            
+        # Read the CSV file
+        df = pd.read_csv(csv_file)
+        
+        # Convert CGPA to numeric, handling any non-numeric values
+        df['CGPA'] = pd.to_numeric(df['cgpa'], errors='coerce')
+        
+        # Sort by CGPA in descending order
+        df = df.sort_values('CGPA', ascending=False)
+        
+        # Create overall toppers list
+        overall_toppers = []
+        for _, row in df[df['category'] == 'overall'].iterrows():
+            overall_toppers.append({
+                'roll_number': str(row['roll_number']),
+                'cgpa': float(row['CGPA'])
+            })
+        
+        # Create branch-wise toppers lists
+        branch_toppers = {
+            'cse': [],
+            'ece': [],
+            'eee': [],
+            'mec': [],
+            'ce': []
+        }
+        
+        # Process each branch
+        for branch in branch_toppers.keys():
+            branch_df = df[df['category'] == branch]
+            branch_df = branch_df.sort_values('CGPA', ascending=False)
+            
+            for _, row in branch_df.iterrows():
+                branch_toppers[branch].append({
+                    'roll_number': str(row['roll_number']),
+                    'cgpa': float(row['CGPA'])
                 })
-
-    # Return the toppers data as JSON
-    return jsonify(toppers_data)
+        
+        return jsonify({
+            'overall': overall_toppers,
+            **branch_toppers
+        })
+        
+    except Exception as e:
+        print(f"Error processing toppers data: {str(e)}")
+        return jsonify({
+            'error': 'Internal server error'
+        }), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

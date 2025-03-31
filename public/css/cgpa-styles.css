@@ -869,16 +869,15 @@ main {
 
 /* Footer */
 .footer {
-    background-color: #1e1e1e;
+    margin-top: 4rem;
     padding: 2rem 0;
-    color: #adb5bd;
-    margin-top: 1rem;
-    border-top: 1px solid #333;
+    background: var(--card-bg);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .footer p {
     margin-bottom: 0;
-    color: #adb5bd;
+    color: var(--text-secondary);
 }
 
 /* Dark theme overrides for Bootstrap elements */

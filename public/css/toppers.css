@@ -44,6 +44,24 @@
     padding: 1.5rem 0;
 }
 
+@media (min-width: 769px) {
+    .top-three {
+        position: relative;
+    }
+    
+    .position-1 {
+        order: 2;
+    }
+    
+    .position-2 {
+        order: 1;
+    }
+    
+    .position-3 {
+        order: 3;
+    }
+}
+
 .top-position {
     display: flex;
     flex-direction: column;
@@ -138,11 +156,12 @@
 .position-cgpa {
     font-weight: 600;
     font-size: 1rem;
-    color: var(--primary-color);
+    color: #4CAF50;
     padding: 0.25rem 0.75rem;
-    background: rgba(67, 97, 238, 0.1);
+    background: rgba(76, 175, 80, 0.15);
     border-radius: 1rem;
     text-align: center;
+    border: 1px solid rgba(76, 175, 80, 0.3);
 }
 
 /* Branch Tabs */
@@ -211,6 +230,7 @@
 .toppers-table th:last-child {
     border-top-right-radius: 8px;
     text-align: right;
+    width: 120px;
 }
 
 .toppers-table td {
@@ -221,6 +241,7 @@
 
 .toppers-table td:last-child {
     text-align: right;
+    width: 120px;
 }
 
 .toppers-table tr:last-child td {
@@ -279,8 +300,11 @@
     border-radius: 4px;
     font-weight: 600;
     font-size: 0.85rem;
-    background: rgba(67, 97, 238, 0.15);
-    color: var(--primary-color);
+    background: rgba(76, 175, 80, 0.15);
+    color: #4CAF50;
+    border: 1px solid rgba(76, 175, 80, 0.3);
+    min-width: 60px;
+    text-align: center;
 }
 
 .roll-number {
@@ -326,31 +350,169 @@
 .delay-2 { animation-delay: 0.2s; }
 .delay-3 { animation-delay: 0.3s; }
 
+/* Year Tabs */
+.year-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+
+.year-tab {
+    padding: 0.5rem 1.5rem;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    min-width: 120px;
+    text-align: center;
+}
+
+.year-tab:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.year-tab.active {
+    background-color: var(--primary-color);
+    color: white;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
+    .toppers-card {
+        margin-bottom: 1.5rem;
+    }
+
+    .toppers-card-header {
+        padding: 1rem 1.25rem;
+    }
+
+    .toppers-card-title {
+        font-size: 1.1rem;
+        gap: 0.5rem;
+    }
+
+    .toppers-card-body {
+        padding: 1.25rem;
+    }
+
     .top-three {
         flex-direction: column;
         align-items: center;
         gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding: 1rem 0;
     }
     
     .top-position {
         width: 100%;
         max-width: 300px;
+        padding: 1rem;
+        gap: 0.5rem;
     }
     
     .position-1, .position-2, .position-3 {
         padding: 1rem;
     }
+
+    .position-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+
+    .position-rank {
+        font-size: 0.9rem;
+    }
+
+    .position-roll {
+        font-size: 0.8rem;
+    }
+
+    .position-cgpa {
+        font-size: 0.9rem;
+        padding: 0.2rem 0.5rem;
+    }
     
     .branch-tabs {
         flex-direction: column;
-        gap: 0.5rem;
+        gap: 0.4rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
     }
     
     .branch-tab {
         width: 100%;
         text-align: center;
+        padding: 0.35rem 0.5rem;
+        font-size: 0.8rem;
     }
 
+    .year-tabs {
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+
+    .year-tab {
+        padding: 0.3rem 0.75rem;
+        font-size: 0.8rem;
+        min-width: calc(33.33% - 0.5rem);
+        margin-bottom: 0.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .toppers-card-header {
+        padding: 0.75rem 1rem;
+    }
+
+    .toppers-card-title {
+        font-size: 1rem;
+    }
+
+    .toppers-card-body {
+        padding: 1rem;
+    }
+
+    .top-position {
+        max-width: 250px;
+        padding: 0.75rem;
+    }
+
+    .position-icon {
+        width: 35px;
+        height: 35px;
+        font-size: 0.9rem;
+    }
+
+    .position-rank {
+        font-size: 0.85rem;
+    }
+
+    .position-roll {
+        font-size: 0.75rem;
+    }
+
+    .position-cgpa {
+        font-size: 0.85rem;
+        padding: 0.15rem 0.4rem;
+    }
+
+    .branch-tab {
+        padding: 0.3rem 0.4rem;
+        font-size: 0.75rem;
+    }
+
+    .year-tabs {
+        gap: 0.4rem;
+    }
+
+    .year-tab {
+        padding: 0.25rem 0.6rem;
+        font-size: 0.75rem;
+        min-width: calc(33.33% - 0.4rem);
+        margin-bottom: 0.2rem;
+    }
 }

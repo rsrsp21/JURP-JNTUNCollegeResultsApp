@@ -24,6 +24,7 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    padding-top: 4.5rem; /* Height of navbar + some extra space */
 }
 
 main {
@@ -32,12 +33,24 @@ main {
 
 /* Navigation */
 .navigation-bar {
-    background: var(--card-bg);
+    background: rgba(30, 41, 59, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     padding: 1rem 0;
-    /* margin-bottom: 2rem; */
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    position: relative;
-    z-index: 1000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+}
+
+/* Add scroll class for JavaScript */
+.navigation-bar.scrolled {
+    background: var(--card-bg);
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
 }
 
 .nav-brand {
@@ -208,7 +221,6 @@ main {
 
 /* Page Header Styling */
 .page-header {
-    /* margin-bottom: 2rem; */
     position: relative;
     overflow: hidden;
     text-align: center;
@@ -216,6 +228,8 @@ main {
     padding-bottom: 1rem;
     background: linear-gradient(180deg, rgba(67, 97, 238, 0.1), transparent);
     border-radius: 0 0 2rem 2rem;
+    margin-top: 0; /* Remove negative margin */
+    z-index: 1;
 }
 
 .page-title {
@@ -257,6 +271,14 @@ main {
 
 /* Responsive adjustments */
 @media (max-width: 767px) {
+    body {
+        padding-top: 4rem; /* Slightly less padding for mobile */
+    }
+
+    .page-header {
+        margin-top: 0; /* Remove negative margin for mobile */
+    }
+
     .navigation-bar {
         padding: 0.75rem 0;
     }
@@ -292,10 +314,6 @@ main {
     
     .nav-link:hover {
         background: rgba(255, 255, 255, 0.1);
-    }
-    
-    .page-header {
-        padding-top: 1rem;
     }
     
     .page-title {
