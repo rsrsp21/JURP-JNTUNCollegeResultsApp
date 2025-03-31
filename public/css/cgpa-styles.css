@@ -894,3 +894,59 @@ main {
 .results-container {
     display: block;
 }
+
+/* Responsive table styles */
+@media screen and (max-width: 768px) {
+    .semester-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .semester-table th,
+    .semester-table td {
+        min-width: 120px; /* Minimum width for cells */
+        padding: 1rem;
+    }
+
+    /* Make semester name column sticky */
+    .semester-table th:first-child,
+    .semester-table td:first-child {
+        position: sticky;
+        left: 0;
+        background: rgba(45, 45, 45, 0.5);
+        z-index: 1;
+    }
+
+    /* Add horizontal scroll indicator */
+    .table-responsive::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 30px;
+        background: linear-gradient(to right, transparent, rgba(30, 30, 30, 0.8));
+        pointer-events: none;
+    }
+}
+
+/* Additional responsive adjustments */
+@media screen and (max-width: 576px) {
+    .semester-table th,
+    .semester-table td {
+        padding: 0.75rem;
+        font-size: 0.9rem;
+    }
+
+    .sgpa-value {
+        min-width: 60px;
+        padding: 0.4rem 0.8rem;
+    }
+
+    .credits-badge {
+        min-width: 40px;
+        padding: 0.4rem 0.8rem;
+    }
+}
