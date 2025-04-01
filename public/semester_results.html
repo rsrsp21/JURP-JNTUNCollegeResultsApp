@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+    <html lang="en" data-bs-theme="dark">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" type="image/png" href="images/university_logo.png">
+        <title>Semester-wise Results</title>
+        <!-- Bootstrap CSS -->
+        <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+        <!-- Google Fonts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <!-- Common CSS -->
+        <link rel="stylesheet" href="css/common.css">
+        <!-- Toppers CSS -->
+        <link rel="stylesheet" href="css/semester_results.css">
+        <!-- jsPDF Library -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+        <!-- jsPDF AutoTable Plugin -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    </head>
+    <body>
+        <!-- Navigation Bar -->
+        <nav class="navigation-bar">
+            <div class="container">
+                <div class="d-flex align-items-center justify-content-between">
+                    <a href="/" class="nav-brand">
+                        <img src="images/university_logo.png" alt="University Logo" class="nav-logo" style="width: 50px;">
+                        <span>JNTUK UCEN Results Portal</span>
+                    </a>
+                    <button class="nav-toggle d-md-none" aria-label="Toggle navigation">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="nav-menu">
+                        <a href="/" class="nav-link">
+                            <i class="fas fa-home"></i>Home
+                        </a>
+                        <a href="/cgpa" class="nav-link">
+                            <i class="fas fa-calculator"></i>CGPA
+                        </a>
+                        <a href="/semester_results" class="nav-link active">
+                            <i class="fas fa-chart-bar"></i>Semester-wise Results
+                        </a>
+                        <a href="/toppers" class="nav-link">
+                            <i class="fas fa-trophy"></i>Toppers
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    
+    <!-- Page Header -->
+    <header class="page-header">
+        <div class="container">
+            <h1 class="page-title">Semester-wise Results</h1>
+            <p class="page-subtitle">
+                View your semester grades, SGPA, credits earned and track your academic progress
+            </p>
+        </div>
+    </header>
+
+    <!-- Main content -->
+    <main class="main-container">
+        <div class="row justify-content-center">
+            <!-- Search Section -->
+            <div class="col-12 col-lg-8">
+                <div class="search-panel">
+                    <div class="panel-header">
+                        <p class="lead">Enter your Roll Number:</p>
+                    </div>
+                    
+                    <div class="search-form">
+                        <div class="input-wrapper">
+                            <i class="fas fa-user-graduate input-icon"></i>
+                            <input 
+                                type="text" 
+                                id="student-id" 
+                                class="form-control search-input" 
+                                placeholder="e.g., 21031A0534"
+                            >
+                        </div>
+                        <button id="search-button" class="btn btn-primary search-btn" onclick="displayResults()">
+                            <i class="fas fa-search"></i>
+                            <span>Search</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loading-indicator" class="row justify-content-center hidden">
+            <div class="col-auto">
+                <div class="loading-spinner"></div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-10">
+                <div id="results-section" class="results-container hidden">
+                    <!-- Student Info -->
+                    <div class="student-info-card">
+                        <div class="student-info-content">
+                            <div class="roll-number" id="roll-number"></div>
+                            <div class="branch-name" id="branch-name"></div>
+                            <div class="batch-info">
+                                <span class="batch-label">Batch:</span>
+                                <span class="batch-value" id="batch"></span>
+                            </div>
+                            <div class="regulation-info">
+                                <span class="regulation-label">Regulation:</span>
+                                <span class="regulation-value" id="regulation"></span>
+                            </div>
+                        </div>
+                        <div class="download-section">
+                            <button id="download-all" class="download-btn">
+                                <i class="fas fa-download"></i>
+                                Download All Results
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Semester Selection -->
+                    <div class="semester-accordion">
+                        <div class="semester-item">
+                            <button class="semester-header" onclick="toggleSemester(1)">
+                                <div class="semester-title">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <span>1-1</span>
+                                </div>
+                                <i class="fas fa-chevron-down semester-arrow"></i>
+                            </button>
+                            <div class="semester-content hidden">
+                                <div id="sgpa-container-1" class="sgpa-display"></div>
+                                <div id="results-container-1" class="results-table-container"></div>
+                                <div class="semester-download">
+                                    <button class="download-btn" onclick="downloadSemester(1)">
+                                        <i class="fas fa-download"></i>
+                                        Download Semester 1-1 Result
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="semester-item">
+                            <button class="semester-header" onclick="toggleSemester(2)">
+                                <div class="semester-title">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <span>1-2</span>
+                                </div>
+                                <i class="fas fa-chevron-down semester-arrow"></i>
+                            </button>
+                            <div class="semester-content hidden">
+                                <div id="sgpa-container-2" class="sgpa-display"></div>
+                                <div id="results-container-2" class="results-table-container"></div>
+                                <div class="semester-download">
+                                    <button class="download-btn" onclick="downloadSemester(2)">
+                                        <i class="fas fa-download"></i>
+                                        Download Semester 1-2 Result
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="semester-item">
+                            <button class="semester-header" onclick="toggleSemester(3)">
+                                <div class="semester-title">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <span>2-1</span>
+                                </div>
+                                <i class="fas fa-chevron-down semester-arrow"></i>
+                            </button>
+                            <div class="semester-content hidden">
+                                <div id="sgpa-container-3" class="sgpa-display"></div>
+                                <div id="results-container-3" class="results-table-container"></div>
+                                <div class="semester-download">
+                                    <button class="download-btn" onclick="downloadSemester(3)">
+                                        <i class="fas fa-download"></i>
+                                        Download Semester 2-1 Result
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="semester-item">
+                            <button class="semester-header" onclick="toggleSemester(4)">
+                                <div class="semester-title">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <span>2-2</span>
+                                </div>
+                                <i class="fas fa-chevron-down semester-arrow"></i>
+                            </button>
+                            <div class="semester-content hidden">
+                                <div id="sgpa-container-4" class="sgpa-display"></div>
+                                <div id="results-container-4" class="results-table-container"></div>
+                                <div class="semester-download">
+                                    <button class="download-btn" onclick="downloadSemester(4)">
+                                        <i class="fas fa-download"></i>
+                                        Download Semester 2-2 Result
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="semester-item">
+                            <button class="semester-header" onclick="toggleSemester(5)">
+                                <div class="semester-title">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <span>3-1</span>
+                                </div>
+                                <i class="fas fa-chevron-down semester-arrow"></i>
+                            </button>
+                            <div class="semester-content hidden">
+                                <div id="sgpa-container-5" class="sgpa-display"></div>
+                                <div id="results-container-5" class="results-table-container"></div>
+                                <div class="semester-download">
+                                    <button class="download-btn" onclick="downloadSemester(5)">
+                                        <i class="fas fa-download"></i>
+                                        Download Semester 3-1 Result
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="semester-item">
+                            <button class="semester-header" onclick="toggleSemester(6)">
+                                <div class="semester-title">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <span>3-2</span>
+                                </div>
+                                <i class="fas fa-chevron-down semester-arrow"></i>
+                            </button>
+                            <div class="semester-content hidden">
+                                <div id="sgpa-container-6" class="sgpa-display"></div>
+                                <div id="results-container-6" class="results-table-container"></div>
+                                <div class="semester-download">
+                                    <button class="download-btn" onclick="downloadSemester(6)">
+                                        <i class="fas fa-download"></i>
+                                        Download Semester 3-2 Result
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="semester-item">
+                            <button class="semester-header" onclick="toggleSemester(7)">
+                                <div class="semester-title">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <span>4-1</span>
+                                </div>
+                                <i class="fas fa-chevron-down semester-arrow"></i>
+                            </button>
+                            <div class="semester-content hidden">
+                                <div id="sgpa-container-7" class="sgpa-display"></div>
+                                <div id="results-container-7" class="results-table-container"></div>
+                                <div class="semester-download">
+                                    <button class="download-btn" onclick="downloadSemester(7)">
+                                        <i class="fas fa-download"></i>
+                                        Download Semester 4-1 Result  
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="semester-item">
+                            <button class="semester-header" onclick="toggleSemester(8)">
+                                <div class="semester-title">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <span>4-2</span>
+                                </div>
+                                <i class="fas fa-chevron-down semester-arrow"></i>
+                            </button>
+                            <div class="semester-content hidden">
+                                <div id="sgpa-container-8" class="sgpa-display"></div>
+                                <div id="results-container-8" class="results-table-container"></div>
+                                <div class="semester-download">
+                                    <button class="download-btn" onclick="downloadSemester(8)">
+                                        <i class="fas fa-download"></i>
+                                        Download Semester 4-2 Result
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="semester-item">
+                            <button class="semester-header" onclick="toggleSemester(9)">
+                                <div class="semester-title">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <span>Honors/Minor</span>
+                                </div>
+                                <i class="fas fa-chevron-down semester-arrow"></i>
+                            </button>
+                            <div class="semester-content hidden">
+                                <div id="sgpa-container-9" class="sgpa-display"></div>
+                                <div id="results-container-9" class="results-table-container"></div>
+                                <div class="semester-download">
+                                    <button class="download-btn" onclick="downloadSemester(9)">
+                                        <i class="fas fa-download"></i>
+                                        Download Honors/Minor Result
+                                    </button>
+                                </div>
+                            </div>  
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="footer-text mb-0">© 2025 JNTUK UCEN Results Portal</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <p class="footer-text mb-0">Created for <span class="footer-highlight">JNTUK UCEN</span> Students</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/semester_results.js"></script>
+</body>
+</html> 

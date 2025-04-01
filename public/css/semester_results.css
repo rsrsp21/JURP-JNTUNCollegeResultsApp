@@ -1,0 +1,905 @@
+/* Modern Variables */
+:root {
+    --primary-color: #4f46e5;
+    --secondary-color: #7c3aed;
+    --accent-color: #06b6d4;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --card-bg: #1e293b;
+    --card-border: rgba(255, 255, 255, 0.1);
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --error-color: #ef4444;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Header */
+
+.header-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #60a5fa;
+    text-shadow: 0 0 10px rgba(96, 165, 250, 0.3);
+}
+
+
+/* Main Container */
+.main-container {
+    padding: 1.5rem;
+    min-height: 100vh;
+}
+
+/* Search Panel */
+.search-panel {
+    background: var(--card-bg);
+    backdrop-filter: blur(20px);
+    border-radius: 1.25rem;
+    padding: 1.5rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--card-border);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-bottom: 1.5rem;
+}
+
+.search-panel:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+}
+
+.panel-header {
+    margin-bottom: 1.25rem;
+}
+
+.panel-header .lead {
+    color: var(--text-primary);
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.search-form {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.input-wrapper {
+    flex: 1;
+    position: relative;
+}
+
+.input-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--primary-color);
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+}
+
+.search-input {
+    width: 100%;
+    padding: 1rem 1rem 1rem 3rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.75rem;
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.2);
+}
+
+.search-btn {
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border: none;
+    border-radius: 0.75rem;
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.search-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(79, 70, 229, 0.3);
+}
+
+.search-btn i {
+    font-size: 1rem;
+}
+
+/* Student Info Card */
+.student-info-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(20px);
+    border-radius: 1.25rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--card-border);
+    transition: all 0.4s ease;
+}
+
+.student-info-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+}
+
+.student-info-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.25rem;
+}
+
+.roll-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.branch-name {
+    font-size: 1.2rem;
+    color: var(--accent-color);
+    margin-bottom: 0.75rem;
+}
+
+.batch-info, .regulation-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.batch-label, .regulation-label {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Semester Accordion */
+.semester-accordion {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.semester-item {
+    background: var(--card-bg);
+    border-radius: 1.25rem;
+    overflow: hidden;
+    border: 1px solid var(--card-border);
+    transition: all 0.3s ease;
+}
+
+.semester-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.semester-header {
+    width: 100%;
+    padding: 1.25rem 1.5rem;
+    background: transparent;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.semester-header:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.semester-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.semester-title i {
+    color: var(--primary-color);
+    font-size: 1.2rem;
+}
+
+.semester-arrow {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    transition: transform 0.3s ease;
+}
+
+.semester-item.active .semester-arrow {
+    transform: rotate(180deg);
+}
+
+.semester-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    background: rgba(255, 255, 255, 0.02);
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+.semester-content.hidden {
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+.semester-content:not(.hidden) {
+    max-height: 2000px;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.semester-content .sgpa-display {
+    margin: 1rem 1.5rem;
+    border-radius: 1rem;
+}
+
+.semester-content .results-table-container {
+    margin: 1rem 1.5rem;
+    border-radius: 1rem;
+}
+
+/* Enhanced SGPA Display */
+.sgpa-display {
+    margin: 1.5rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.1), rgba(124, 58, 237, 0.1));
+    border-radius: 1.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.sgpa-display::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+}
+
+.sgpa-display:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+}
+
+.sgpa-value {
+    font-size: 4rem;
+    font-weight: 800;
+    margin: 1rem 0;
+    animation: pulse 2s infinite;
+}
+
+/* Gradient for passing SGPA */
+.sgpa-value.pass {
+    background: linear-gradient(135deg, var(--success-color), #10b981);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 30px rgba(16, 185, 129, 0.4);
+}
+
+/* Solid red for fail */
+.sgpa-value.fail {
+    background: none;
+    color: var(--error-color);
+    text-shadow: 0 0 20px rgba(239, 68, 68, 0.4); /* Using RGBA for text-shadow with 0.4 opacity */
+}
+
+
+.sgpa-label {
+    color: var(--text-secondary);
+    font-size: 1.2rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 1rem;
+}
+
+.credits-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 1rem;
+    margin-top: 1rem;
+}
+
+.credits-label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.credits-value {
+    color: var(--accent-color);
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+/* Enhanced Results Table */
+.results-table-container {
+    margin: 1.5rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.results-table-container:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+}
+
+.results-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 0;
+}
+
+.results-table th {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 1rem;
+    text-align: left;
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.results-table td {
+    padding: 1rem;
+    color: var(--text-primary);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
+
+.results-table tr:hover td {
+    background: rgba(255, 255, 255, 0.03);
+    transform: scale(1.01);
+}
+
+/* Animations */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .main-container {
+        padding: 0.75rem;
+    }
+
+    .search-panel {
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        text-align: center;
+    }
+
+    .search-form {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: center;
+        width: 100%;
+    }
+
+    .input-wrapper {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 0.75rem 0.75rem 0.75rem 2.5rem;
+        font-size: 0.9rem;
+    }
+
+    .input-icon {
+        left: 0.75rem;
+        font-size: 0.9rem;
+    }
+
+    .search-btn {
+        width: 100%;
+        max-width: 300px;
+        justify-content: center;
+        padding: 0.75rem 1.25rem;
+        font-size: 0.9rem;
+    }
+
+    .student-info-card {
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .student-info-content {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .roll-number {
+        font-size: 1.1rem;
+    }
+
+    .branch-name {
+        font-size: 0.95rem;
+    }
+
+    .batch-info, .regulation-info {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.85rem;
+    }
+
+    .semester-header {
+        padding: 0.75rem 1rem;
+    }
+
+    .semester-title {
+        font-size: 0.9rem;
+    }
+
+    .semester-title i {
+        font-size: 1rem;
+    }
+
+    .semester-content {
+        padding: 0.5rem;
+    }
+
+    .sgpa-display {
+        margin: 0.5rem;
+        padding: 1rem;
+    }
+
+    .sgpa-value {
+        font-size: 2.5rem;
+    }
+
+    .sgpa-label {
+        font-size: 0.9rem;
+    }
+
+    .credits-info {
+        flex-direction: column;
+        gap: 0.25rem;
+        padding: 0.5rem 1rem;
+    }
+
+    .credits-label {
+        font-size: 0.8rem;
+    }
+
+    .credits-value {
+        font-size: 0.9rem;
+    }
+
+    .results-table-container {
+        margin: 0.5rem;
+        padding: 0.5rem;
+    }
+
+    .results-table {
+        width: 100%;
+        font-size: 0.8rem;
+    }
+
+    .results-table th {
+        padding: 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    .results-table td {
+        padding: 0.5rem;
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-container {
+        padding: 0.5rem;
+    }
+
+    .search-panel {
+        padding: 0.75rem;
+    }
+
+    .panel-header .lead {
+        font-size: 0.9rem;
+        text-align: center;
+    }
+
+    .input-wrapper {
+        max-width: 250px;
+    }
+
+    .search-input {
+        padding: 0.5rem 0.5rem 0.5rem 2rem;
+        font-size: 0.8rem;
+    }
+
+    .input-icon {
+        left: 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    .search-btn {
+        max-width: 250px;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.8rem;
+    }
+
+    .student-info-card {
+        padding: 0.5rem;
+        text-align: center;
+    }
+
+    .student-info-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .roll-number {
+        font-size: 0.9rem;
+        text-align: center;
+    }
+
+    .branch-name {
+        font-size: 0.8rem;
+        text-align: center;
+    }
+
+    .batch-info, .regulation-info {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+        justify-content: center;
+        width: 100%;
+        max-width: 200px;
+    }
+
+    .semester-header {
+        padding: 0.5rem 0.75rem;
+    }
+
+    .semester-title {
+        font-size: 0.8rem;
+    }
+
+    .semester-title i {
+        font-size: 0.8rem;
+    }
+
+    .semester-arrow {
+        font-size: 0.7rem;
+    }
+
+    .sgpa-display {
+        margin: 0.25rem;
+        padding: 0.5rem;
+    }
+
+    .sgpa-value {
+        font-size: 1.75rem;
+    }
+
+    .sgpa-label {
+        font-size: 0.75rem;
+    }
+
+    .credits-info {
+        padding: 0.25rem 0.5rem;
+    }
+
+    .credits-label {
+        font-size: 0.7rem;
+    }
+
+    .credits-value {
+        font-size: 0.75rem;
+    }
+
+    .semester-content .results-table-container {
+        margin: 0.5rem 0;
+        padding: 0.25rem 0;
+        border-radius: 0.5rem;
+    }
+
+    .results-table-container {
+        margin: 0.25rem 0;
+        padding: 0.25rem 0;
+        width: 100%;
+        border-radius: 0.5rem;
+    }
+
+    .results-table {
+        font-size: 0.65rem;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    .results-table th {
+        padding: 0.25rem;
+        font-size: 0.65rem;
+        white-space: normal;
+        word-wrap: break-word;
+        text-align: center;
+        vertical-align: middle;
+        height: auto;
+        min-height: 2.5rem;
+    }
+
+    /* Make table columns narrower */
+    .results-table th:nth-child(1),
+    .results-table td:nth-child(1) {
+        width: 10%;
+    }
+
+    .results-table th:nth-child(2),
+    .results-table td:nth-child(2) {
+        width: 30%;
+    }
+
+    .results-table th:nth-child(3),
+    .results-table td:nth-child(3) {
+        width: 12%;
+    }
+
+    .results-table th:nth-child(4),
+    .results-table td:nth-child(4) {
+        width: 12%;
+    }
+
+    .results-table th:nth-child(5),
+    .results-table td:nth-child(5) {
+        width: 12%;
+    }
+
+    .results-table th:nth-child(6),
+    .results-table td:nth-child(6) {
+        width: 12%;
+    }
+
+    /* Add text wrapping for long content */
+    .results-table td {
+        white-space: normal;
+        word-wrap: break-word;
+        text-align: center;
+        padding: 0.25rem;
+    }
+
+    /* Prevent subject code from breaking */
+    .results-table td:nth-child(1) {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Center align all headers */
+    .results-table th {
+        text-align: center;
+    }
+}
+
+/* Add touch-friendly styles */
+@media (hover: none) {
+    .search-btn:active,
+    .semester-header:active {
+        transform: scale(0.98);
+    }
+
+    .results-table tr:active td {
+        background: rgba(255, 255, 255, 0.05);
+    }
+}
+
+/* Add landscape mode optimizations */
+@media (max-height: 480px) and (orientation: landscape) {
+    .main-container {
+        padding: 0.5rem;
+    }
+
+    .search-panel {
+        margin-bottom: 0.5rem;
+    }
+
+    .student-info-card {
+        margin-bottom: 0.5rem;
+    }
+
+    .semester-accordion {
+        gap: 0.5rem;
+    }
+
+    .semester-header {
+        padding: 0.75rem 1rem;
+    }
+
+    .sgpa-display {
+        margin: 0.5rem;
+        padding: 0.75rem;
+    }
+
+    .sgpa-value {
+        font-size: 2rem;
+        margin: 0.5rem 0;
+    }
+}
+
+/* Add high-DPI screen optimizations */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .results-table th,
+    .results-table td {
+        border-bottom-width: 0.5px;
+    }
+}
+
+/* Add print styles */
+@media print {
+    .search-panel,
+    .search-btn,
+    .semester-arrow {
+        display: none;
+    }
+
+    .main-container {
+        padding: 0;
+    }
+
+    .student-info-card,
+    .semester-item {
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+
+    .results-table {
+        border-collapse: collapse;
+    }
+
+    .results-table th,
+    .results-table td {
+        border: 1px solid #ddd;
+    }
+}
+
+/* Loading Indicator */
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    border-top-color: var(--primary-color);
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Download Button Styles */
+.download-section {
+    display: flex;
+    justify-content: center;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--card-border);
+}
+
+.semester-download {
+    display: flex;
+    justify-content: center;
+    margin: 1.5rem 0;
+    padding-top: 1rem;
+    border-top: 1px solid var(--card-border);
+}
+
+.download-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border: none;
+    border-radius: 0.75rem;
+    color: white;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(79, 70, 229, 0.2);
+}
+
+.download-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.3);
+}
+
+.download-btn i {
+    font-size: 1rem;
+}
+
+.download-btn:active {
+    transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+    .download-section {
+        margin-top: 1rem;
+        padding-top: 1rem;
+    }
+
+    .semester-download {
+        margin: 1rem 0;
+        padding-top: 0.75rem;
+    }
+
+    .download-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .download-section {
+        margin-top: 0.75rem;
+        padding-top: 0.75rem;
+    }
+
+    .semester-download {
+        margin: 0.75rem 0;
+        padding-top: 0.5rem;
+    }
+
+    .download-btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+    }
+}

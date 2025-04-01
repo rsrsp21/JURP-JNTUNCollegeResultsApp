@@ -1,4 +1,4 @@
-from flask import Flask, send_from_directory, jsonify, request
+from flask import Flask, send_from_directory, jsonify, request, send_file
 import os
 import csv
 import glob
@@ -14,6 +14,10 @@ def serve_cgpa():
 @app.route('/toppers')
 def serve_toppers():
     return send_from_directory('public', 'toppers.html')
+
+@app.route('/semester_results')
+def serve_semester_results():
+    return send_from_directory('public', 'semester_results.html')
 
 # Serve static files (catch-all route should be last)
 @app.route('/', defaults={'path': ''})
@@ -139,6 +143,41 @@ def get_toppers():
         return jsonify({
             'error': 'Internal server error'
         }), 500
+
+# Serve static files from the public directory
+@app.route('/')
+def serve_index():
+    return send_from_directory('public', 'semester_results.html')
+
+@app.route('/css/<path:filename>')
+def serve_css(filename):
+    return send_from_directory('public/css', filename)
+
+@app.route('/js/<path:filename>')
+def serve_js(filename):
+    return send_from_directory('public/js', filename)
+
+@app.route('/api/semester/<int:semester>')
+def serve_semester_data(semester):
+    # Get student ID from query parameters
+    student_id = request.args.get('student_id', '')
+    
+    # Determine which batch folder to use based on student ID pattern
+    if student_id.startswith(('21031A', '22035A')):
+        batch_folder = '2021'
+    elif student_id.startswith(('22031A', '23035A')):
+        batch_folder = '2022'
+    elif student_id.startswith(('23031A', '24035A')):
+        batch_folder = '2023'
+    elif student_id.startswith(('24031A', '25035A')):
+        batch_folder = '2024'
+    else:
+        return 'Invalid student ID pattern', 400
+        
+    file_path = os.path.join('data', 'semesters', batch_folder, f'semester{semester}.csv')
+    if os.path.exists(file_path):
+        return send_file(file_path, mimetype='text/csv')
+    return 'Semester data not found', 404
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
