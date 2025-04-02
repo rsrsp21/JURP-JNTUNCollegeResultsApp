@@ -483,11 +483,9 @@ function downloadSemester(semester) {
     doc.text('Academic Performance', 20, 120);
     doc.text('SGPA:', 20, 130);
     doc.text('Credits:', 20, 140);
-    
     doc.setFont('helvetica', 'normal');
-    doc.text(sgpa, 80, 130);
+    doc.text(sgpa.trim(), 80, 130); 
     doc.text(credits, 80, 140);
-    
     // Results Table
     doc.setFont('helvetica', 'bold');
     doc.text('Subject-wise Results', 20, 160);
