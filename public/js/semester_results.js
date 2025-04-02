@@ -518,10 +518,10 @@ function downloadSemester(semester) {
             halign: 'center'
         },
         columnStyles: {
-            0: { cellWidth: 30 }, // Subject Code
+            0: { cellWidth: 20 }, // Subject Code
             1: { cellWidth: 100 }, // Subject Name
-            2: { cellWidth: 30 }, // Credits
-            3: { cellWidth: 30 }  // Grade
+            2: { cellWidth: 20 }, // Credits
+            3: { cellWidth: 20 }  // Grade
         },
         alternateRowStyles: { fillColor: [240, 240, 240] },
         margin: { top: 10 }
@@ -635,7 +635,7 @@ function downloadAllResults() {
             },
             columnStyles: {
                 0: { cellWidth: 20 }, // Subject Code
-                1: { cellWidth: 80 }, // Subject Name
+                1: { cellWidth: 100 }, // Subject Name
                 2: { cellWidth: 20 }, // Credits
                 3: { cellWidth: 20 }  // Grade
             },
