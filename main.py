@@ -144,6 +144,13 @@ def get_toppers():
             'error': 'Internal server error'
         }), 500
 
+# Endpoint to reset chart data
+@app.route('/api/reset_chart', methods=['POST'])
+def reset_chart_data():
+    # Logic to reset chart data or state if needed
+    # Currently, just returns a success message
+    return jsonify({'status': 'success', 'message': 'Chart data reset successfully.'})
+
 # Serve static files from the public directory
 @app.route('/')
 def serve_index():

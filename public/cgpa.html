@@ -174,9 +174,15 @@
                             <i class="fas fa-chart-line me-2"></i>
                             Semester-wise Performance
                         </h3>
+                        
+                        <div class="chart-container mb-4" style="position: relative; height: 350px;">
+                            <canvas id="sgpaChart"></canvas>
+                            <p id="no-chart-data-message" class="text-center text-muted mt-5 d-none">No semester data available for chart.</p> 
+                        </div>
                         <div id="table-container" class="table-responsive">
                             <!-- Table will be populated here -->
                         </div>
+
                     </div>
                     
                     <!-- Action Buttons -->
@@ -241,7 +247,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-6 text-center text-md-start">
-                    <p class="footer-text mb-0">© 2025 JNTUK UCEN Results Portal</p>
+                    <p class="footer-text mb-0"> 2025 JNTUK UCEN Results Portal</p>
                 </div>
                 <div class="col-md-6 text-center text-md-end">
                     <p class="footer-text mb-0">Created for <span class="footer-highlight">JNTUK UCEN</span> Students</p>
@@ -249,6 +255,9 @@
             </div>
         </div>
     </footer>
+
+    <!-- Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!-- jsPDF Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>

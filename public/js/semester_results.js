@@ -165,7 +165,7 @@ function toggleSemester(semester) {
 
 function showSemester(semester) {
     currentSemester = semester;
-    console.log(`Showing semester ${semester}, data available:`, allSemesterData[semester]);
+    // console.log(`Showing semester ${semester}, data available:`, allSemesterData[semester]);
     
     // Display results for current semester if data exists
     if (allSemesterData[semester]) {
@@ -183,7 +183,7 @@ function showSemester(semester) {
         
         createResultsTable(allSemesterData[semester], resultsContainer);
     } else {
-        console.log(`No data available for semester ${semester}`);
+        // console.log(`No data available for semester ${semester}`);
     }
 }
 
@@ -306,14 +306,14 @@ function updateSGPA(sgpa, totalCredits, studentId, container) {
 
 function updateSemesterVisibility(studentId) {
     const semesterItems = document.querySelectorAll('.semester-item');
-    console.log('Updating semester visibility for semesters:', Object.keys(allSemesterData));
+    // console.log('Updating semester visibility for semesters:', Object.keys(allSemesterData));
     semesterItems.forEach((item, index) => {
         const semester = index + 1;
         if (allSemesterData[semester] && allSemesterData[semester].length > 0) {
-            console.log(`Showing semester ${semester}`);
+            // console.log(`Showing semester ${semester}`);
             item.classList.remove('hidden');
         } else {
-            console.log(`Hiding semester ${semester}`);
+            // console.log(`Hiding semester ${semester}`);
             item.classList.add('hidden');
         }
     });
@@ -326,7 +326,7 @@ async function loadAllSemesterData(studentId) {
     try {
         // Load data for all semesters (assuming 8 semesters)
         for (let semester = 1; semester <= 9; semester++) {
-            console.log(`Loading data for semester ${semester}...`);
+            // console.log(`Loading data for semester ${semester}...`);
             const response = await fetch(`/api/semester/${semester}?student_id=${studentId}`);
             if (!response.ok) {
                 if (response.status === 400) {
@@ -344,13 +344,13 @@ async function loadAllSemesterData(studentId) {
             }
             const csvData = await response.text();
             const studentData = getStudentData(studentId, parseCSV(csvData));
-            console.log(`Semester ${semester} data:`, studentData);
+            // console.log(`Semester ${semester} data:`, studentData);
             if (studentData.length > 0) {
                 allSemesterData[semester] = studentData;
             }
         }
 
-        console.log('All semester data loaded:', allSemesterData);
+        // console.log('All semester data loaded:', allSemesterData);
 
         if (Object.keys(allSemesterData).length === 0) {
             alert('No data found for the given Roll Number in any semester.');
@@ -583,7 +583,7 @@ function downloadAllResults() {
     // Add each semester's results
     for (let semester = 1; semester <= 9; semester++) { // Loop through all 9 semesters
         if (!allSemesterData[semester] || allSemesterData[semester].length === 0) {
-            console.log(`No data for semester ${semester}`);
+            // console.log(`No data for semester ${semester}`);
             continue; // Skip if no data for this semester
         }
         

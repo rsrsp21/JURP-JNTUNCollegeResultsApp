@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Get student data from API
 async function fetchStudentData(id) {
     try {
-        console.log('Fetching data for:', id);
+        // console.log('Fetching data for:', id);
         const response = await fetch(`/api/cgpa/${id}`);
         
         if (!response.ok) {
@@ -48,7 +48,7 @@ async function fetchStudentData(id) {
         }
         
         const data = await response.json();
-        console.log('Data received:', data);
+        // console.log('Data received:', data);
         return data;
     } catch (error) {
         console.error('Error fetching student data:', error);
@@ -74,8 +74,27 @@ function getEngineeringBranch(branchCode) {
     }
 }
 
+// Function to reset chart data
+async function resetChartData() {
+    try {
+        const response = await fetch('/api/reset_chart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        const result = await response.json();
+        // console.log('Reset Chart Response:', result);
+    } catch (error) {
+        console.error('Error resetting chart data:', error);
+    }
+}
+
 // Display student results
 async function displayResults() {
+    // Reset chart data before fetching new results
+    await resetChartData();
+
     var studentId = document.getElementById('student-id').value.trim();
     if (!studentId) {
         alert('Please enter a valid Roll Number.');
@@ -100,6 +119,35 @@ async function displayResults() {
     resultsSection.classList.remove('shown');
 
     try {
+        // --- Clear previous results first ---
+        const idContainer = document.getElementById('id-container');
+        const cgpaContainer = document.getElementById('cgpa-container');
+        const percentageContainer = document.getElementById('percentage-container');
+        const creditsContainer = document.getElementById('credits-container');
+        const supplementaryContainer = document.getElementById('supplementary-container');
+        const tableContainer = document.getElementById('table-container');
+        const chartContainer = document.getElementById('sgpaChart')?.parentNode;
+        const messageContainer = document.getElementById('message-container');
+        const progressFill = document.getElementById('progress-fill');
+
+        if(idContainer) idContainer.innerHTML = '';
+        if(cgpaContainer) cgpaContainer.innerHTML = '';
+        if(percentageContainer) percentageContainer.innerHTML = '';
+        if(creditsContainer) creditsContainer.innerHTML = '';
+        if(supplementaryContainer) supplementaryContainer.innerHTML = '';
+        if(tableContainer) tableContainer.innerHTML = '';
+        if(messageContainer) messageContainer.innerHTML = '';
+        progressFill.style.width = '0%'; // Reset progress bar
+        
+        // Ensure chart canvas exists before proceeding
+        if(chartContainer && !chartContainer.querySelector('canvas#sgpaChart')) {
+            chartContainer.innerHTML = '<canvas id="sgpaChart"></canvas>';
+        } else if (chartContainer) {
+             // If canvas exists, clear potential old message sibling (less likely needed now, but safe)
+             const oldMsg = chartContainer.querySelector('p.no-chart-data');
+             if(oldMsg) oldMsg.remove();
+        }
+
         const studentData = await fetchStudentData(studentId);
         if (!studentData) {
             alert('No data found for the given Roll Number.');
@@ -121,7 +169,6 @@ async function displayResults() {
         }, 10);
 
     // Display Roll Number and Branch
-    var idContainer = document.getElementById('id-container');
     idContainer.innerHTML = '';
 
     var idHeading = document.createElement('div');
@@ -130,7 +177,6 @@ async function displayResults() {
     idContainer.appendChild(idHeading);
 
     // Display CGPA
-    var cgpaContainer = document.getElementById('cgpa-container');
     cgpaContainer.innerHTML = '';
 
     var cgpaValue = document.createElement('div');
@@ -143,7 +189,6 @@ async function displayResults() {
     var progressPercentage = (cgpa / 10) * 100; // Assuming max CGPA is 10
     
     // Set progress bar width and color
-    var progressFill = document.getElementById('progress-fill');
     progressFill.style.width = `${progressPercentage}%`;
     
     // Set color based on CGPA and regulation
@@ -201,9 +246,7 @@ async function displayResults() {
         }
     }
 
-    var messageContainer = document.getElementById('message-container');
     messageContainer.innerHTML = '';
-
     if (message !== '') {
         var messageElement = document.createElement('div');
         messageElement.textContent = message;
@@ -239,7 +282,6 @@ async function displayResults() {
     }
 
     // Display Percentage
-    var percentageContainer = document.getElementById('percentage-container');
     percentageContainer.innerHTML = '';
     
     var percentageLabel = document.createElement('div');
@@ -259,7 +301,6 @@ async function displayResults() {
     percentageContainer.appendChild(percentageValue);
 
     // Display Total Credits
-    var creditsContainer = document.getElementById('credits-container');
     creditsContainer.innerHTML = '';
     
     var creditsLabel = document.createElement('div');
@@ -274,7 +315,6 @@ async function displayResults() {
 
     // Display Supplementary Appearances
     var supplementaryAppearances = studentData['Supplementary Appearances'];
-    var supplementaryContainer = document.getElementById('supplementary-container');
     supplementaryContainer.innerHTML = '';
     
     var supplementaryLabel = document.createElement('div');
@@ -297,7 +337,6 @@ async function displayResults() {
     supplementaryContainer.appendChild(supplementaryValue);
 
     // Create and populate semester table
-    var tableContainer = document.getElementById('table-container');
     tableContainer.innerHTML = '';
 
     var table = document.createElement('table');
@@ -326,64 +365,218 @@ async function displayResults() {
     table.appendChild(tableBody);
 
     // Define the semester keys and labels
-    // Define the semester keys and labels
-const semesterData = [
-    { key: '1-1', label: 'First Year - First Semester' },
-    { key: '1-2', label: 'First Year - Second Semester' },
-    { key: '2-1', label: 'Second Year - First Semester' },
-    { key: '2-2', label: 'Second Year - Second Semester' },
-    { key: '3-1', label: 'Third Year - First Semester' },
-    { key: '3-2', label: 'Third Year - Second Semester' },
-    { key: '4-1', label: 'Fourth Year - First Semester' }
-];
+    const semesterData = [
+        { key: '1-1', label: 'First Year - First Semester' },
+        { key: '1-2', label: 'First Year - Second Semester' },
+        { key: '2-1', label: 'Second Year - First Semester' },
+        { key: '2-2', label: 'Second Year - Second Semester' },
+        { key: '3-1', label: 'Third Year - First Semester' },
+        { key: '3-2', label: 'Third Year - Second Semester' },
+        { key: '4-1', label: 'Fourth Year - First Semester' }
+    ];
 
-// Loop through the semesters and display only available ones
-semesterData.forEach(semester => {
-    const sgpa = studentData[semester.key];
-    const credits = studentData[`Credits_${semester.key}`];
+    // Loop through the semesters and display only available ones
+    semesterData.forEach(semester => {
+        const sgpa = studentData[semester.key];
+        const credits = studentData[`Credits_${semester.key}`];
 
-    // Skip missing semesters
-    if (!sgpa || sgpa === 'N/A') return;
+        // Skip missing semesters
+        if (!sgpa || sgpa === 'N/A') return;
 
-    var row = document.createElement('tr');
+        var row = document.createElement('tr');
 
-    // Semester label
-    var labelCell = document.createElement('td');
-    labelCell.textContent = semester.label;
-    labelCell.className = 'semester-name';
-    row.appendChild(labelCell);
+        // Semester label
+        var labelCell = document.createElement('td');
+        labelCell.textContent = semester.label;
+        labelCell.className = 'semester-name';
+        row.appendChild(labelCell);
 
-    // SGPA with appropriate styling
-    var sgpaCell = document.createElement('td');
-    if (sgpa && sgpa !== '0.0') {
-        const sgpaValue = parseFloat(sgpa);
-        let sgpaClass = 'sgpa-value ';
-        
-        if (regulation === 'R23') {
-            if (sgpaValue >= 7.5) sgpaClass += 'excellent-sgpa';
-            else if (sgpaValue >= 6.5) sgpaClass += 'good-sgpa';
-            else if (sgpaValue >= 5.5) sgpaClass += 'average-sgpa';
-            else sgpaClass += 'poor-sgpa';
+        // SGPA with appropriate styling
+        var sgpaCell = document.createElement('td');
+        if (sgpa && sgpa !== '0.0') {
+            const sgpaValue = parseFloat(sgpa);
+            let sgpaClass = 'sgpa-value ';
+            
+            if (regulation === 'R23') {
+                if (sgpaValue >= 7.5) sgpaClass += 'excellent-sgpa';
+                else if (sgpaValue >= 6.5) sgpaClass += 'good-sgpa';
+                else if (sgpaValue >= 5.5) sgpaClass += 'average-sgpa';
+                else sgpaClass += 'poor-sgpa';
+            } else {
+                if (sgpaValue >= 7.75) sgpaClass += 'excellent-sgpa';
+                else if (sgpaValue >= 6.75) sgpaClass += 'good-sgpa';
+                else if (sgpaValue >= 5.75) sgpaClass += 'average-sgpa';
+                else sgpaClass += 'poor-sgpa';
+            }
+            
+            sgpaCell.innerHTML = `<span class="${sgpaClass}">${sgpa}</span>`;
         } else {
-            if (sgpaValue >= 7.75) sgpaClass += 'excellent-sgpa';
-            else if (sgpaValue >= 6.75) sgpaClass += 'good-sgpa';
-            else if (sgpaValue >= 5.75) sgpaClass += 'average-sgpa';
-            else sgpaClass += 'poor-sgpa';
+            sgpaCell.innerHTML = '<span class="poor-sgpa">NA</span>';
         }
+        row.appendChild(sgpaCell);
+
+        // Credits
+        var creditsCell = document.createElement('td');
+        creditsCell.innerHTML = `<span class="credits-badge">${credits || 'N/A'}</span>`;
+        row.appendChild(creditsCell);
+
+        tableBody.appendChild(row);
+    });
+
+    // Global variable to hold the chart instance
+    let sgpaChartInstance = null;
+
+    // Enhanced function to create SGPA Chart with explicit canvas reset
+    function createSGPAChart(semesters, sgpaValues) {
+        // Ensure the existing chart is destroyed
+        if (sgpaChartInstance) {
+            // console.log('Destroying existing chart instance...');
+            sgpaChartInstance.destroy();
+            sgpaChartInstance = null; // Explicitly nullify
+            // console.log('Chart destroyed.');
+        }
+
+        // Ensure canvas exists and is ready
+        const chartContainer = document.getElementById('sgpaChart')?.parentNode;
+        if (!chartContainer) {
+            console.error('Chart container not found.');
+            return; // Exit if container is not ready
+        }
+
+        // Clear and recreate the canvas
+        chartContainer.innerHTML = '<canvas id="sgpaChart"></canvas>';
+        const ctx = document.getElementById('sgpaChart')?.getContext('2d');
         
-        sgpaCell.innerHTML = `<span class="${sgpaClass}">${sgpa}</span>`;
-    } else {
-        sgpaCell.innerHTML = '<span class="poor-sgpa">NA</span>';
+        // Check if context was successfully obtained (canvas exists)
+        if (!ctx) {
+            console.error('Failed to get canvas context for sgpaChart');
+            return; // Exit if canvas is not ready
+        }
+
+        // console.log('Creating new chart instance...');
+        sgpaChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: semesters,
+                datasets: [{
+                    label: 'SGPA',
+                    data: sgpaValues,
+                    borderColor: '#00bcd4', // Cyan border color
+                    backgroundColor: 'rgba(0, 188, 212, 0.1)', // Light cyan fill
+                    borderWidth: 2.5,
+                    fill: true,
+                    tension: 0.4, // Smooth curves
+                    pointBackgroundColor: '#ffffff', // White points
+                    pointBorderColor: '#00bcd4', // Cyan border for points
+                    pointBorderWidth: 2,
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    pointHoverBackgroundColor: '#00bcd4',
+                    pointHoverBorderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: false, // Don't force start at 0
+                        min: Math.max(0, Math.min(...sgpaValues) - 1), // Dynamic min based on data, but not below 0
+                        max: Math.min(10, Math.max(...sgpaValues) + 1), // Dynamic max based on data, but not above 10
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.15)', // Lighter grid lines
+                            drawBorder: false,
+                        },
+                        ticks: {
+                            color: '#adb5bd', // Light gray tick labels
+                            stepSize: 1
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false, // Hide vertical grid lines
+                        },
+                        ticks: {
+                            color: '#adb5bd' // Light gray tick labels
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false // Hide legend as there's only one dataset
+                    },
+                    tooltip: {
+                        enabled: true,
+                        backgroundColor: 'rgba(0, 0, 0, 0.85)',
+                        titleColor: '#ffffff',
+                        bodyColor: '#ffffff',
+                        padding: 12,
+                        cornerRadius: 4,
+                        displayColors: false,
+                        borderColor: 'rgba(255, 255, 255, 0.2)',
+                        borderWidth: 1,
+                        callbacks: {
+                            label: function(context) {
+                                return ` Semester ${context.label}: ${context.parsed.y.toFixed(2)}`;
+                            },
+                            title: function() {
+                                return ''; // Hide default title
+                            }
+                        }
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index',
+                }
+            }
+        });
+        // console.log('New chart instance created.');
     }
-    row.appendChild(sgpaCell);
 
-    // Credits
-    var creditsCell = document.createElement('td');
-    creditsCell.innerHTML = `<span class="credits-badge">${credits || 'N/A'}</span>`;
-    row.appendChild(creditsCell);
+    // --- Add Chart Creation Logic Here ---
+    const semestersForChart = [];
+    const sgpaValuesForChart = [];
+    
+    // Use the same semesterData array used for the table
+    semesterData.forEach(semester => {
+        const sgpa = studentData[semester.key]; // Access SGPA directly
+        
+        // Check if data exists for this semester key
+        if (typeof sgpa !== 'undefined' && sgpa !== null) {
+            semestersForChart.push(semester.key); // Include semester even if SGPA is N/A
+            
+            // Use 0 if SGPA is 'N/A' or '0.0', otherwise parse the float
+            if (sgpa === 'N/A' || sgpa === '0.0') {
+                sgpaValuesForChart.push(0);
+            } else {
+                sgpaValuesForChart.push(parseFloat(sgpa));
+            }
+        } 
+        // If sgpa is undefined or null, we simply skip this semester for the chart
+    });
 
-    tableBody.appendChild(row);
-});
+    // Create/Update SGPA Chart only if *any* data was processed
+    if (semestersForChart.length > 0) {
+         // Call create chart function (it will handle canvas ensure/destroy)
+         createSGPAChart(semestersForChart, sgpaValuesForChart);
+    } else {
+        // If no data, destroy chart, hide canvas, show message
+        if (sgpaChartInstance) {
+            sgpaChartInstance.destroy();
+            sgpaChartInstance = null;
+        }
+         
+         const chartContainer = document.getElementById('sgpaChart')?.parentNode;
+         const canvas = document.getElementById('sgpaChart');
+         const noDataMessage = document.getElementById('no-chart-data-message');
+
+         if(canvas) canvas.style.display = 'none'; // Hide canvas
+         if(chartContainer) chartContainer.style.display = 'none'; // Hide container
+         if(noDataMessage) noDataMessage.classList.remove('d-none'); // Show message
+    }
+    // --- End Chart Creation Logic ---
+
     } catch (error) {
         console.error('Error displaying results:', error);
         alert('An error occurred while fetching data. Please try again.');
