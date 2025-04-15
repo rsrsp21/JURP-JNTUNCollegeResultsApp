@@ -214,13 +214,11 @@ function getEngineeringBranch(branchCode) {
     }
 }
 
-function updateStudentInfo(studentId) {
+async function updateStudentInfo(studentId) {
     document.getElementById('roll-number').textContent = studentId;
-    // Extract branch code from student ID (assuming it's the 5th character)
     const branchCode = studentId.charAt(7);
     document.getElementById('branch-name').textContent = getEngineeringBranch(branchCode);
-    
-    // Determine batch and regulation based on student ID pattern
+
     let batch, regulation;
     if (studentId.startsWith('21031A') || studentId.startsWith('22035A')) {
         batch = '2021-2025';
@@ -238,9 +236,23 @@ function updateStudentInfo(studentId) {
         batch = 'N/A';
         regulation = 'N/A';
     }
-    
+
     document.getElementById('batch').textContent = batch;
     document.getElementById('regulation').textContent = regulation;
+
+    try {
+        const response = await fetch(`/api/cgpa/${studentId}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch CGPA data');
+        }
+        const data = await response.json();
+        document.getElementById('cgpa').textContent = data.CGPA || 'N/A';
+        document.getElementById('total-credits').textContent = data['Total Credits'] || 'N/A';
+    } catch (error) {
+        console.error('Error fetching CGPA data:', error);
+        document.getElementById('cgpa').textContent = 'N/A';
+        document.getElementById('total-credits').textContent = 'N/A';
+    }
 }
 
 
@@ -422,7 +434,10 @@ document.getElementById('student-id').addEventListener('keypress', function(e) {
 });
 
 // Add event listener for the download all button
-document.getElementById('download-all').addEventListener('click', downloadAllResults);
+document.getElementById('download-all').addEventListener('click', downloadAllResults_main);
+
+// Add event listener for the download all button
+document.getElementById('download-all-honmin').addEventListener('click', downloadAllResults_honmin);
 
 function downloadSemester(semester) {
     const studentId = document.getElementById('student-id').value;
@@ -539,31 +554,29 @@ function downloadSemester(semester) {
 }
 
 
-function downloadAllResults() {
+function downloadAllResults_honmin() {
     const studentId = document.getElementById('student-id').value;
     const rollNumber = document.getElementById('roll-number').textContent;
     const branchName = document.getElementById('branch-name').textContent;
     const batch = document.getElementById('batch').textContent;
     const regulation = document.getElementById('regulation').textContent;
-    
-    // Create new jsPDF instance
+    const cgpa = document.getElementById('cgpa').textContent;
+    const totalCredits = document.getElementById('total-credits').textContent;
+
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    
-    // Add university logo if available
+    const doc = new jsPDF({ margin: { top: 20, bottom: 20 } });
+
     const logo = document.querySelector('link[rel="icon"]')?.href;
     if (logo) {
         doc.addImage(logo, 'PNG', 15, 10, 30, 30);
     }
-    
-    // Title and Header
+
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(20);
     doc.text('JNTUK UCEN', 105, 20, { align: 'center' });
     doc.setFontSize(16);
     doc.text('Complete Academic Record', 105, 30, { align: 'center' });
-    
-    // Student Information
+
     doc.setFontSize(12);
     doc.text('Student Information', 20, 50);
     doc.setFont('helvetica', 'bold');
@@ -571,90 +584,327 @@ function downloadAllResults() {
     doc.text('Branch:', 20, 70);
     doc.text('Batch:', 20, 80);
     doc.text('Regulation:', 20, 90);
-    
+    doc.text('CGPA:', 20, 100);
+    doc.text('Total Credits Earned*:', 20, 110);
+
     doc.setFont('helvetica', 'normal');
     doc.text(rollNumber, 80, 60);
     doc.text(branchName, 80, 70);
     doc.text(batch, 80, 80);
     doc.text(regulation, 80, 90);
-    
-    let currentY = 110;
-    
-    // Add each semester's results
-    for (let semester = 1; semester <= 9; semester++) { // Loop through all 9 semesters
-        if (!allSemesterData[semester] || allSemesterData[semester].length === 0) {
-            // console.log(`No data for semester ${semester}`);
-            continue; // Skip if no data for this semester
-        }
-        
-        // Add new page if not enough space
+    doc.text(cgpa, 80, 100);
+    doc.text(totalCredits, 80, 110);
+
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(10);
+    doc.text('* Honors/Minor credits excluded', 20, 120);
+
+    let currentY = 130;
+
+    for (let year = 1; year <= 4; year++) {
         if (currentY > doc.internal.pageSize.height - 100) {
+            doc.addPage();
+            currentY = 10;
+        }
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(14);
+        doc.text(`Year ${year}`, 10, currentY);
+        currentY += 10;
+
+        for (let semesterIndex = 0; semesterIndex < 2; semesterIndex++) {
+            let semester = (year - 1) * 2 + semesterIndex + 1;
+            if (!allSemesterData[semester] || allSemesterData[semester].length === 0) continue;
+
+            let formattedSemester = `${year}-${semester % 2 === 0 ? 2 : 1}`;
+            const labelX = semesterIndex === 0 ? 10 : 110;
+
+            doc.setFontSize(12);
+            doc.text(`Semester ${formattedSemester}`, labelX, currentY);
+
+            const sgpa = calculateSGPA(allSemesterData[semester]);
+            const credits = calculateTotalCredits(allSemesterData[semester]);
+
+            doc.setFontSize(10);
+            doc.text(`SGPA: ${sgpa}    Credits: ${credits}`, labelX, currentY + 10);
+        }
+
+        currentY += 20;
+        let tableY = currentY;
+        let leftTableY = tableY;
+        let rightTableY = tableY;
+
+        for (let semesterIndex = 0; semesterIndex < 2; semesterIndex++) {
+            let semester = (year - 1) * 2 + semesterIndex + 1;
+            if (!allSemesterData[semester] || allSemesterData[semester].length === 0) continue;
+
+            const baseX = semesterIndex === 0 ? 10 : 110;
+
+            const tableData = allSemesterData[semester].map(subject => [
+                subject['Subject Code'],
+                subject['Subject Name'],
+                subject['Grade'],
+                subject['Credits']
+            ]);
+
+            doc.autoTable({
+                startY: tableY,
+                margin: { top: tableY, left: baseX },
+                head: [['Subject Code', 'Subject Name', 'Grade', 'Credits']],
+                body: tableData,
+                theme: 'grid',
+                headStyles: {
+                    fillColor: [0, 102, 204],
+                    textColor: [255, 255, 255],
+                    halign: 'center',
+                    fontSize: 8
+                },
+                bodyStyles: {
+                    fontSize: 8,
+                    halign: 'center',
+                    cellPadding: 1
+                },
+                columnStyles: {
+                    0: { cellWidth: 20 },
+                    1: { cellWidth: 45, halign: 'left', textWrap: 'wrap' },
+                    2: { cellWidth: 14 },
+                    3: { cellWidth: 15 }
+                },
+                alternateRowStyles: { fillColor: [240, 240, 240] },
+                tableWidth: 'wrap'
+            });
+
+            if (semesterIndex === 0) {
+                leftTableY = doc.lastAutoTable.finalY;
+            } else {
+                rightTableY = doc.lastAutoTable.finalY;
+            }
+        }
+
+        currentY = Math.max(leftTableY, rightTableY) + 10;
+    }
+
+    // Handle Honors/Minor semester (semester 9)
+    if (allSemesterData[9] && allSemesterData[9].length > 0) {
+        const sgpa = calculateSGPA(allSemesterData[9]);
+        const credits = calculateTotalCredits(allSemesterData[9]);
+
+        const tableData = allSemesterData[9].map(subject => [
+            subject['Subject Code'],
+            subject['Subject Name'],
+            subject['Grade'],
+            subject['Credits']
+        ]);
+
+        const tempDoc = new jsPDF();
+        tempDoc.autoTable({
+            startY: 0,
+            margin: { top: 0 },
+            head: [['Subject Code', 'Subject Name', 'Grade', 'Credits']],
+            body: tableData,
+            theme: 'grid',
+            headStyles: { fontSize: 8 },
+            bodyStyles: { fontSize: 8, cellPadding: 1 },
+            columnStyles: {
+                0: { cellWidth: 20 },
+                1: { cellWidth: 45 },
+                2: { cellWidth: 14 },
+                3: { cellWidth: 15 }
+            }
+        });
+
+        const tableHeight = tempDoc.lastAutoTable.finalY;
+        const footerBuffer = 30;
+        const remainingHeight = doc.internal.pageSize.height - currentY - footerBuffer;
+
+        if (tableHeight + 40 > remainingHeight) {
             doc.addPage();
             currentY = 20;
         }
-        
-        // Semester header
+
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(14);
-        let formattedSemester =
-            semester === 9 ? "Honors/Minor" : `${Math.ceil(semester / 2)}-${(semester % 2 === 0) ? 2 : 1}`;
-        doc.text(`Year & Semester ${formattedSemester}`, 20, currentY);
-        currentY += 10;
-        
-        // SGPA and credits
-        const sgpa = calculateSGPA(allSemesterData[semester]);
-        const credits = calculateTotalCredits(allSemesterData[semester]);
-        
-        doc.setFontSize(11);
-        doc.text(`SGPA: ${sgpa}    Credits: ${credits}`, 20, currentY);
+        doc.text('Honors/Minor', 10, currentY);
         currentY += 15;
-        
-        // Create table data
-        const tableData = allSemesterData[semester].map(subject => [
-            subject['Subject Code'],
-            subject['Subject Name'],
-            subject['Credits'],
-            subject['Grade']
-        ]);
-        
-        // Add table using autoTable
+
+        doc.setFontSize(10);
+        doc.text(`SGPA: ${sgpa}    Credits: ${credits}`, 10, currentY);
+        currentY += 10;
+
         doc.autoTable({
             startY: currentY,
-            head: [['Subject Code', 'Subject Name', 'Credits', 'Grade']],
+            margin: { left: 10 },
+            head: [['Subject Code', 'Subject Name', 'Grade', 'Credits']],
             body: tableData,
             theme: 'grid',
             headStyles: {
                 fillColor: [0, 102, 204],
                 textColor: [255, 255, 255],
                 halign: 'center',
-                fontSize: 10
+                fontSize: 8
             },
             bodyStyles: {
-                fontSize: 9,
-                halign: 'center'
+                fontSize: 8,
+                halign: 'center',
+                cellPadding: 1
             },
             columnStyles: {
-                0: { cellWidth: 20 }, // Subject Code
-                1: { cellWidth: 100 }, // Subject Name
-                2: { cellWidth: 20 }, // Credits
-                3: { cellWidth: 20 }  // Grade
+                0: { cellWidth: 20 },
+                1: { cellWidth: 45, halign: 'left', textWrap: 'wrap' },
+                2: { cellWidth: 14 },
+                3: { cellWidth: 15 }
             },
             alternateRowStyles: { fillColor: [240, 240, 240] },
-            margin: { top: 10 },
-            tableWidth: 'auto' // Adjust table width to fit page
+            tableWidth: 'wrap'
         });
-        
-        // Update Y position after table
-        currentY = doc.lastAutoTable.finalY + 20;
+
+        currentY = doc.lastAutoTable.finalY + 10;
     }
-    
-    // Footer
+
     const date = new Date().toLocaleDateString('en-GB');
     doc.setFont('helvetica', 'italic');
     doc.setFontSize(8);
     doc.text('This is a computer-generated document.', 105, doc.internal.pageSize.height - 10, { align: 'center' });
     doc.text(`Generated on: ${date}`, 105, doc.internal.pageSize.height - 5, { align: 'center' });
-    
-    // Save the PDF
+
+    doc.save(`${studentId}_all_semesters.pdf`);
+}
+
+function downloadAllResults_main() {
+    const studentId = document.getElementById('student-id').value;
+    const rollNumber = document.getElementById('roll-number').textContent;
+    const branchName = document.getElementById('branch-name').textContent;
+    const batch = document.getElementById('batch').textContent;
+    const regulation = document.getElementById('regulation').textContent;
+    const cgpa = document.getElementById('cgpa').textContent;
+    const totalCredits = document.getElementById('total-credits').textContent;
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ margin: { top: 20, bottom: 20 } });
+
+    const logo = document.querySelector('link[rel="icon"]')?.href;
+    if (logo) {
+        doc.addImage(logo, 'PNG', 15, 10, 30, 30);
+    }
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(20);
+    doc.text('JNTUK UCEN', 105, 20, { align: 'center' });
+    doc.setFontSize(16);
+    doc.text('Complete Academic Record', 105, 30, { align: 'center' });
+
+    doc.setFontSize(12);
+    doc.text('Student Information', 20, 50);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Roll Number:', 20, 60);
+    doc.text('Branch:', 20, 70);
+    doc.text('Batch:', 20, 80);
+    doc.text('Regulation:', 20, 90);
+    doc.text('CGPA:', 20, 100);
+    doc.text('Total Credits Earned*:', 20, 110);
+
+    doc.setFont('helvetica', 'normal');
+    doc.text(rollNumber, 80, 60);
+    doc.text(branchName, 80, 70);
+    doc.text(batch, 80, 80);
+    doc.text(regulation, 80, 90);
+    doc.text(cgpa, 80, 100);
+    doc.text(totalCredits, 80, 110);
+
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(10);
+    doc.text('* Honors/Minor credits excluded', 20, 120);
+
+    let currentY = 130;
+
+    for (let year = 1; year <= 4; year++) {
+        if (currentY > doc.internal.pageSize.height - 100) {
+            doc.addPage();
+            currentY = 10;
+        }
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(14);
+        doc.text(`Year ${year}`, 10, currentY);
+        currentY += 10;
+
+        for (let semesterIndex = 0; semesterIndex < 2; semesterIndex++) {
+            let semester = (year - 1) * 2 + semesterIndex + 1;
+            if (!allSemesterData[semester] || allSemesterData[semester].length === 0) continue;
+
+            let formattedSemester = `${year}-${semester % 2 === 0 ? 2 : 1}`;
+            const labelX = semesterIndex === 0 ? 10 : 110;
+
+            doc.setFontSize(12);
+            doc.text(`Semester ${formattedSemester}`, labelX, currentY);
+
+            const sgpa = calculateSGPA(allSemesterData[semester]);
+            const credits = calculateTotalCredits(allSemesterData[semester]);
+
+            doc.setFontSize(10);
+            doc.text(`SGPA: ${sgpa}    Credits: ${credits}`, labelX, currentY + 10);
+        }
+
+        currentY += 20;
+        let tableY = currentY;
+        let leftTableY = tableY;
+        let rightTableY = tableY;
+
+        for (let semesterIndex = 0; semesterIndex < 2; semesterIndex++) {
+            let semester = (year - 1) * 2 + semesterIndex + 1;
+            if (!allSemesterData[semester] || allSemesterData[semester].length === 0) continue;
+
+            const baseX = semesterIndex === 0 ? 10 : 110;
+
+            const tableData = allSemesterData[semester].map(subject => [
+                subject['Subject Code'],
+                subject['Subject Name'],
+                subject['Grade'],
+                subject['Credits']
+            ]);
+
+            doc.autoTable({
+                startY: tableY,
+                margin: { top: tableY, left: baseX },
+                head: [['Subject Code', 'Subject Name', 'Grade', 'Credits']],
+                body: tableData,
+                theme: 'grid',
+                headStyles: {
+                    fillColor: [0, 102, 204],
+                    textColor: [255, 255, 255],
+                    halign: 'center',
+                    fontSize: 8
+                },
+                bodyStyles: {
+                    fontSize: 8,
+                    halign: 'center',
+                    cellPadding: 1
+                },
+                columnStyles: {
+                    0: { cellWidth: 20 },
+                    1: { cellWidth: 45, halign: 'left', textWrap: 'wrap' },
+                    2: { cellWidth: 14 },
+                    3: { cellWidth: 15 }
+                },
+                alternateRowStyles: { fillColor: [240, 240, 240] },
+                tableWidth: 'wrap'
+            });
+
+            if (semesterIndex === 0) {
+                leftTableY = doc.lastAutoTable.finalY;
+            } else {
+                rightTableY = doc.lastAutoTable.finalY;
+            }
+        }
+
+        currentY = Math.max(leftTableY, rightTableY) + 10;
+    }
+
+    const date = new Date().toLocaleDateString('en-GB');
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(8);
+    doc.text('This is a computer-generated document.', 105, doc.internal.pageSize.height - 10, { align: 'center' });
+    doc.text(`Generated on: ${date}`, 105, doc.internal.pageSize.height - 5, { align: 'center' });
+
     doc.save(`${studentId}_all_semesters.pdf`);
 }
