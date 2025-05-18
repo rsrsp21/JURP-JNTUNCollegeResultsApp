@@ -373,7 +373,7 @@ async function displayResults() {
         { key: '3-1', label: 'Third Year - First Semester' },
         { key: '3-2', label: 'Third Year - Second Semester' },
         { key: '4-1', label: 'Fourth Year - First Semester' },
-        { key: '4-1', label: 'Fourth Year - Second Semester' }
+        { key: '4-2', label: 'Fourth Year - Second Semester' }
     ];
 
     // Loop through the semesters and display only available ones
