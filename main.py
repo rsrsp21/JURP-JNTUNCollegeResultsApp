@@ -74,7 +74,7 @@ def get_cgpa_data(student_id):
     }
 
     # Optional: Add semester-wise data
-    semesters = ['1-1', '1-2', '2-1', '2-2', '3-1', '3-2', '4-1']
+    semesters = ['1-1', '1-2', '2-1', '2-2', '3-1', '3-2', '4-1', '4-2']
     for sem in semesters:
         if sem in student_data and student_data[sem].strip():
             formatted_data[sem] = student_data[sem]
