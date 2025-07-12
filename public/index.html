@@ -63,53 +63,57 @@
             </p>
         </div>
     </header>
-    <div class="blinking-note mb-3 text-center" style="font-weight:600;color:#ffc107;animation:blinker 1.5s linear infinite;">
-                    4-1 Adv. Supply, 4-2 R20 April-2025 Regular results released!
-                </div>
-                <style>
-            @keyframes blinker {
-                50% { opacity: 0; }
-            }
-            .blinking-note {
-                animation: blinker 1.2s linear infinite;
-            }
-        </style>
+    <!-- <div class="blinking-note mb-3 text-center" style="font-weight:600;color:#ffc107;animation:blinker 1.5s linear infinite;">
+        4-1 Adv. Supply, 4-2 R20 April-2025 Regular results released!
+    </div>
+    <style>
+        @keyframes blinker {
+            50% { opacity: 0; }
+        }
+        .blinking-note {
+            animation: blinker 1.2s linear infinite;
+        }
+    </style> -->
 
     <!-- Main Content -->
     <main class="container">
-         <!-- Navigation Cards Section -->
-         <section class="navigation-cards">
-            <div class="cards-container">
-                <!-- <a href="/" class="card">
-                    <div class="card-icon">
-                        <i class="fas fa-home"></i>
-                    </div>
-                    <h3>Home</h3>
-                    <span class="card-link">Go to Home</span>
-                </a> -->
-                <a href="/cgpa" class="card">
-                    <div class="card-icon">
-                        <i class="fas fa-calculator"></i>
-                    </div>
-                    <h3>CGPA</h3>
-                    <span class="card-link">Check CGPA</span>
-                </a>
-                <a href="/semester_results" class="card">
-                    <div class="card-icon">
-                        <i class="fas fa-chart-bar"></i>
-                    </div>
-                    <h3>Semester-wise Results</h3>
-                    <span class="card-link">View Semester-wise Results</span>
-                </a>
-                <a href="/toppers" class="card">
-                    <div class="card-icon">
-                        <i class="fas fa-trophy"></i>
-                    </div>
-                    <h3>Toppers</h3>
-                    <span class="card-link">See Toppers List</span>
-                </a>
+       <!-- Notifications and Navigation Sections -->
+<section class="content-wrapper">
+    <section class="notifications-section">
+        <h2 class="section-title text-center mb-5"><span><i class="fas fa-bell"></i></span> Notifications</h2>
+        <div class="notifications-container">
+            <div class="notification-card">
+                <p>2-1, 3-1 Supply May-2025 Results released! <span class="notification-date">July 12, 2025</span></p>
+                <p>4-1 Advanced Supplementary and 4-2 R20 Regular results April 2025 are released!.</p>
             </div>
-        </section>
+        </div>
+    </section>
+    <section class="navigation-tiles">
+        <div class="tiles-container">
+            <a href="/cgpa" class="tile">
+                <div class="tile-icon">
+                    <i class="fas fa-calculator"></i>
+                </div>
+                <h3>CGPA</h3>
+                <span class="tile-link">Check CGPA</span>
+            </a>
+            <a href="/semester_results" class="tile">
+                <div class="tile-icon">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <h3>Semester-wise Results</h3>
+                <span class="tile-link">View Semester-wise Results</span>
+            </a>
+            <a href="/toppers" class="tile">
+                <div class="tile-icon">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <h3>Toppers</h3>
+                <span class="tile-link">See Toppers List</span>
+            </a>
+        </div>
+    </section>
+</section>
 
         <!-- Features Section -->
         <section class="features-section">
@@ -125,8 +129,6 @@
                             <ul class="feature-list">
                                 <li><i class="fas fa-check"></i> Semester-wise performance breakdown</li>
                                 <li><i class="fas fa-check"></i> Subject-wise grades and marks</li>
-                                <!-- <li><i class="fas fa-check"></i> Attendance records</li>
-                                <li><i class="fas fa-check"></i> Internal assessment details</li> -->
                             </ul>
                         </div>
 
@@ -150,8 +152,6 @@
                             <h3>Toppers List</h3>
                             <ul class="feature-list">
                                 <li><i class="fas fa-check"></i> Department-wise toppers</li>
-                                <!-- <li><i class="fas fa-check"></i> Semester-wise rankings</li>
-                                <li><i class="fas fa-check"></i> Performance statistics</li> -->
                                 <li><i class="fas fa-check"></i> Historical topper data</li>
                             </ul>
                         </div>
@@ -163,9 +163,7 @@
                             <h3>Download Options</h3>
                             <ul class="feature-list">
                                 <li><i class="fas fa-check"></i> PDF format results</li>
-                                <!-- <li><i class="fas fa-check"></i> CSV data export</li> -->
                                 <li><i class="fas fa-check"></i> Print-friendly layouts</li>
-                                <!-- <li><i class="fas fa-check"></i> Bulk result downloads</li> -->
                             </ul>
                         </div>
                     </div>
@@ -178,7 +176,6 @@
                 </div>
             </div>
         </section>
-
 
         <!-- How It Works Section -->
         <section class="how-it-works">
