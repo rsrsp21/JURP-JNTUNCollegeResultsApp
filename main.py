@@ -187,19 +187,74 @@ def get_batch_data(batch_year):
     
 @app.route('/api/toppers')
 def get_toppers():
-    # This function uses pandas. Make sure it's installed: pip install pandas
-    # The logic here seems fine, no changes needed.
-    pass # Keep your existing toppers logic here
+    try:
+        # Get year parameter from query string, default to 2021
+        year = request.args.get('year', '2021')
+        csv_file = f'data/toppers_{year}.csv'
+        
+        # Check if file exists
+        if not os.path.exists(csv_file):
+            return jsonify({
+                'error': f'No data available for {year} batch'
+            }), 404
+            
+        # Read the CSV file
+        df = pd.read_csv(csv_file)
+        
+        # Convert CGPA to numeric, handling any non-numeric values
+        df['CGPA'] = pd.to_numeric(df['cgpa'], errors='coerce')
+        
+        # Sort by CGPA in descending order
+        df = df.sort_values('CGPA', ascending=False)
+        
+        # Create overall toppers list
+        overall_toppers = []
+        for _, row in df[df['category'] == 'overall'].iterrows():
+            overall_toppers.append({
+                'roll_number': str(row['roll_number']),
+                'cgpa': float(row['CGPA'])
+            })
+        
+        # Create branch-wise toppers lists
+        branch_toppers = {
+            'cse': [],
+            'ece': [],
+            'eee': [],
+            'mec': [],
+            'ce': []
+        }
+        
+        # Process each branch
+        for branch in branch_toppers.keys():
+            branch_df = df[df['category'] == branch]
+            branch_df = branch_df.sort_values('CGPA', ascending=False)
+            
+            for _, row in branch_df.iterrows():
+                branch_toppers[branch].append({
+                    'roll_number': str(row['roll_number']),
+                    'cgpa': float(row['CGPA'])
+                })
+        
+        return jsonify({
+            'overall': overall_toppers,
+            **branch_toppers
+        })
+        
+    except Exception as e:
+        print(f"Error processing toppers data: {str(e)}")
+        return jsonify({
+            'error': 'Internal server error'
+        }), 500
 
 # --- Static File and Main Route (Catch-all) ---
 # This must be the last set of routes
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve_static(path):
-    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
-        return send_from_directory(app.static_folder, path)
+    if path != "" and os.path.exists(os.path.join(app.static_folder, path)): # type: ignore
+        return send_from_directory(app.static_folder, path) # type: ignore
     else:
-        return send_from_directory(app.static_folder, 'index.html')
+        return send_from_directory(app.static_folder, 'index.html') # type: ignore
 
 # --- Run the App ---
 if __name__ == '__main__':
