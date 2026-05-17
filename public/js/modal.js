@@ -1,6 +1,6 @@
 /* Results AI Announcement Modal and Carousel Logic */
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const overlay = document.getElementById('ask-ai-modal');
     if (!overlay) return;
 
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
         overlay.classList.remove('active');
         localStorage.setItem('hasSeenAskAiModal', 'true');
         stopAutoSlide();
-        
+
         // Hide overlay after animation finishes
         overlay.addEventListener('transitionend', function handler(e) {
             if (e.propertyName === 'opacity') {
@@ -50,13 +50,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Modal Close Event Listeners
     if (closeBtn) closeBtn.addEventListener('click', closeModal);
-    if (actionBtn) actionBtn.addEventListener('click', function() {
+    if (actionBtn) actionBtn.addEventListener('click', function () {
         localStorage.setItem('hasSeenAskAiModal', 'true');
     });
     if (dismissLink) dismissLink.addEventListener('click', closeModal);
 
     // Close when clicking outside of the card
-    overlay.addEventListener('click', function(e) {
+    overlay.addEventListener('click', function (e) {
         if (e.target === overlay) {
             closeModal();
         }
@@ -95,14 +95,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Next/Prev Buttons
     if (nextBtn) {
-        nextBtn.addEventListener('click', function() {
+        nextBtn.addEventListener('click', function () {
             stopAutoSlide(); // Stop auto-play once user interacts
             updateCarousel(currentIndex + 1);
         });
     }
 
     if (prevBtn) {
-        prevBtn.addEventListener('click', function() {
+        prevBtn.addEventListener('click', function () {
             stopAutoSlide(); // Stop auto-play once user interacts
             updateCarousel(currentIndex - 1);
         });
@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Pagination Dots
     dots.forEach((dot, idx) => {
-        dot.addEventListener('click', function() {
+        dot.addEventListener('click', function () {
             stopAutoSlide(); // Stop auto-play once user interacts
             updateCarousel(idx);
         });
@@ -119,9 +119,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- Auto Slide Setup ---
     function startAutoSlide() {
         stopAutoSlide();
-        autoSlideInterval = setInterval(function() {
+        autoSlideInterval = setInterval(function () {
             updateCarousel(currentIndex + 1);
-        }, 5000); // Change slide every 5 seconds
+        }, 2000); // Change slide every 2 seconds
     }
 
     function stopAutoSlide() {
