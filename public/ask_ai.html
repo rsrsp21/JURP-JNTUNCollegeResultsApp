@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="images/university_logo.png">
+    <title>Ask AI</title>
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/ask_ai.css">
+</head>
+<body>
+    <nav class="navigation-bar">
+        <div class="container">
+            <div class="d-flex align-items-center justify-content-between">
+                <a href="/" class="nav-brand">
+                    <img src="images/university_logo.png" alt="University Logo" class="nav-logo" style="width: 50px;">
+                    <span>JNTUK UCEN Results Portal</span>
+                </a>
+                <button class="nav-toggle d-md-none" aria-label="Toggle navigation">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="nav-menu">
+                    <a href="/" class="nav-link">
+                        <i class="fas fa-home"></i>Home
+                    </a>
+                    <a href="/cgpa" class="nav-link">
+                        <i class="fas fa-calculator"></i>CGPA
+                    </a>
+                    <a href="/semester_results" class="nav-link">
+                        <i class="fas fa-chart-bar"></i>Semester-wise Results
+                    </a>
+                    <a href="/ask-ai" class="nav-link active"><i class="fas fa-wand-magic-sparkles"></i>Ask AI
+                    </a>
+                    <a href="/toppers" class="nav-link">
+                        <i class="fas fa-trophy"></i>Toppers
+                    </a>
+
+
+
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header class="page-header">
+        <div class="container">
+            <h1 class="page-title">Ask AI</h1>
+            <p class="page-subtitle">
+                Chat about results, CGPA, SGPA, credits, backlogs, toppers, downloads, and portal help
+            </p>
+        </div>
+    </header>
+
+    <main class="ask-ai-page">
+        <section class="ask-ai-chat-panel" aria-labelledby="ask-ai-chat-title">
+            <div class="ask-ai-chat-header">
+                <div>
+                    <div class="ask-ai-chat-kicker">
+                        <i class="fas fa-wand-magic-sparkles"></i>
+                        Results AI
+                    </div>
+                    <h2 id="ask-ai-chat-title">Ask Anything about results</h2>
+                </div>
+                <span class="ask-ai-chat-scope">Gemini powered</span>
+            </div>
+            <div id="ask-ai-messages" class="ask-ai-chat-messages" aria-live="polite">
+                <div class="ask-ai-chat-message ai">
+                    <p>Hi, I can help with results, CGPA, backlogs, toppers, downloads, and academic performance.</p>
+                </div>
+            </div>
+            <div class="ask-ai-chat-prompts" aria-label="Suggested chat questions">
+                <button type="button" class="ask-ai-chat-chip" data-message="Which semester did I perform the best?">Best performing semester</button>
+                <button type="button" class="ask-ai-chat-chip" data-message="How do I download my result PDF?">Download help</button>
+                <button type="button" class="ask-ai-chat-chip" data-message="What results were recently released?">Latest results</button>
+                <button type="button" class="ask-ai-chat-chip" data-message="What is the CGPA of 21031A0546?">Ask by roll number</button>
+                <button type="button" class="ask-ai-chat-chip" data-message="Do I have any backlogs?">Do I have any backlogs?</button>
+                <button type="button" class="ask-ai-chat-chip" data-message="How can I improve my academic performance?">Improve performance</button>
+            </div>
+            <div class="ask-ai-chat-form">
+                <div class="ask-ai-chat-input-wrapper">
+                    <i class="fas fa-message ask-ai-chat-input-icon"></i>
+                    <input
+                        type="text"
+                        id="ask-ai-chat-input"
+                        class="ask-ai-chat-input"
+                        placeholder="Ask about results, CGPA, downloads, toppers..."
+                    >
+                </div>
+                <button type="button" id="ask-ai-chat-send" class="ask-ai-chat-send">
+                    <i class="fas fa-paper-plane"></i>
+                    <span>Send</span>
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="footer-text mb-0">2025 JNTUK UCEN Results Portal</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <p class="footer-text mb-0">Created for <span class="footer-highlight">JNTUK UCEN</span> Students</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/ask_ai.js"></script>
+</body>
+</html>
+
+

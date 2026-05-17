@@ -17,6 +17,8 @@
     <link rel="stylesheet" href="css/common.css">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/styles.css">
+    <!-- Results AI Modal CSS -->
+    <link rel="stylesheet" href="css/modal.css">
     <!-- jsPDF for PDF generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
@@ -43,12 +45,14 @@
                     <a href="/semester_results" class="nav-link">
                         <i class="fas fa-chart-bar"></i>Semester-wise Results
                     </a>
+                    <a href="/ask-ai" class="nav-link"><i class="fas fa-wand-magic-sparkles"></i>Ask AI
+                    </a>
                     <a href="/toppers" class="nav-link">
                         <i class="fas fa-trophy"></i>Toppers
                     </a>
-                    <a href="/login" class="nav-link">
-                        <i class="fas fa-user-shield"></i>Admin Login
-                    </a>
+
+
+
                 </div>
             </div>
         </div>
@@ -70,6 +74,14 @@
 
     <!-- Main Content -->
     <main class="container">
+        <!-- Ask AI Launch -->
+        <section class="ask-ai-quick-launch" aria-labelledby="ask-ai-launch-title">
+            <a href="/ask-ai" class="ask-ai-glow-button">
+                <i class="fas fa-wand-magic-sparkles"></i>
+                <span id="ask-ai-launch-title">Ask AI about results</span>
+            </a>
+        </section>
+
        <!-- Notifications and Navigation Sections -->
 <section class="content-wrapper">
     <section class="notifications-section">
@@ -231,8 +243,84 @@
         </div>
     </footer>
 
+    <!-- Beautiful "New Feature" Glassmorphism Modal -->
+    <div id="ask-ai-modal" class="modal-overlay hidden" aria-hidden="true" role="dialog">
+        <div class="modal-card">
+            <!-- Sleek Glow Border Element -->
+            <div class="modal-glow-border"></div>
+            <!-- Close Button -->
+            <button class="modal-close-btn" aria-label="Close modal">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="modal-title-section">
+                <span class="badge-new"><i class="fas fa-wand-magic-sparkles"></i> NEW FEATURE</span>
+                <h2>Introducing Results AI</h2>
+                <p>Chat naturally with your digital academic advisor to analyze results and track your progress!</p>
+            </div>
+            
+            <!-- Carousel for AI Questions -->
+            <div class="modal-carousel">
+                <div class="carousel-slides-wrapper">
+                    <div class="carousel-slides">
+                        <!-- Slide 1: Detailed CGPA & Stats -->
+                        <div class="carousel-slide active">
+                            <div class="slide-icon-wrapper cgpa-icon">
+                                <i class="fas fa-graduation-cap"></i>
+                            </div>
+                            <h3>Deep Academic Insights</h3>
+                            <p class="question-example">"What is the CGPA of 21031A0546?"</p>
+                            <p class="slide-desc">Ask by roll number to fetch overall performance, total earned credits, and batch rankings.</p>
+                        </div>
+                        <!-- Slide 2: Performance improvement -->
+                        <div class="carousel-slide">
+                            <div class="slide-icon-wrapper performance-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <h3>Improve Your Performance</h3>
+                            <p class="question-example">"How can I improve my academic performance?"</p>
+                            <p class="slide-desc">Ask for personalized strategies, grade updates, and actionable academic advice.</p>
+                        </div>
+                        <!-- Slide 3: Backlog Queries -->
+                        <div class="carousel-slide">
+                            <div class="slide-icon-wrapper backlog-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <h3>Check Backlogs Instantly</h3>
+                            <p class="question-example">"Do I have any backlogs?"</p>
+                            <p class="slide-desc">Get a quick and accurate overview of any pending subjects with clear semester details.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Navigation controls -->
+                <div class="carousel-nav">
+                    <button class="carousel-nav-btn prev-btn" aria-label="Previous slide">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <div class="carousel-dots">
+                        <span class="dot active" data-index="0"></span>
+                        <span class="dot" data-index="1"></span>
+                        <span class="dot" data-index="2"></span>
+                    </div>
+                    <button class="carousel-nav-btn next-btn" aria-label="Next slide">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <a href="/ask-ai" class="btn modal-action-btn">
+                    <i class="fas fa-wand-magic-sparkles"></i> Try Ask AI Now
+                </a>
+                <button type="button" class="modal-dismiss-link">Maybe Later</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Custom JavaScript -->
     <script src="js/main.js"></script>
     <script src="js/script.js"></script>
+    <!-- Results AI Modal Script -->
+    <script src="js/modal.js"></script>
 </body>
 </html>

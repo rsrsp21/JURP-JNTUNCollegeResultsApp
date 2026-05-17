@@ -255,7 +255,6 @@ async function updateStudentInfo(studentId) {
     }
 }
 
-
 function createResultsTable(studentData, container) {
     container.innerHTML = '';
 
@@ -401,7 +400,7 @@ async function displayResults() {
     // Only proceed if we have valid data
     if (Object.keys(allSemesterData).length > 0) {
         // Update UI with animations
-        updateStudentInfo(studentId);
+        await updateStudentInfo(studentId);
         
         // Display the current semester's data
         if (allSemesterData[currentSemester]) {
