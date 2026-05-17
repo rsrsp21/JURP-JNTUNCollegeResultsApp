@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const sendButton = document.getElementById('ask-ai-chat-send');
     const chips = document.querySelectorAll('.ask-ai-chat-chip');
     let activeStudentId = '';
+    let chatHistory = [];
 
     if (navToggle && navMenu) {
         navToggle.addEventListener('click', function() {
@@ -69,7 +70,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 body: JSON.stringify({
                     message,
-                    activeStudentId
+                    activeStudentId,
+                    history: chatHistory
                 })
             });
             const data = await response.json();
@@ -82,10 +84,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 activeStudentId = data.studentId;
             }
 
-            loadingMessage.innerHTML = formatChatAnswer(data.answer || 'I could not prepare an answer for that.');
+            const answer = data.answer || 'I could not prepare an answer for that.';
+            loadingMessage.innerHTML = formatChatAnswer(answer);
+
+            // Record multi-turn history context (limit to last 16 messages/8 turns to prevent payload bloating)
+            chatHistory.push({ role: 'user', text: message });
+            chatHistory.push({ role: 'model', text: answer });
+            if (chatHistory.length > 16) {
+                chatHistory.shift();
+                chatHistory.shift();
+            }
         } catch (error) {
             loadingMessage.classList.add('error');
-            loadingMessage.innerHTML = '<p>AI chat is unavailable right now. Check the Gemini API key in your environment variables and try again.</p>';
+            loadingMessage.innerHTML = `<p>${error.message || 'Results AI is currently offline or undergoing maintenance. Please try again in a few moments.'}</p>`;
             console.warn('Ask AI chat error:', error);
         } finally {
             sendButton.disabled = false;
