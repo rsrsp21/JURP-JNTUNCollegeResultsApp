@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="images/university_logo.png">
-    <title>Ask AI</title>
+    <title>Ask AI — JNTUK UCEN Results Portal</title>
+    <meta name="description" content="Ask anything about your results, CGPA, SGPA, backlogs, and academic performance using AI.">
     <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,6 +16,8 @@
     <link rel="stylesheet" href="css/modal.css">
 </head>
 <body>
+
+    <!-- Navigation Bar (same as all pages) -->
     <nav class="navigation-bar">
         <div class="container">
             <div class="d-flex align-items-center justify-content-between">
@@ -26,81 +29,123 @@
                     <i class="fas fa-bars"></i>
                 </button>
                 <div class="nav-menu">
-                    <a href="/" class="nav-link">
-                        <i class="fas fa-home"></i>Home
-                    </a>
-                    <a href="/cgpa" class="nav-link">
-                        <i class="fas fa-calculator"></i>CGPA
-                    </a>
-                    <a href="/semester_results" class="nav-link">
-                        <i class="fas fa-chart-bar"></i>Semester-wise Results
-                    </a>
-                    <a href="/ask-ai" class="nav-link active"><i class="fas fa-wand-magic-sparkles"></i>Ask AI
-                    </a>
-                    <a href="/toppers" class="nav-link">
-                        <i class="fas fa-trophy"></i>Toppers
-                    </a>
-
-
-
+                    <a href="/" class="nav-link"><i class="fas fa-home"></i>Home</a>
+                    <a href="/cgpa" class="nav-link"><i class="fas fa-calculator"></i>CGPA</a>
+                    <a href="/semester_results" class="nav-link"><i class="fas fa-chart-bar"></i>Semester-wise Results</a>
+                    <a href="/ask-ai" class="nav-link active"><i class="fas fa-wand-magic-sparkles"></i>Ask AI</a>
+                    <a href="/toppers" class="nav-link"><i class="fas fa-trophy"></i>Toppers</a>
                 </div>
             </div>
         </div>
     </nav>
 
+    <!-- Page Header (same style as all pages) -->
     <header class="page-header">
         <div class="container">
             <h1 class="page-title">Ask AI</h1>
             <p class="page-subtitle">
-                Chat about results, CGPA, SGPA, credits, backlogs, toppers, downloads, and portal help
+                Chat about results, CGPA, SGPA, credits, backlogs, compare students, toppers, downloads, and portal help
             </p>
         </div>
     </header>
 
+    <!-- Main Content -->
     <main class="ask-ai-page">
-        <section class="ask-ai-chat-panel" aria-labelledby="ask-ai-chat-title">
-            <div class="ask-ai-chat-header">
-                <div>
-                    <div class="ask-ai-chat-kicker">
+
+        <!-- Chat Panel -->
+        <section class="chat-panel" aria-labelledby="chat-panel-title">
+
+            <!-- Chat Header -->
+            <div class="chat-panel-header">
+                <div class="chat-panel-identity">
+                    <div class="chat-ai-avatar-sm">
                         <i class="fas fa-wand-magic-sparkles"></i>
-                        Results AI
                     </div>
-                    <h2 id="ask-ai-chat-title">Ask Anything about results</h2>
+                    <div>
+                        <div class="chat-ai-name" id="chat-panel-title">Results AI</div>
+                        <div class="chat-ai-status"><span class="chat-online-dot"></span>Online · Gemini powered</div>
+                    </div>
                 </div>
-                <span class="ask-ai-chat-scope">Gemini powered</span>
-            </div>
-            <div id="ask-ai-messages" class="ask-ai-chat-messages" aria-live="polite">
-                <div class="ask-ai-chat-message ai">
-                    <p>Hi, I can help with results, CGPA, backlogs, toppers, downloads, and academic performance.</p>
-                </div>
-            </div>
-            <div class="ask-ai-chat-prompts" aria-label="Suggested chat questions">
-                <button type="button" class="ask-ai-chat-chip" data-message="Which semester did I perform the best?">Best performing semester</button>
-                <button type="button" class="ask-ai-chat-chip" data-message="How do I download my result PDF?">Download help</button>
-                <button type="button" class="ask-ai-chat-chip" data-message="What results were recently released?">Latest results</button>
-                <button type="button" class="ask-ai-chat-chip" data-message="What is the CGPA of 21031A0546?">Ask by roll number</button>
-                <button type="button" class="ask-ai-chat-chip" data-message="Do I have any backlogs?">Do I have any backlogs?</button>
-                <button type="button" class="ask-ai-chat-chip" data-message="How can I improve my academic performance?">Improve performance</button>
-                <button type="button" class="ask-ai-chat-chip" data-message="">Compare Students</button>
-            </div>
-            <div class="ask-ai-chat-form">
-                <div class="ask-ai-chat-input-wrapper">
-                    <i class="fas fa-message ask-ai-chat-input-icon"></i>
-                    <input
-                        type="text"
-                        id="ask-ai-chat-input"
-                        class="ask-ai-chat-input"
-                        placeholder="Ask about results, CGPA, downloads, toppers..."
-                    >
-                </div>
-                <button type="button" id="ask-ai-chat-send" class="ask-ai-chat-send">
-                    <i class="fas fa-paper-plane"></i>
-                    <span>Send</span>
+                <button class="chat-new-btn" id="chat-clear-btn" title="Start a new chat">
+                    <i class="fas fa-rotate-left"></i> New Chat
                 </button>
             </div>
+
+            <!-- Messages Window -->
+            <div class="chat-messages-window" id="ask-ai-messages" aria-live="polite">
+
+                <!-- Welcome message -->
+                <div class="chat-row ai-row">
+                    <div class="chat-avatar ai-avatar">
+                        <i class="fas fa-wand-magic-sparkles"></i>
+                    </div>
+                    <div class="chat-bubble-wrap">
+                        <div class="chat-bubble ai-bubble">
+                            <p>👋 Hi! I'm your <strong>Results AI</strong> assistant.</p>
+                            <p>I can help you with CGPA &amp; SGPA queries, semester performance, backlogs, topper lists, and portal navigation. What would you like to know?</p>
+                        </div>
+                        <span class="chat-time" id="welcome-time"></span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Suggested Chips -->
+            <div class="chat-suggestions" id="chat-suggestions">
+                <button class="chat-chip chat-suggestions-toggle" type="button" id="chat-suggestions-toggle" aria-expanded="false">
+                    Suggestions <i class="fas fa-arrow-up"></i>
+                </button>
+                <button class="chat-chip" data-message="Do I have any backlogs?">
+                    Do I have any backlogs?
+                </button>
+                <button class="chat-chip" data-message="Which semester did I perform the best?">
+                    Best performing semester
+                </button>
+                <button class="chat-chip" data-message="What is the CGPA of 21031A0546?">
+                    Ask by roll number
+                </button>
+                <button class="chat-chip compare-chip" data-message="">
+                    Compare Students
+                </button>
+                <button class="chat-chip" data-message="How can I improve my academic performance?">
+                    Improve performance
+                </button>
+                <button class="chat-chip" data-message="How do I download my result PDF?">
+                    Download help
+                </button>
+                <button class="chat-chip" data-message="What results were recently released?">
+                    Latest results
+                </button>
+            </div>
+
+            <!-- Input Row -->
+            <div class="chat-input-row">
+                <div class="chat-input-box">
+                    <textarea
+                        id="ask-ai-chat-input"
+                        class="chat-textarea"
+                        placeholder="Ask about results, CGPA, backlogs, toppers…"
+                        rows="1"
+                        autocomplete="off"
+                        aria-label="Type your message"
+                    ></textarea>
+                    <button type="button" id="ask-ai-chat-send" class="chat-send-btn" aria-label="Send message">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                <p class="chat-hint">Press <kbd>Enter</kbd> to send · <kbd>Shift+Enter</kbd> for new line</p>
+            </div>
+
         </section>
+
+        <p class="chat-disclaimer-line">
+            <i class="fas fa-circle-info" style="font-size:0.65rem; opacity:0.6;"></i>
+            Results AI can make mistakes. Always verify important information.
+        </p>
+
     </main>
 
+    <!-- Footer (same as all pages) -->
     <footer class="footer">
         <div class="container">
             <div class="row">
@@ -114,15 +159,15 @@
         </div>
     </footer>
 
-    <!-- Simple Roll Number Prompt Modal -->
+    <!-- Roll Number Prompt Modal -->
     <div id="roll-prompt-modal" class="modal-overlay hidden" aria-hidden="true" role="dialog">
         <div class="simple-modal-card">
             <h3>Enter Student Roll Number</h3>
             <div class="simple-modal-body">
-                <input 
-                    type="text" 
-                    id="roll-prompt-input" 
-                    placeholder="e.g. 21031A0546" 
+                <input
+                    type="text"
+                    id="roll-prompt-input"
+                    placeholder="e.g. 21031A0546"
                     autocomplete="off"
                     maxlength="10"
                 >
@@ -141,5 +186,3 @@
     <script src="js/ask_ai.js"></script>
 </body>
 </html>
-
-
