@@ -221,3 +221,196 @@
         width: 100%;
     }
 }
+
+/* ==========================================================================
+   MARKDOWN PARSER ELEMENT RENDERING STYLES
+   ========================================================================== */
+.ask-ai-chat-message h3, 
+.ask-ai-chat-message h4 {
+    margin: 1rem 0 0.5rem;
+    font-weight: 600;
+    color: #4cc9f0;
+}
+
+.ask-ai-chat-message h3:first-child, 
+.ask-ai-chat-message h4:first-child {
+    margin-top: 0;
+}
+
+.ask-ai-chat-message p {
+    margin-bottom: 0.8rem;
+}
+
+.ask-ai-chat-message p:last-child {
+    margin-bottom: 0;
+}
+
+/* Bullet list and number list styles */
+.ask-ai-chat-message ul, 
+.ask-ai-chat-message ol {
+    margin: 0.5rem 0 0.8rem;
+    padding-left: 1.25rem;
+}
+
+.ask-ai-chat-message li {
+    margin-bottom: 0.35rem;
+}
+
+.ask-ai-chat-message li::marker {
+    color: #4cc9f0;
+}
+
+/* Markdown table glassmorphic rendering styles */
+.ask-ai-chat-message table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 1rem 0;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.ask-ai-chat-message th, 
+.ask-ai-chat-message td {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.86rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.ask-ai-chat-message th {
+    background: rgba(255, 255, 255, 0.06);
+    color: #4cc9f0;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ask-ai-chat-message tr:last-child td {
+    border-bottom: none;
+}
+
+.ask-ai-chat-message tr:hover td {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+/* ==========================================================================
+   SIMPLE ROLL NUMBER PROMPT MODAL STYLES
+   ========================================================================== */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.modal-overlay.hidden {
+    display: none !important;
+}
+
+.simple-modal-card {
+    background: rgba(26, 32, 44, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 0.85rem;
+    padding: 1.5rem;
+    width: min(400px, 90%);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    transform: translateY(20px);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.modal-overlay.active .simple-modal-card {
+    transform: translateY(0);
+}
+
+.simple-modal-card h3 {
+    margin: 0 0 1rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #f8fafc;
+}
+
+.simple-modal-body {
+    margin-bottom: 1.25rem;
+}
+
+#roll-prompt-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    color: #f8fafc;
+    font-size: 0.95rem;
+    outline: none;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+#roll-prompt-input:focus {
+    border-color: #4cc9f0;
+    box-shadow: 0 0 8px rgba(76, 201, 240, 0.2);
+}
+
+.roll-prompt-error {
+    margin-top: 0.4rem;
+    color: #ef476f;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.roll-prompt-error.hidden {
+    display: none !important;
+}
+
+.simple-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+.simple-modal-btn {
+    padding: 0.55rem 1.1rem;
+    font-size: 0.88rem;
+    font-weight: 500;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.simple-modal-btn.cancel {
+    background: transparent;
+    color: #94a3b8;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.simple-modal-btn.cancel:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #f8fafc;
+}
+
+.simple-modal-btn.submit {
+    background: #4cc9f0;
+    color: #0f172a;
+    font-weight: 600;
+}
+
+.simple-modal-btn.submit:hover {
+    background: #38bdf8;
+    transform: translateY(-1px);
+}

@@ -135,6 +135,41 @@ def get_student_semester_records(student_id):
 
     return semester_records
 
+def get_toppers_rag_data():
+    """Load the top overall and branch toppers for all available batches."""
+    toppers_data = {}
+    for year in ['2021', '2022', '2023', '2024']:
+        csv_path = f'data/toppers_{year}.csv'
+        if os.path.exists(csv_path):
+            toppers_data[year] = {
+                'overall': [],
+                'branches': {
+                    'cse': [],
+                    'ece': [],
+                    'eee': [],
+                    'mec': [],
+                    'ce': []
+                }
+            }
+            try:
+                with open(csv_path, mode='r', encoding='utf-8') as f:
+                    reader = csv.DictReader(f)
+                    for row in reader:
+                        category = row.get('category', '').lower().strip()
+                        roll_number = row.get('roll_number', '').strip()
+                        cgpa = row.get('cgpa', '').strip()
+                        record = {'rollNumber': roll_number, 'cgpa': cgpa}
+                        
+                        if category == 'overall':
+                            if len(toppers_data[year]['overall']) < 5:
+                                toppers_data[year]['overall'].append(record)
+                        elif category in toppers_data[year]['branches']:
+                            if len(toppers_data[year]['branches'][category]) < 3:
+                                toppers_data[year]['branches'][category].append(record)
+            except Exception as e:
+                print(f"Error reading toppers CSV for {year}: {e}")
+    return toppers_data
+
 def build_student_rag_context(student_id, question):
     """Build a compact roll-specific context packet for AI answers."""
     cgpa_data = get_student_cgpa_data(student_id)
@@ -157,7 +192,7 @@ def build_student_rag_context(student_id, question):
             elif grade in {'D', 'E'}:
                 low_grade_subjects.append(subject_summary)
 
-    return {
+    context = {
         'retrievalBasis': 'Retrieved from server CSV files by exact roll number match',
         'question': question,
         'student': {
@@ -180,6 +215,11 @@ def build_student_rag_context(student_id, question):
             'lowGradeSubjectCount': len(low_grade_subjects)
         }
     }
+
+    if 'topper' in question.lower() or 'rank' in question.lower() or 'best' in question.lower():
+        context['toppersData'] = get_toppers_rag_data()
+
+    return context
 
 def extract_roll_number(text):
     match = ROLL_NUMBER_PATTERN.search(text or '')
@@ -211,7 +251,7 @@ def needs_student_result_context(message):
     return bool(words & student_specific_keywords)
 
 def build_general_portal_context(question):
-    return {
+    context = {
         'retrievalBasis': 'General portal context; no student roll number was required or supplied',
         'question': question,
         'portal': {
@@ -227,6 +267,11 @@ def build_general_portal_context(question):
         }
     }
 
+    if 'topper' in question.lower() or 'rank' in question.lower() or 'best' in question.lower():
+        context['toppersData'] = get_toppers_rag_data()
+
+    return context
+
 def call_gemini_with_context(question, student_context, max_tokens=600):
     api_key = os.environ.get('GEMINI_API_KEY')
     if not api_key or api_key == 'your_gemini_api_key_here':
@@ -236,20 +281,38 @@ def call_gemini_with_context(question, student_context, max_tokens=600):
     api_url = f'https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent'
 
     prompt = f"""
-You are an academic result advisor for JNTUK UCEN students.
-Answer the student's question using only the supplied result data and portal capabilities.
-Be accurate, concise, supportive, and practical.
-This is a retrieval-augmented answer: use the retrieved roll-number records below as the source of truth.
-Do not answer unrelated questions.
-Do not invent missing rules, university policies, eligibility criteria, official cutoffs, or data not present here.
-If the data is insufficient, say what is missing.
-Use short paragraphs and bullets when useful.
+You are "Results AI", a premium, highly-intelligent, and extremely supportive Academic Results Advisor for JNTUK UCEN students. 
+Your goal is to explain academic results, credits, CGPA/SGPA, backlogs, toppers, and portal features clearly, responsibly, and in a highly polished tone.
 
-Retrieved context:
+---
+### 🛠️ STRATEGIC INSTRUCTIONS & PERSONALITY:
+1. **Dynamic Tone**: 
+   - Be supportive, highly professional, and encouraging. 
+   - If a student has an outstanding CGPA (e.g., >= 8.5) or strong improvements, congratulate them warmly!
+   - If a student has backlogs or grades needing attention, be encouraging, empathetic, and focus on practical steps to clear them.
+2. **Zero Hallucination / Strict Ground Truth**: 
+   - Use the retrieved context below as your absolute source of truth. 
+   - Do NOT invent or assume any missing student details, grades, roll numbers, cutoffs, regulations, or official JNTU policies.
+   - If the data is insufficient to answer the question, state exactly what is missing and direct them to the appropriate portal page.
+3. **Premium Markdown Formatting**:
+   - **Bolding**: Highlight key metrics like CGPA, SGPA, roll numbers, or specific grades using `**` (e.g., **9.07 CGPA**).
+   - **Tables**: When presenting list of subjects, semester-wise grades, or rankings, ALWAYS use highly clean Markdown tables with headers (e.g., Columns: `Semester`, `Subject Code`, `Subject Name`, `Grade`, `Credits`).
+   - **Visual Structure**: Use clean lists, short paragraphs, and emoji bullet points to make the advice incredibly easy to scan.
+4. **Actionable RAG Guidance**:
+   - **Roll Numbers**: When answering roll-specific queries, start by acknowledging the student ID (e.g., "### 📊 Analysis for Roll Number: **[Roll Number]**").
+   - **Toppers Analysis**: When toppers are requested, look under `toppersData`. Render a beautifully structured table showcasing overall/branch toppers with rank, roll number, and CGPA. Include an inspiring commendation.
+   - **Backlog & SGPA Analysis**: If the user is asking about backlogs or improvement, parse their `derivedSignals` (`failedSubjects`, `lowGradeSubjects`) and offer a clear summary and motivational academic tips.
+   - **PDF Downloads**: If asked about downloads, explain that they can navigate to the **Semester-wise Results** page, enter their roll number, load their records, and click **"Download PDF"** to get their official gradesheet.
+
+---
+### 📊 RETRIEVED DATA CONTEXT (Source of Truth):
 {json.dumps(student_context, ensure_ascii=False)}
 
-Student question:
-{question}
+---
+### 💬 STUDENT QUESTION:
+"{question}"
+
+Please provide your highly structured, helpful, and premium Results AI response below:
 """
 
     gemini_payload = {

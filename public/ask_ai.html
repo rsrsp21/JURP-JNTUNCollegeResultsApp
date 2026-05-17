@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/common.css">
     <link rel="stylesheet" href="css/ask_ai.css">
+    <link rel="stylesheet" href="css/modal.css">
 </head>
 <body>
     <nav class="navigation-bar">
@@ -112,6 +113,30 @@
         </div>
     </footer>
 
+    <!-- Simple Roll Number Prompt Modal -->
+    <div id="roll-prompt-modal" class="modal-overlay hidden" aria-hidden="true" role="dialog">
+        <div class="simple-modal-card">
+            <h3>Enter Student Roll Number</h3>
+            <div class="simple-modal-body">
+                <input 
+                    type="text" 
+                    id="roll-prompt-input" 
+                    placeholder="e.g. 21031A0546" 
+                    autocomplete="off"
+                    maxlength="10"
+                >
+                <div class="roll-prompt-error hidden" id="roll-prompt-error">
+                    Please enter a valid JNTUK roll number.
+                </div>
+            </div>
+            <div class="simple-modal-footer">
+                <button type="button" class="simple-modal-btn cancel" id="roll-prompt-cancel">Cancel</button>
+                <button type="button" class="simple-modal-btn submit" id="roll-prompt-submit">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="js/ask_ai.js"></script>
 </body>
 </html>
