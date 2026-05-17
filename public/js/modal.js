@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function closeModal() {
         overlay.classList.remove('active');
-        localStorage.setItem('hasSeenAskAiModal', 'true');
+        sessionStorage.setItem('hasSeenAskAiModal', 'true');
         stopAutoSlide();
 
         // Hide overlay after animation finishes
@@ -42,8 +42,8 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Check localStorage and show modal only once
-    if (!localStorage.getItem('hasSeenAskAiModal')) {
+    // Check sessionStorage and show modal only once
+    if (!sessionStorage.getItem('hasSeenAskAiModal')) {
         // Optional slight delay for polished page-load entrance
         setTimeout(showModal, 1000);
     }
@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Modal Close Event Listeners
     if (closeBtn) closeBtn.addEventListener('click', closeModal);
     if (actionBtn) actionBtn.addEventListener('click', function () {
-        localStorage.setItem('hasSeenAskAiModal', 'true');
+        sessionStorage.setItem('hasSeenAskAiModal', 'true');
     });
     if (dismissLink) dismissLink.addEventListener('click', closeModal);
 

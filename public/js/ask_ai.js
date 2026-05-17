@@ -1,5 +1,5 @@
 function escapeChatHTML(value) {
-    return String(value ?? '').replace(/[&<>"']/g, function(character) {
+    return String(value ?? '').replace(/[&<>"']/g, function (character) {
         return {
             '&': '&amp;',
             '<': '&lt;',
@@ -22,7 +22,7 @@ function formatChatAnswer(answer) {
         .replace(/\n/g, '<br>') + '</p>';
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const navToggle = document.querySelector('.nav-toggle');
     const navMenu = document.querySelector('.nav-menu');
     const messages = document.getElementById('ask-ai-messages');
@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let chatHistory = [];
 
     if (navToggle && navMenu) {
-        navToggle.addEventListener('click', function() {
+        navToggle.addEventListener('click', function () {
             navMenu.classList.toggle('active');
         });
     }
@@ -104,11 +104,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    sendButton.addEventListener('click', function() {
+    sendButton.addEventListener('click', function () {
         sendChatMessage();
     });
 
-    input.addEventListener('keypress', function(event) {
+    input.addEventListener('keypress', function (event) {
         if (event.key === 'Enter') {
             event.preventDefault();
             sendChatMessage();
@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', function() {
         pendingCallback = callback;
         rollPromptInput.value = '';
         if (rollPromptError) rollPromptError.classList.add('hidden');
-        
+
         rollPromptModal.classList.remove('hidden');
         void rollPromptModal.offsetWidth; // force reflow
         rollPromptModal.classList.add('active');
@@ -149,7 +149,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (rollPromptCancel) rollPromptCancel.addEventListener('click', closeRollModal);
     if (rollPromptModal) {
-        rollPromptModal.addEventListener('click', function(e) {
+        rollPromptModal.addEventListener('click', function (e) {
             if (e.target === rollPromptModal) {
                 closeRollModal();
             }
@@ -160,20 +160,20 @@ document.addEventListener('DOMContentLoaded', function() {
         const val = (rollPromptInput.value || '').trim().toUpperCase();
         // Validation: exactly 10 characters conforming to JNTU pattern
         const isValid = val.length === 10 && /^[0-9]{2}[0-9A-Z]{3}A[0-9A-Z]{4}$/i.test(val);
-        
+
         if (!isValid) {
             if (rollPromptError) rollPromptError.classList.remove('hidden');
             rollPromptInput.focus();
             return;
         }
-        
+
         if (pendingCallback) pendingCallback(val);
         closeRollModal();
     }
 
     if (rollPromptSubmit) rollPromptSubmit.addEventListener('click', submitRollValue);
     if (rollPromptInput) {
-        rollPromptInput.addEventListener('keypress', function(e) {
+        rollPromptInput.addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 submitRollValue();
@@ -181,13 +181,19 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    chips.forEach(function(chip) {
-        chip.addEventListener('click', function() {
+    chips.forEach(function (chip) {
+        chip.addEventListener('click', function () {
             let message = chip.dataset.message;
             if (chip.textContent.toLowerCase().includes('roll number')) {
-                openRollModal(function(rollNumber) {
+                openRollModal(function (rollNumber) {
                     sendChatMessage(`What is the CGPA of ${rollNumber}?`);
                 });
+            } else if (chip.textContent.toLowerCase().includes('compare')) {
+                // Fill input with compare template, let user fill in roll numbers
+                input.value = 'Compare ROLL1 and ROLL2';
+                input.focus();
+                // Select all so they can immediately type over it
+                input.select();
             } else {
                 sendChatMessage(message);
             }
