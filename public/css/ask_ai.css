@@ -1596,6 +1596,38 @@
     margin-top: 0.7rem;
 }
 
+.ask-ai-form-panel {
+    margin-top: 1.35rem;
+    overflow: hidden;
+    border-radius: 24px;
+    background: #122037;
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    box-shadow: 0 16px 34px rgba(2, 6, 23, 0.28);
+}
+
+.ask-ai-form-header {
+    padding: 1.15rem 1.45rem;
+    background: var(--chat-reference-bg);
+    border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.ask-ai-form-header h2 {
+    margin: 0;
+    color: var(--chat-text-primary);
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.ask-ai-google-form {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-height: 2765px;
+    border: 0;
+    background: #fff;
+}
+
 @media (max-width: 768px) {
     .ask-ai-page {
         width: min(720px, calc(100% - 1rem));
@@ -1640,6 +1672,15 @@
     .chat-send-btn {
         width: 44px;
         height: 44px;
+    }
+
+    .ask-ai-form-panel {
+        margin-top: 1rem;
+        border-radius: 20px;
+    }
+
+    .ask-ai-form-header {
+        padding: 1rem 1.15rem;
     }
 }
 
