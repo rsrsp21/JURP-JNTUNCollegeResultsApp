@@ -1,27 +1,30 @@
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="dark">
+
 <head>
     <meta charset="UTF-8">
     <link rel="icon" type="image/png" href="images/university_logo.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Check CGPA</title>
-    
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
-    
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <!-- Common CSS -->
     <link rel="stylesheet" href="css/common.css">
     <!-- Custom Styles -->
     <link rel="stylesheet" href="css/cgpa-styles.css">
 </head>
+
 <body>
     <!-- Navigation Bar -->
     <nav class="navigation-bar">
@@ -44,17 +47,17 @@
                     <a href="/semester_results" class="nav-link">
                         <i class="fas fa-chart-bar"></i>Semester-wise Results
                     </a>
+                    <a href="/ask-ai" class="nav-link"><i class="fas fa-wand-magic-sparkles"></i>Ask AI
+                    </a>
                     <a href="/toppers" class="nav-link">
                         <i class="fas fa-trophy"></i>Toppers
                     </a>
-                    <a href="/login" class="nav-link">
-                        <i class="fas fa-user-shield"></i>Admin Login
-                    </a>
+
                 </div>
             </div>
         </div>
     </nav>
-    
+
     <!-- Page Header -->
     <header class="page-header">
         <div class="container">
@@ -65,29 +68,34 @@
         </div>
     </header>
 
+    <section class="ask-ai-quick-launch" aria-label="Ask AI about results">
+        <a href="/ask-ai" class="ask-ai-glow-button">
+            <i class="fas fa-wand-magic-sparkles"></i>
+            <span>Ask AI about results</span>
+        </a>
+    </section>
+    <br>
+
     <!-- Main content -->
     <main class="container main-container">
         <div class="row justify-content-center">
             <!-- Search Section -->
             <div class="col-12 col-lg-8">
-                <div class="blinking-note mb-3 text-center" style="font-weight:600;color:#ffc107;animation:blinker 1.5s linear infinite;">
-        4-1 Supply, 2-2 RC/RV R20/R23, 4-2 Reg/Supp R20 May-2026 Results Released!
-    </div>
+                <div class="blinking-note mb-3 text-center"
+                    style="font-weight:600;color:#ffc107;animation:blinker 1.5s linear infinite;">
+                    4-1 Supply, 2-2 RC/RV R20/R23, 4-2 Reg/Supp R20 May-2026 Results Released!
+                </div>
                 <div class="search-panel">
                     <div class="panel-header">
                         <!-- <h1>Find Your CGPA</h1> -->
                         <p class="lead">Enter your Roll Number:</p>
                     </div>
-                    
+
                     <div class="search-form">
                         <div class="input-wrapper">
                             <i class="fas fa-user-graduate input-icon"></i>
-                            <input 
-                                type="text" 
-                                id="student-id" 
-                                class="form-control search-input" 
-                                placeholder="e.g., 21031A0534"
-                            >
+                            <input type="text" id="student-id" class="form-control search-input"
+                                placeholder="e.g., 21031A0534">
                         </div>
                         <button id="search-button" class="btn btn-primary search-btn">
                             <i class="fas fa-search"></i>
@@ -99,8 +107,11 @@
         </div>
         <style>
             @keyframes blinker {
-                50% { opacity: 0; }
+                50% {
+                    opacity: 0;
+                }
             }
+
             .blinking-note {
                 animation: blinker 1.2s linear infinite;
             }
@@ -123,7 +134,7 @@
                             <!-- Student ID and Branch will be populated here -->
                         </div>
                     </div>
-                    
+
                     <!-- CGPA Overview -->
                     <div class="cgpa-overview">
                         <div class="row">
@@ -144,7 +155,7 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <!-- Performance Stats -->
                             <div class="col-md-6">
                                 <div class="stats-container">
@@ -157,7 +168,7 @@
                                             <!-- Percentage will be populated here -->
                                         </div>
                                     </div>
-                                    
+
                                     <!-- Credits -->
                                     <div class="stat-card">
                                         <div class="stat-icon">
@@ -167,7 +178,7 @@
                                             <!-- Total Credits will be populated here -->
                                         </div>
                                     </div>
-                                    
+
                                     <!-- Supplementary -->
                                     <div class="stat-card">
                                         <div class="stat-icon">
@@ -181,24 +192,25 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Semester Performance -->
                     <div class="semester-performance-section">
                         <h3 class="section-title">
                             <i class="fas fa-chart-line me-2"></i>
                             Semester-wise Performance
                         </h3>
-                        
+
                         <div class="chart-container mb-4" style="position: relative; height: 350px;">
                             <canvas id="sgpaChart"></canvas>
-                            <p id="no-chart-data-message" class="text-center text-muted mt-5 d-none">No semester data available for chart.</p> 
+                            <p id="no-chart-data-message" class="text-center text-muted mt-5 d-none">No semester data
+                                available for chart.</p>
                         </div>
                         <div id="table-container" class="table-responsive">
                             <!-- Table will be populated here -->
                         </div>
 
                     </div>
-                    
+
                     <!-- Action Buttons -->
                     <div class="action-buttons">
                         <button id="printResultsBtn" class="btn btn-primary">
@@ -264,7 +276,8 @@
                     <p class="footer-text mb-0"> 2025 JNTUK UCEN Results Portal</p>
                 </div>
                 <div class="col-md-6 text-center text-md-end">
-                    <p class="footer-text mb-0">Created for <span class="footer-highlight">JNTUK UCEN</span> Students</p>
+                    <p class="footer-text mb-0">Created for <span class="footer-highlight">JNTUK UCEN</span> Students
+                    </p>
                 </div>
             </div>
         </div>
@@ -281,4 +294,5 @@
     <script src="js/main.js"></script>
     <script src="js/cgpa.js"></script>
 </body>
+
 </html>
