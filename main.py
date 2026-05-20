@@ -23,8 +23,8 @@ app = Flask(__name__, static_folder='public')
 app.secret_key = 'jntun_results_secret_key'
 
 ADMIN_USER = {
-    "username": os.getenv("ADMIN_USERNAME", "admin"),
-    "password": os.getenv("ADMIN_PASSWORD", "jntun@321")
+    "username": os.getenv("ADMIN_USERNAME"),
+    "password": os.getenv("ADMIN_PASSWORD")
 }
 
 # Fixed regex: uses lookarounds instead of \b to handle digit-letter boundaries
@@ -494,7 +494,9 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        if username == ADMIN_USER['username'] and password == ADMIN_USER['password']:
+        admin_username = ADMIN_USER.get('username')
+        admin_password = ADMIN_USER.get('password')
+        if admin_username and admin_password and username == admin_username and password == admin_password:
             session['logged_in'] = True
             return redirect(url_for('admin_panel'))
         else:
