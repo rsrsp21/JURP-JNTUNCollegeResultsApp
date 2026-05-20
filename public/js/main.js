@@ -45,3 +45,46 @@ document.addEventListener('DOMContentLoaded', function() {
         lastScroll = currentScroll;
     });
 });
+
+// Dynamic Notifications loading
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('/api/notifications')
+        .then(response => response.json())
+        .then(data => {
+            if (data && data.length > 0) {
+                // 1. Update all page-header blinking notes with the 1st notification
+                const blinkingNotes = document.querySelectorAll('.blinking-note.text-center');
+                blinkingNotes.forEach(note => {
+                    note.textContent = data[0].text;
+                });
+
+                // 2. Render top 3 in notification card (if present)
+                const notificationsCard = document.querySelector('.notifications-section .notification-card');
+                if (notificationsCard) {
+                    notificationsCard.innerHTML = '';
+                    data.slice(0, 3).forEach((item, index) => {
+                        const p = document.createElement('p');
+                        // Use textContent to prevent XSS, but preserve spacing
+                        p.textContent = item.text + ' ';
+                        
+                        if (item.is_new) {
+                            const newBadge = document.createElement('span');
+                            newBadge.className = 'blinking-note';
+                            newBadge.textContent = 'New!';
+                            p.appendChild(newBadge);
+                        }
+
+                        if (item.date) {
+                            const dateSpan = document.createElement('span');
+                            dateSpan.className = 'notification-date';
+                            dateSpan.textContent = ' ' + item.date;
+                            p.appendChild(dateSpan);
+                        }
+                        notificationsCard.appendChild(p);
+                    });
+                }
+            }
+        })
+        .catch(err => console.error('Error fetching notifications:', err));
+});
+

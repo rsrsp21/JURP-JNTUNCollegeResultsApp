@@ -101,7 +101,8 @@ function getRegulationFromId(studentId) {
         studentId.startsWith('22031A') || studentId.startsWith('23035A')) {
         return 'R20';
     } else if (studentId.startsWith('23031A') || studentId.startsWith('24035A') || 
-               studentId.startsWith('24031A') || studentId.startsWith('25035A')) {
+               studentId.startsWith('24031A') || studentId.startsWith('25035A') ||
+               studentId.startsWith('25031A') || studentId.startsWith('26035A')) {
         return 'R23';
     }
     return 'R20'; // Default to R20 if pattern not recognized
@@ -231,6 +232,9 @@ async function updateStudentInfo(studentId) {
         regulation = 'R23';
     } else if (studentId.startsWith('24031A') || studentId.startsWith('25035A')) {
         batch = '2024-2028';
+        regulation = 'R23';
+    } else if (studentId.startsWith('25031A') || studentId.startsWith('26035A')) {
+        batch = '2025-2029';
         regulation = 'R23';
     } else {
         batch = 'N/A';

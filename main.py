@@ -6,8 +6,15 @@ import json
 import re
 import pandas as pd
 import requests
+import io
+from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
 from flask import Flask, send_from_directory, jsonify, request, render_template, session, redirect, url_for, send_file
+from admin_engine.logic import (
+    get_batch, save_processed_csv, apply_revaluation,
+    merge_all_semesters, calculate_supple_appearances,
+    get_toppers_list, convert_pdf_to_csv, extract_tables_from_pdf
+)
 
 load_dotenv()
 
@@ -16,8 +23,8 @@ app = Flask(__name__, static_folder='public')
 app.secret_key = 'jntun_results_secret_key'
 
 ADMIN_USER = {
-    "username": "admin",
-    "password": "jntun@321"  # Change this in a real application
+    "username": os.getenv("ADMIN_USERNAME", "admin"),
+    "password": os.getenv("ADMIN_PASSWORD", "jntun@321")
 }
 
 # Fixed regex: uses lookarounds instead of \b to handle digit-letter boundaries
@@ -44,6 +51,8 @@ id_prefix_mapping = {
     '24035A': ('data/cgpa_data_2023.csv', '2023-27', 'R23'),
     '24031A': ('data/cgpa_data_2024.csv', '2024-28', 'R23'),
     '25035A': ('data/cgpa_data_2024.csv', '2024-28', 'R23'),
+    '25031A': ('data/cgpa_data_2025.csv', '2025-29', 'R23'),
+    '26035A': ('data/cgpa_data_2025.csv', '2025-29', 'R23'),
 }
 
 # --- Helper Functions ---
@@ -53,6 +62,7 @@ def get_batch_folder_from_id(student_id):
     if student_id.startswith(('22031A', '23035A')): return '2022'
     if student_id.startswith(('23031A', '24035A')): return '2023'
     if student_id.startswith(('24031A', '25035A')): return '2024'
+    if student_id.startswith(('25031A', '26035A')): return '2025'
     return None
 
 def parse_csv_data(csv_string):
@@ -324,17 +334,17 @@ def needs_student_result_context(message):
     return bool(words & student_specific_keywords)
 
 def get_latest_notification():
-    """Dynamically read the latest notification from public/index.html blinking-note."""
+    """Dynamically read the latest notification from data/notifications.json."""
     try:
-        html_path = os.path.join('public', 'index.html')
-        if os.path.exists(html_path):
-            with open(html_path, 'r', encoding='utf-8') as f:
-                content = f.read()
-            match = re.search(r'class="blinking-note mb-3 text-center"[^>]*>\s*(.*?)\s*</div>', content, re.DOTALL)
-            if match:
-                return match.group(1).strip()
+        json_path = os.path.join('data', 'notifications.json')
+        if os.path.exists(json_path):
+            with open(json_path, 'r', encoding='utf-8') as f:
+                import json
+                notifications = json.load(f)
+                if notifications and isinstance(notifications, list):
+                    return notifications[0].get('text', '').strip()
     except Exception as e:
-        print(f"Error parsing index.html for notifications: {e}")
+        print(f"Error parsing notifications.json: {e}")
     return None
 
 def build_general_portal_context(question):
@@ -505,6 +515,20 @@ def admin_panel():
     return render_template('admin.html')
 
 # --- API Endpoints ---
+
+@app.route('/api/notifications')
+def serve_notifications():
+    """Serve the list of notifications from data/notifications.json."""
+    try:
+        json_path = os.path.join('data', 'notifications.json')
+        if os.path.exists(json_path):
+            with open(json_path, 'r', encoding='utf-8') as f:
+                import json
+                notifications = json.load(f)
+                return jsonify(notifications)
+    except Exception as e:
+        print(f"Error serving notifications API: {e}")
+    return jsonify([])
 
 @app.route('/api/cgpa/<student_id>')
 def serve_cgpa_data_api(student_id):
@@ -708,6 +732,276 @@ def get_toppers():
         return jsonify({
             'error': 'Internal server error'
         }), 500
+
+# --- Native Admin API Routes ---
+
+@app.route('/api/admin/ingest', methods=['POST'])
+def admin_ingest_results():
+    if not session.get('logged_in'):
+        return jsonify({'error': 'Unauthorized'}), 401
+        
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file uploaded'}), 400
+        
+    file = request.files['file']
+    semester = request.form.get('semester')
+    result_type = request.form.get('result_type')
+    ignore_tags_str = request.form.get('ignore_tags', '')
+    
+    if not file or not file.filename:
+        return jsonify({'error': 'No file selected'}), 400
+    if not semester or not result_type:
+        return jsonify({'error': 'Semester and Result Type are required'}), 400
+        
+    ignore_list = [c.strip() for c in ignore_tags_str.split('\n') if c.strip()]
+    
+    try:
+        # Parse CSV file in-memory
+        csv_bytes = file.read()
+        df = pd.read_csv(io.BytesIO(csv_bytes))
+        
+        if 'Subject Code' not in df.columns or 'ID' not in df.columns:
+            return jsonify({'error': "Data Structure Mismatch: 'ID' and 'Subject Code' columns required."}), 400
+            
+        df['Batch'] = df['ID'].apply(get_batch)
+        unique_batches = [b for b in df['Batch'].unique() if b != "Unknown" and int(b) >= 2021]
+        
+        if not unique_batches:
+            return jsonify({'error': 'No student records from 2021 batch onwards identified in the file.'}), 400
+            
+        df = df[df['Batch'].isin(unique_batches)]
+            
+        base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "csv"))
+        saved_files = []
+        logs = []
+        
+        for batch in unique_batches:
+            batch_df = df[df['Batch'] == batch].drop(columns=['Batch'])
+            
+            if result_type == "Standard Phase (Regular/Supply)":
+                paths = save_processed_csv(batch_df, batch, semester, base_path, ignore_list)
+                if isinstance(paths, list):
+                    saved_files.extend(paths)
+                    logs.append(f"Batch {batch}: Successfully processed Standard Phase.")
+            else:
+                paths, msg = apply_revaluation(batch_df, batch, semester, base_path)
+                if paths is None:
+                    logs.append(f"Batch {batch} revaluation failed: {msg}")
+                else:
+                    saved_files.extend(paths)
+                    logs.append(f"Batch {batch}: Successfully processed Revaluation.")
+                    
+        return jsonify({
+            'success': True,
+            'logs': logs,
+            'files': [os.path.relpath(f, base_path) if not f.startswith("Portal Sync") and not f.startswith("SGPA Summary") else f for f in saved_files]
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/admin/generate-reports', methods=['POST'])
+def admin_generate_reports():
+    if not session.get('logged_in'):
+        return jsonify({'error': 'Unauthorized'}), 401
+        
+    batch_year = request.form.get('batch_year')
+    report_type = request.form.get('report_type', 'both')
+    
+    if not batch_year:
+        return jsonify({'error': 'Batch year is required'}), 400
+
+    base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "csv"))
+    
+    batches = []
+    if batch_year.strip().lower() == 'all':
+        if os.path.exists(base_path):
+            for name in os.listdir(base_path):
+                if os.path.isdir(os.path.join(base_path, name)) and name.isdigit() and int(name) >= 2021:
+                    batches.append(name)
+        if not batches:
+            batches = ['2021', '2022', '2023', '2024', '2025']
+        batches = sorted(list(set(batches)))
+    else:
+        try:
+            if int(batch_year) < 2021:
+                return jsonify({'error': 'Report generation is restricted to 2021 batch and onwards.'}), 400
+            batches = [batch_year.strip()]
+        except ValueError:
+            return jsonify({'error': 'Invalid batch year format. Use a 4-digit year or "all".'}), 400
+            
+    logs = []
+    
+    try:
+        for b in batches:
+            if report_type in ['cgpa', 'both']:
+                cgpa_file, msg1 = merge_all_semesters(b, base_path)
+                if cgpa_file:
+                    supple_file, msg2 = calculate_supple_appearances(b, base_path)
+                    if supple_file:
+                        logs.append(f"CGPA Master: Successfully generated and synchronized graduation report for batch {b}.")
+                    else:
+                        logs.append(f"CGPA Master: Aggregation succeeded but supplementary calculation failed for batch {b}: {msg2}")
+                else:
+                    logs.append(f"CGPA Master Error (Batch {b}): {msg1}")
+                    
+            if report_type in ['toppers', 'both']:
+                output_file, toppers_df = get_toppers_list(b, base_path)
+                if output_file:
+                    logs.append(f"Toppers: Successfully extracted Hall of Fame and branch rankings for batch {b}.")
+                else:
+                    logs.append(f"Toppers Error (Batch {b}): Failed to generate toppers list.")
+                
+        return jsonify({
+            'success': True,
+            'logs': logs
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/admin/convert-pdf', methods=['POST'])
+def admin_convert_pdf():
+    if not session.get('logged_in'):
+        return jsonify({'error': 'Unauthorized'}), 401
+        
+    pdf_files = request.files.getlist('pdf_files')
+    pdf_model = 'new'
+    selected_cols_str = request.form.get('selected_cols', '')
+    
+    if not pdf_files or not pdf_files[0].filename:
+        return jsonify({'error': 'No PDF files provided'}), 400
+        
+    required = [c.strip() for c in selected_cols_str.split(',') if c.strip()]
+    if not required:
+        required = None
+        
+    try:
+        results = []
+        for file in pdf_files:
+            file.seek(0)
+            df, stats = extract_tables_from_pdf(file, required_columns=required, model=pdf_model)
+            
+            if not df.empty and 'ID' in df.columns:
+                df['Batch'] = df['ID'].apply(get_batch)
+                df = df[df['Batch'].apply(lambda b: b != "Unknown" and int(b) >= 2021)]
+                df = df.drop(columns=['Batch'])
+                
+            if df.empty:
+                results.append({
+                    'filename': file.filename,
+                    'error': 'No student records from 2021 batch onwards found in the PDF.'
+                })
+            else:
+                csv_data = df.to_csv(index=False)
+                results.append({
+                    'filename': file.filename,
+                    'success': True,
+                    'csv_data': csv_data,
+                    'stats': {
+                        'total_rows': len(df),
+                        'total_pages': stats['total_pages'],
+                        'columns_found': stats['columns_found']
+                    },
+                    'preview': df.to_dict(orient='records')
+                })
+                
+        return jsonify({
+            'success': True,
+            'results': results
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/admin/add-notification', methods=['POST'])
+def admin_add_notification():
+    if not session.get('logged_in'):
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    data = request.get_json()
+    if not data or 'text' not in data or not data['text'].strip():
+        return jsonify({'error': 'Notification text is required'}), 400
+    
+    text = data['text'].strip()
+    is_new = bool(data.get('is_new', False))
+    
+    # Default to formatted today's date if not provided
+    date_str = data.get('date', '').strip()
+    if not date_str:
+        import datetime
+        now = datetime.datetime.now()
+        months = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov", "Dec"]
+        date_str = f"{months[now.month - 1]} {now.day}, {now.year}"
+        
+    try:
+        json_path = os.path.join('data', 'notifications.json')
+        notifications = []
+        if os.path.exists(json_path):
+            with open(json_path, 'r', encoding='utf-8') as f:
+                import json
+                notifications = json.load(f)
+                
+        # Push to top
+        notifications.insert(0, {
+            'text': text,
+            'date': date_str,
+            'is_new': is_new
+        })
+        
+        with open(json_path, 'w', encoding='utf-8') as f:
+            json.dump(notifications, f, indent=2)
+            
+        return jsonify({'success': True, 'notifications': notifications})
+    except Exception as e:
+        print(f"Error adding notification: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/admin/delete-notification/<int:index>', methods=['DELETE'])
+def admin_delete_notification(index):
+    if not session.get('logged_in'):
+        return jsonify({'error': 'Unauthorized'}), 401
+        
+    try:
+        json_path = os.path.join('data', 'notifications.json')
+        if os.path.exists(json_path):
+            with open(json_path, 'r', encoding='utf-8') as f:
+                import json
+                notifications = json.load(f)
+            
+            if 0 <= index < len(notifications):
+                notifications.pop(index)
+                with open(json_path, 'w', encoding='utf-8') as f:
+                    json.dump(notifications, f, indent=2)
+                return jsonify({'success': True, 'notifications': notifications})
+                
+        return jsonify({'error': 'Notification not found'}), 404
+    except Exception as e:
+        print(f"Error deleting notification: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/admin/toggle-blinking/<int:index>', methods=['POST'])
+def admin_toggle_blinking(index):
+    if not session.get('logged_in'):
+        return jsonify({'error': 'Unauthorized'}), 401
+        
+    try:
+        json_path = os.path.join('data', 'notifications.json')
+        if os.path.exists(json_path):
+            with open(json_path, 'r', encoding='utf-8') as f:
+                import json
+                notifications = json.load(f)
+            
+            if 0 <= index < len(notifications):
+                notifications[index]['is_new'] = not notifications[index].get('is_new', False)
+                with open(json_path, 'w', encoding='utf-8') as f:
+                    json.dump(notifications, f, indent=2)
+                return jsonify({'success': True, 'notifications': notifications})
+                
+        return jsonify({'error': 'Notification not found'}), 404
+    except Exception as e:
+        print(f"Error toggling blinking: {e}")
+        return jsonify({'error': str(e)}), 500
 
 # --- Static File and Main Route (Catch-all) ---
 # This must be the last set of routes
