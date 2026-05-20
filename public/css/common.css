@@ -371,3 +371,15 @@ main {
         padding: 1.5rem 0;
     }
 }
+
+/* Blinking Note and Animations */
+@keyframes blinker {
+    50% { opacity: 0; }
+}
+
+.blinking-note {
+    animation: blinker 1.2s linear infinite;
+    color: #ffc107 !important;
+    font-weight: 600;
+}
+

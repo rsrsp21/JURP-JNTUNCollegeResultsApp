@@ -66,6 +66,7 @@
                 <div class="year-tab" data-year="2022">2022-26 Batch</div>
                 <div class="year-tab" data-year="2023">2023-27 Batch</div>
                 <div class="year-tab" data-year="2024">2024-28 Batch</div>
+                <div class="year-tab" data-year="2025">2025-29 Batch</div>
             </div>
         </div>
     </header>
@@ -76,9 +77,12 @@
             <span>Ask AI about results</span>
         </a>
     </section>
+    <br>
 
     <!-- Main Content -->
     <main class="container">
+        <div class="blinking-note mb-3 text-center" style="font-weight:600;color:#ffc107;animation:blinker 1.5s linear infinite;">
+        </div>
         <!-- Loading Spinner -->
         <div id="loading-container" class="loading-container fade-in">
             <div class="loading-spinner"></div>
@@ -279,12 +283,16 @@
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <div class="row">
-                <div class="col-md-6 text-center text-md-start">
-                    <p class="footer-text mb-0">Â© 2025 JNTUK UCEN Results Portal</p>
+            <div class="row align-items-center">
+                <div class="col-md-4 text-center text-md-start">
+                    <p class="footer-text mb-0">© 2025 JNTUK UCEN Results Portal</p>
                 </div>
-                <div class="col-md-6 text-center text-md-end">
+                <div class="col-md-4 text-center my-2 my-md-0">
+                    <p class="footer-text mb-0">Created by <span class="footer-highlight">Sri Ram Sai Pavan Relangi</span></p>
+                </div>
+                <div class="col-md-4 text-center text-md-end d-flex align-items-center justify-content-center justify-content-md-end gap-3">
                     <p class="footer-text mb-0">Created for <span class="footer-highlight">JNTUK UCEN</span> Students</p>
+                    <a href="/login" class="admin-login-link" style="font-size: 11px; color: rgba(255,255,255,0.45); text-decoration: none; padding: 2px 6px; border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; transition: all 0.2s;" onmouseover="this.style.color='#ffc107'; this.style.borderColor='#ffc107';" onmouseout="this.style.color='rgba(255,255,255,0.45)'; this.style.borderColor='rgba(255,255,255,0.15)';"><i class="fas fa-key" style="font-size: 9px; margin-right: 3px;"></i>Admin</a>
                 </div>
             </div>
         </div>
