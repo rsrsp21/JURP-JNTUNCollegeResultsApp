@@ -7,9 +7,24 @@ import re
 import pandas as pd
 import requests
 import io
+import shutil
+import time
+import uuid
+from contextlib import contextmanager
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
-from flask import Flask, send_from_directory, jsonify, request, render_template, session, redirect, url_for, send_file
+from flask import Flask, send_from_directory, jsonify, request, render_template, session, redirect, url_for
+from utils.r2_storage import (
+    is_r2_configured,
+    download_prefix_to_folder,
+    hash_folder_files,
+    list_csv_files as list_r2_csv_files,
+    read_csv_text as read_r2_csv_text,
+    read_text_key,
+    upload_changed_files_to_prefix,
+    write_text_key,
+    write_csv_text as write_r2_csv_text
+)
 from admin_engine.logic import (
     get_batch, save_processed_csv, apply_revaluation,
     merge_all_semesters, calculate_supple_appearances,
@@ -17,6 +32,11 @@ from admin_engine.logic import (
 )
 
 load_dotenv()
+
+R2_CACHE_TTL_SECONDS = int(os.getenv("R2_CACHE_TTL_SECONDS", "300"))
+_r2_text_cache = {}
+_r2_rows_cache = {}
+_r2_dataframe_cache = {}
 
 # --- App Initialization ---
 app = Flask(__name__, static_folder='public')
@@ -76,6 +96,123 @@ def parse_csv_data(csv_string):
             data.append(dict(zip(headers, values)))
     return data
 
+def _cache_get(cache, key):
+    item = cache.get(key)
+    if not item:
+        return None
+
+    created_at, value = item
+    if time.time() - created_at > R2_CACHE_TTL_SECONDS:
+        cache.pop(key, None)
+        return None
+
+    return value
+
+def _cache_set(cache, key, value):
+    cache[key] = (time.time(), value)
+    return value
+
+def clear_r2_runtime_cache():
+    _r2_text_cache.clear()
+    _r2_rows_cache.clear()
+    _r2_dataframe_cache.clear()
+
+def read_r2_text_or_none(key):
+    if not is_r2_configured():
+        return None
+    cached = _cache_get(_r2_text_cache, key)
+    if cached is not None:
+        return cached
+
+    try:
+        _, content = read_text_key(key)
+        return _cache_set(_r2_text_cache, key, content)
+    except Exception:
+        return None
+
+def read_r2_csv_rows(key):
+    cached = _cache_get(_r2_rows_cache, key)
+    if cached is not None:
+        return [row.copy() for row in cached]
+
+    content = read_r2_text_or_none(key)
+    if content is None:
+        return []
+
+    rows = list(csv.DictReader(io.StringIO(content)))
+    _cache_set(_r2_rows_cache, key, rows)
+    return [row.copy() for row in rows]
+
+def read_r2_dataframe(key):
+    cached = _cache_get(_r2_dataframe_cache, key)
+    if cached is not None:
+        return cached.copy()
+
+    content = read_r2_text_or_none(key)
+    if content is None:
+        return None
+
+    df = pd.read_csv(io.StringIO(content), encoding='utf-8-sig')
+    _cache_set(_r2_dataframe_cache, key, df)
+    return df.copy()
+
+def read_r2_json_or_default(key, default):
+    content = read_r2_text_or_none(key)
+    if content is None:
+        return default
+    try:
+        return json.loads(content)
+    except json.JSONDecodeError:
+        return default
+
+def write_r2_json(key, value):
+    write_text_key(key, json.dumps(value, indent=2), content_type='application/json; charset=utf-8')
+    clear_r2_runtime_cache()
+
+def csv_workspace_prefixes_for_ingest(batches, semester, result_type):
+    sem_folder = semester.replace("-", "_")
+    prefixes = []
+
+    for batch in batches:
+        prefixes.append(f"{batch}/{sem_folder}")
+        if result_type == "Standard Phase (Regular/Supply)":
+            prefixes.append(f"{batch}/honors-minors")
+
+    return prefixes
+
+
+@contextmanager
+def r2_csv_workspace(relative_prefixes=None):
+    if not is_r2_configured():
+        raise RuntimeError('Cloudflare R2 is not configured')
+
+    workspace_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '.r2_work'))
+    workspace = os.path.join(workspace_root, str(uuid.uuid4()))
+    os.makedirs(workspace, exist_ok=True)
+    try:
+        prefixes = []
+        if relative_prefixes:
+            seen = set()
+            for prefix in relative_prefixes:
+                normalized = str(prefix).strip('/').replace('\\', '/')
+                if normalized and normalized not in seen:
+                    prefixes.append(normalized)
+                    seen.add(normalized)
+
+        if prefixes:
+            for prefix in prefixes:
+                local_folder = os.path.join(workspace, *prefix.split('/'))
+                download_prefix_to_folder(f"csv/{prefix}", local_folder)
+        else:
+            download_prefix_to_folder('csv', workspace)
+
+        previous_hashes = hash_folder_files(workspace)
+        yield workspace
+        upload_changed_files_to_prefix(workspace, 'csv', previous_hashes)
+        clear_r2_runtime_cache()
+    finally:
+        shutil.rmtree(workspace, ignore_errors=True)
+
 def get_student_cgpa_data(student_id):
     """Helper to get a single student's CGPA record from a CSV."""
     matched = next((data for prefix, data in id_prefix_mapping.items() if student_id.startswith(prefix)), None)
@@ -83,19 +220,17 @@ def get_student_cgpa_data(student_id):
         return None
 
     csv_file_path, batch, regulation = matched
-    if not os.path.exists(csv_file_path):
+    rows = read_r2_csv_rows(csv_file_path)
+    if not rows:
         return None
 
-    # utf-8-sig handles BOM (\ufeff) that Excel often adds to CSV files
-    with open(csv_file_path, mode='r', encoding='utf-8-sig') as file:
-        reader = csv.DictReader(file)
-        for row in reader:
-            row_id = (row.get('ID') or '').strip()
-            if row_id == student_id:
-                row['ID'] = row_id
-                row['Batch'] = batch
-                row['Regulation'] = regulation
-                return row
+    for row in rows:
+        row_id = (row.get('ID') or '').strip()
+        if row_id == student_id:
+            row['ID'] = row_id
+            row['Batch'] = batch
+            row['Regulation'] = regulation
+            return row
 
     return None
 
@@ -110,13 +245,10 @@ def get_student_ids_by_batch(batch_year):
         return []
 
     for csv_file in csv_files_for_batch:
-        if os.path.exists(csv_file):
-            with open(csv_file, mode='r', encoding='utf-8-sig') as file:
-                reader = csv.DictReader(file)
-                for row in reader:
-                    student_id = (row.get('ID') or '').strip()
-                    if student_id and get_batch_folder_from_id(student_id) == batch_year:
-                        student_ids.append(student_id)
+        for row in read_r2_csv_rows(csv_file):
+            student_id = (row.get('ID') or '').strip()
+            if student_id and get_batch_folder_from_id(student_id) == batch_year:
+                student_ids.append(student_id)
     return list(set(student_ids))
 
 def get_student_semester_records(student_id):
@@ -127,28 +259,45 @@ def get_student_semester_records(student_id):
 
     semester_records = {}
     for semester in range(1, 10):
-        file_path = os.path.join('data', 'semesters', batch_folder, f'semester{semester}.csv')
-        if not os.path.exists(file_path):
+        file_path = f"data/semesters/{batch_folder}/semester{semester}.csv"
+        rows_data = read_r2_csv_rows(file_path)
+        if not rows_data:
             continue
 
-        with open(file_path, mode='r', encoding='utf-8-sig') as file:
-            reader = csv.DictReader(file)
-            rows = []
-            for row in reader:
-                row_id = (row.get('ID') or '').strip()
-                if row_id == student_id:
-                    rows.append({
-                        'subjectCode': row.get('Subject Code', ''),
-                        'subjectName': row.get('Subject Name', ''),
-                        'grade': row.get('Grade', ''),
-                        'credits': row.get('Credits', '')
-                    })
-            if rows:
-                label = 'Honors/Minor' if semester == 9 else f'{(semester + 1) // 2}-{2 if semester % 2 == 0 else 1}'
-                semester_records[str(semester)] = {
-                    'label': label,
-                    'subjects': rows
-                }
+        rows = []
+        for row in rows_data:
+            row_id = (row.get('ID') or '').strip()
+            if row_id == student_id:
+                rows.append({
+                    'subjectCode': row.get('Subject Code', ''),
+                    'subjectName': row.get('Subject Name', ''),
+                    'grade': row.get('Grade', ''),
+                    'credits': row.get('Credits', '')
+                })
+        if rows:
+            label = 'Honors/Minor' if semester == 9 else f'{(semester + 1) // 2}-{2 if semester % 2 == 0 else 1}'
+            semester_records[str(semester)] = {
+                'label': label,
+                'subjects': rows
+            }
+
+    return semester_records
+
+def get_student_semester_raw_records(student_id):
+    """Retrieve raw semester rows for the browser-facing semester results page."""
+    batch_folder = get_batch_folder_from_id(student_id)
+    if not batch_folder:
+        return {}
+
+    semester_records = {}
+    for semester in range(1, 10):
+        file_path = f"data/semesters/{batch_folder}/semester{semester}.csv"
+        rows = [
+            row for row in read_r2_csv_rows(file_path)
+            if (row.get('ID') or '').strip() == student_id
+        ]
+        if rows:
+            semester_records[str(semester)] = rows
 
     return semester_records
 
@@ -156,8 +305,9 @@ def get_toppers_rag_data():
     """Load the top overall and branch toppers for all available batches."""
     toppers_data = {}
     for year in ['2021', '2022', '2023', '2024']:
-        csv_path = f'data/toppers_{year}.csv'
-        if os.path.exists(csv_path):
+        csv_path = f"data/toppers_{year}.csv"
+        rows = read_r2_csv_rows(csv_path)
+        if rows:
             toppers_data[year] = {
                 'overall': [],
                 'branches': {
@@ -169,23 +319,57 @@ def get_toppers_rag_data():
                 }
             }
             try:
-                with open(csv_path, mode='r', encoding='utf-8-sig') as f:
-                    reader = csv.DictReader(f)
-                    for row in reader:
-                        category = row.get('category', '').lower().strip()
-                        roll_number = row.get('roll_number', '').strip()
-                        cgpa = row.get('cgpa', '').strip()
-                        record = {'rollNumber': roll_number, 'cgpa': cgpa}
+                for row in rows:
+                    category = row.get('category', '').lower().strip()
+                    roll_number = row.get('roll_number', '').strip()
+                    cgpa = row.get('cgpa', '').strip()
+                    record = {'rollNumber': roll_number, 'cgpa': cgpa}
 
-                        if category == 'overall':
-                            if len(toppers_data[year]['overall']) < 5:
-                                toppers_data[year]['overall'].append(record)
-                        elif category in toppers_data[year]['branches']:
-                            if len(toppers_data[year]['branches'][category]) < 3:
-                                toppers_data[year]['branches'][category].append(record)
+                    if category == 'overall':
+                        if len(toppers_data[year]['overall']) < 5:
+                            toppers_data[year]['overall'].append(record)
+                    elif category in toppers_data[year]['branches']:
+                        if len(toppers_data[year]['branches'][category]) < 3:
+                            toppers_data[year]['branches'][category].append(record)
             except Exception as e:
                 print(f"Error reading toppers CSV for {year}: {e}")
     return toppers_data
+
+def generate_toppers_from_r2_merged(year):
+    df = read_r2_dataframe(f"csv/{year}/merged_cgpas2.csv")
+    if df is None:
+        return False, "merged_cgpas2.csv not found. Run CGPA calculation first."
+
+    if "ID" not in df.columns or "Average CGPA" not in df.columns:
+        return False, "merged_cgpas2.csv must contain ID and Average CGPA columns."
+
+    df["Average CGPA"] = pd.to_numeric(df["Average CGPA"], errors="coerce").fillna(0)
+    branch_map = {
+        "1": "ce",
+        "2": "eee",
+        "3": "mec",
+        "4": "ece",
+        "5": "cse"
+    }
+
+    results = []
+    overall_top = df.sort_values("Average CGPA", ascending=False).head(10)
+    for _, row in overall_top.iterrows():
+        results.append(["overall", row["ID"], row["Average CGPA"]])
+
+    ids = df["ID"].astype(str)
+    for branch_num, branch_name in branch_map.items():
+        branch_students = df[ids.str.len().gt(7) & ids.str[7].eq(branch_num)]
+        branch_top = branch_students.sort_values("Average CGPA", ascending=False).head(10)
+        for _, row in branch_top.iterrows():
+            results.append([branch_name, row["ID"], row["Average CGPA"]])
+
+    output_df = pd.DataFrame(results, columns=["category", "roll_number", "cgpa"])
+    csv_data = output_df.to_csv(index=False)
+    write_text_key(f"csv/{year}/top_10_students.csv", csv_data)
+    write_text_key(f"data/toppers_{year}.csv", csv_data)
+    clear_r2_runtime_cache()
+    return True, "Successfully extracted toppers list directly from R2 merged CGPA data."
 
 def build_student_rag_context(student_id, question):
     """Build a compact roll-specific context packet for AI answers."""
@@ -336,13 +520,9 @@ def needs_student_result_context(message):
 def get_latest_notification():
     """Dynamically read the latest notification from data/notifications.json."""
     try:
-        json_path = os.path.join('data', 'notifications.json')
-        if os.path.exists(json_path):
-            with open(json_path, 'r', encoding='utf-8') as f:
-                import json
-                notifications = json.load(f)
-                if notifications and isinstance(notifications, list):
-                    return notifications[0].get('text', '').strip()
+        notifications = read_r2_json_or_default('data/notifications.json', [])
+        if notifications and isinstance(notifications, list):
+            return notifications[0].get('text', '').strip()
     except Exception as e:
         print(f"Error parsing notifications.json: {e}")
     return None
@@ -522,12 +702,7 @@ def admin_panel():
 def serve_notifications():
     """Serve the list of notifications from data/notifications.json."""
     try:
-        json_path = os.path.join('data', 'notifications.json')
-        if os.path.exists(json_path):
-            with open(json_path, 'r', encoding='utf-8') as f:
-                import json
-                notifications = json.load(f)
-                return jsonify(notifications)
+        return jsonify(read_r2_json_or_default('data/notifications.json', []))
     except Exception as e:
         print(f"Error serving notifications API: {e}")
     return jsonify([])
@@ -540,6 +715,22 @@ def serve_cgpa_data_api(student_id):
         return jsonify(student_data)
     return jsonify({'error': 'Student not found'}), 404
 
+@app.route('/api/student-results/<student_id>')
+def serve_student_results_api(student_id):
+    """Return CGPA and all semester rows in one request."""
+    student_id = student_id.strip().upper()
+    cgpa_data = get_student_cgpa_data(student_id)
+    semester_records = get_student_semester_raw_records(student_id)
+
+    if not cgpa_data and not semester_records:
+        return jsonify({'error': 'Student not found'}), 404
+
+    return jsonify({
+        'studentId': student_id,
+        'cgpaData': cgpa_data,
+        'semesterData': semester_records
+    })
+
 @app.route('/api/semester/<int:semester>')
 def serve_semester_data(semester):
     student_id = request.args.get('student_id', '')
@@ -547,9 +738,10 @@ def serve_semester_data(semester):
     if not batch_folder:
         return 'Invalid student ID pattern', 400
 
-    file_path = os.path.join('data', 'semesters', batch_folder, f'semester{semester}.csv')
-    if os.path.exists(file_path):
-        return send_file(file_path, mimetype='text/csv')
+    file_path = f"data/semesters/{batch_folder}/semester{semester}.csv"
+    content = read_r2_text_or_none(file_path)
+    if content is not None:
+        return app.response_class(content, mimetype='text/csv')
     return 'Semester data not found', 404
 
 @app.route('/api/ask-ai', methods=['POST'])
@@ -653,32 +845,42 @@ def get_batch_data(batch_year):
     if not batch_year.isdigit() or len(batch_year) != 4:
         return jsonify({"error": "Invalid batch year format. Please use YYYY."}), 400
 
-    student_ids = get_student_ids_by_batch(batch_year)
-    if not student_ids:
+    cgpa_records_by_id = {}
+    csv_files_for_batch = {
+        (prefix, csv_file, batch, regulation)
+        for prefix, (csv_file, batch, regulation) in id_prefix_mapping.items()
+        if batch.startswith(batch_year)
+    }
+
+    for prefix, csv_file, batch, regulation in csv_files_for_batch:
+        for row in read_r2_csv_rows(csv_file):
+            student_id = (row.get('ID') or '').strip()
+            if student_id and student_id.startswith(prefix) and get_batch_folder_from_id(student_id) == batch_year:
+                row['ID'] = student_id
+                row['Batch'] = batch
+                row['Regulation'] = regulation
+                cgpa_records_by_id[student_id] = row
+
+    if not cgpa_records_by_id:
         return jsonify({"error": f"No student data found for the batch year {batch_year}."}), 404
+
+    student_ids = sorted(cgpa_records_by_id.keys())
+    semester_data_by_student = {student_id: {} for student_id in student_ids}
+    student_id_set = set(student_ids)
+
+    for semester in range(1, 10):
+        file_path = f"data/semesters/{batch_year}/semester{semester}.csv"
+        for entry in read_r2_csv_rows(file_path):
+            student_id = (entry.get('ID') or '').strip()
+            if student_id in student_id_set:
+                semester_data_by_student[student_id].setdefault(str(semester), []).append(entry)
 
     all_batch_data = []
     for student_id in student_ids:
-        cgpa_data = get_student_cgpa_data(student_id)
-        if not cgpa_data:
-            continue
-
-        all_semester_data = {}
-        batch_folder = get_batch_folder_from_id(student_id)
-        if batch_folder:
-            for semester in range(1, 10):
-                file_path = os.path.join('data', 'semesters', batch_folder, f'semester{semester}.csv')
-                if os.path.exists(file_path):
-                    with open(file_path, 'r', encoding='utf-8-sig') as f:
-                        parsed_data = parse_csv_data(f.read())
-                        student_sem_data = [entry for entry in parsed_data if entry.get('ID') == student_id]
-                        if student_sem_data:
-                            all_semester_data[str(semester)] = student_sem_data
-
         student_record = {
             "studentId": student_id,
-            "cgpaData": cgpa_data,
-            "allSemesterData": all_semester_data
+            "cgpaData": cgpa_records_by_id[student_id],
+            "allSemesterData": semester_data_by_student.get(student_id, {})
         }
         all_batch_data.append(student_record)
 
@@ -688,14 +890,14 @@ def get_batch_data(batch_year):
 def get_toppers():
     try:
         year = request.args.get('year', '2021')
-        csv_file = f'data/toppers_{year}.csv'
+        csv_file = f"data/toppers_{year}.csv"
+        df = read_r2_dataframe(csv_file)
 
-        if not os.path.exists(csv_file):
+        if df is None:
             return jsonify({
                 'error': f'No data available for {year} batch'
             }), 404
 
-        df = pd.read_csv(csv_file, encoding='utf-8-sig')
         df['CGPA'] = pd.to_numeric(df['cgpa'], errors='coerce')
         df = df.sort_values('CGPA', ascending=False)
 
@@ -773,30 +975,36 @@ def admin_ingest_results():
             
         df = df[df['Batch'].isin(unique_batches)]
             
-        base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "csv"))
         saved_files = []
         logs = []
-        
-        for batch in unique_batches:
-            batch_df = df[df['Batch'] == batch].drop(columns=['Batch'])
-            
-            if result_type == "Standard Phase (Regular/Supply)":
-                paths = save_processed_csv(batch_df, batch, semester, base_path, ignore_list)
-                if isinstance(paths, list):
-                    saved_files.extend(paths)
-                    logs.append(f"Batch {batch}: Successfully processed Standard Phase.")
-            else:
-                paths, msg = apply_revaluation(batch_df, batch, semester, base_path)
-                if paths is None:
-                    logs.append(f"Batch {batch} revaluation failed: {msg}")
+
+        sync_prefixes = csv_workspace_prefixes_for_ingest(unique_batches, semester, result_type)
+
+        with r2_csv_workspace(sync_prefixes) as base_path:
+            for batch in unique_batches:
+                batch_df = df[df['Batch'] == batch].drop(columns=['Batch'])
+                
+                if result_type == "Standard Phase (Regular/Supply)":
+                    paths = save_processed_csv(batch_df, batch, semester, base_path, ignore_list)
+                    if isinstance(paths, list):
+                        saved_files.extend(paths)
+                        logs.append(f"Batch {batch}: Successfully processed Standard Phase.")
                 else:
-                    saved_files.extend(paths)
-                    logs.append(f"Batch {batch}: Successfully processed Revaluation.")
+                    paths, msg = apply_revaluation(batch_df, batch, semester, base_path)
+                    if paths is None:
+                        logs.append(f"Batch {batch} revaluation failed: {msg}")
+                    else:
+                        saved_files.extend(paths)
+                        logs.append(f"Batch {batch}: Successfully processed Revaluation.")
                     
         return jsonify({
             'success': True,
             'logs': logs,
-            'files': [os.path.relpath(f, base_path) if not f.startswith("Portal Sync") and not f.startswith("SGPA Summary") else f for f in saved_files]
+            'files': [
+                f"csv/{os.path.relpath(f, base_path).replace(os.sep, '/')}" if os.path.isabs(str(f)) and str(f).startswith(base_path)
+                else f
+                for f in saved_files
+            ]
         })
         
     except Exception as e:
@@ -814,16 +1022,13 @@ def admin_generate_reports():
     if not batch_year:
         return jsonify({'error': 'Batch year is required'}), 400
 
-    base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "csv"))
-    
     batches = []
     if batch_year.strip().lower() == 'all':
-        if os.path.exists(base_path):
-            for name in os.listdir(base_path):
-                if os.path.isdir(os.path.join(base_path, name)) and name.isdigit() and int(name) >= 2021:
-                    batches.append(name)
-        if not batches:
-            batches = ['2021', '2022', '2023', '2024', '2025']
+        csv_files = list_r2_csv_files()
+        for item in csv_files:
+            parts = item.get('path', '').split('/')
+            if len(parts) >= 2 and parts[0] == 'csv' and parts[1].isdigit() and int(parts[1]) >= 2021:
+                batches.append(parts[1])
         batches = sorted(list(set(batches)))
     else:
         try:
@@ -836,24 +1041,36 @@ def admin_generate_reports():
     logs = []
     
     try:
-        for b in batches:
-            if report_type in ['cgpa', 'both']:
-                cgpa_file, msg1 = merge_all_semesters(b, base_path)
-                if cgpa_file:
-                    supple_file, msg2 = calculate_supple_appearances(b, base_path)
-                    if supple_file:
-                        logs.append(f"CGPA Master: Successfully generated and synchronized graduation report for batch {b}.")
-                    else:
-                        logs.append(f"CGPA Master: Aggregation succeeded but supplementary calculation failed for batch {b}: {msg2}")
-                else:
-                    logs.append(f"CGPA Master Error (Batch {b}): {msg1}")
-                    
-            if report_type in ['toppers', 'both']:
-                output_file, toppers_df = get_toppers_list(b, base_path)
-                if output_file:
+        if not batches:
+            batches = ['2021', '2022', '2023', '2024', '2025']
+
+        if report_type == 'toppers':
+            for b in batches:
+                ok, msg = generate_toppers_from_r2_merged(b)
+                if ok:
                     logs.append(f"Toppers: Successfully extracted Hall of Fame and branch rankings for batch {b}.")
                 else:
-                    logs.append(f"Toppers Error (Batch {b}): Failed to generate toppers list.")
+                    logs.append(f"Toppers Error (Batch {b}): {msg}")
+        else:
+            with r2_csv_workspace(batches) as base_path:
+                for b in batches:
+                    if report_type in ['cgpa', 'both']:
+                        cgpa_file, msg1 = merge_all_semesters(b, base_path)
+                        if cgpa_file:
+                            supple_file, msg2 = calculate_supple_appearances(b, base_path)
+                            if supple_file:
+                                logs.append(f"CGPA Master: Successfully generated and synchronized graduation report for batch {b}.")
+                            else:
+                                logs.append(f"CGPA Master: Aggregation succeeded but supplementary calculation failed for batch {b}: {msg2}")
+                        else:
+                            logs.append(f"CGPA Master Error (Batch {b}): {msg1}")
+                            
+                    if report_type in ['toppers', 'both']:
+                        output_file, toppers_df = get_toppers_list(b, base_path)
+                        if output_file:
+                            logs.append(f"Toppers: Successfully extracted Hall of Fame and branch rankings for batch {b}.")
+                        else:
+                            logs.append(f"Toppers Error (Batch {b}): Failed to generate toppers list.")
                 
         return jsonify({
             'success': True,
@@ -916,6 +1133,75 @@ def admin_convert_pdf():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/admin/csv-files', methods=['GET'])
+def admin_list_csv_files():
+    if not session.get('logged_in'):
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    if not is_r2_configured():
+        return jsonify({'error': 'Cloudflare R2 is not configured'}), 500
+
+    try:
+        return jsonify({'success': True, 'source': 'r2', 'files': list_r2_csv_files()})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/admin/csv-file', methods=['GET'])
+def admin_get_csv_file():
+    if not session.get('logged_in'):
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    requested_path = request.args.get('path', '')
+    if not is_r2_configured():
+        return jsonify({'error': 'Cloudflare R2 is not configured'}), 500
+
+    try:
+        key, content = read_r2_csv_text(requested_path)
+        rows = content.splitlines()
+        return jsonify({
+            'success': True,
+            'source': 'r2',
+            'path': key,
+            'content': content,
+            'line_count': len(rows),
+            'size': len(content.encode('utf-8'))
+        })
+    except FileNotFoundError:
+        return jsonify({'error': 'CSV file not found or not editable'}), 404
+    except UnicodeDecodeError:
+        return jsonify({'error': 'Unable to read this CSV as UTF-8 text'}), 400
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/admin/csv-file', methods=['PUT'])
+def admin_save_csv_file():
+    if not session.get('logged_in'):
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    data = request.get_json(silent=True) or {}
+    requested_path = data.get('path', '')
+    content = data.get('content')
+    if content is None:
+        return jsonify({'error': 'CSV content is required'}), 400
+
+    if not is_r2_configured():
+        return jsonify({'error': 'Cloudflare R2 is not configured'}), 500
+
+    try:
+        key, size = write_r2_csv_text(requested_path, content)
+        clear_r2_runtime_cache()
+        return jsonify({
+            'success': True,
+            'source': 'r2',
+            'path': key,
+            'size': size,
+            'message': 'CSV file saved successfully to Cloudflare R2'
+        })
+    except FileNotFoundError:
+        return jsonify({'error': 'CSV file not found or not editable'}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/admin/add-notification', methods=['POST'])
 def admin_add_notification():
     if not session.get('logged_in'):
@@ -937,12 +1223,7 @@ def admin_add_notification():
         date_str = f"{months[now.month - 1]} {now.day}, {now.year}"
         
     try:
-        json_path = os.path.join('data', 'notifications.json')
-        notifications = []
-        if os.path.exists(json_path):
-            with open(json_path, 'r', encoding='utf-8') as f:
-                import json
-                notifications = json.load(f)
+        notifications = read_r2_json_or_default('data/notifications.json', [])
                 
         # Push to top
         notifications.insert(0, {
@@ -951,8 +1232,7 @@ def admin_add_notification():
             'is_new': is_new
         })
         
-        with open(json_path, 'w', encoding='utf-8') as f:
-            json.dump(notifications, f, indent=2)
+        write_r2_json('data/notifications.json', notifications)
             
         return jsonify({'success': True, 'notifications': notifications})
     except Exception as e:
@@ -965,17 +1245,12 @@ def admin_delete_notification(index):
         return jsonify({'error': 'Unauthorized'}), 401
         
     try:
-        json_path = os.path.join('data', 'notifications.json')
-        if os.path.exists(json_path):
-            with open(json_path, 'r', encoding='utf-8') as f:
-                import json
-                notifications = json.load(f)
-            
-            if 0 <= index < len(notifications):
-                notifications.pop(index)
-                with open(json_path, 'w', encoding='utf-8') as f:
-                    json.dump(notifications, f, indent=2)
-                return jsonify({'success': True, 'notifications': notifications})
+        notifications = read_r2_json_or_default('data/notifications.json', [])
+        
+        if 0 <= index < len(notifications):
+            notifications.pop(index)
+            write_r2_json('data/notifications.json', notifications)
+            return jsonify({'success': True, 'notifications': notifications})
                 
         return jsonify({'error': 'Notification not found'}), 404
     except Exception as e:
@@ -988,17 +1263,12 @@ def admin_toggle_blinking(index):
         return jsonify({'error': 'Unauthorized'}), 401
         
     try:
-        json_path = os.path.join('data', 'notifications.json')
-        if os.path.exists(json_path):
-            with open(json_path, 'r', encoding='utf-8') as f:
-                import json
-                notifications = json.load(f)
-            
-            if 0 <= index < len(notifications):
-                notifications[index]['is_new'] = not notifications[index].get('is_new', False)
-                with open(json_path, 'w', encoding='utf-8') as f:
-                    json.dump(notifications, f, indent=2)
-                return jsonify({'success': True, 'notifications': notifications})
+        notifications = read_r2_json_or_default('data/notifications.json', [])
+        
+        if 0 <= index < len(notifications):
+            notifications[index]['is_new'] = not notifications[index].get('is_new', False)
+            write_r2_json('data/notifications.json', notifications)
+            return jsonify({'success': True, 'notifications': notifications})
                 
         return jsonify({'error': 'Notification not found'}), 404
     except Exception as e:

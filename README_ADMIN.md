@@ -30,20 +30,28 @@ This directory contains the JNTU Results Ingestion and Processing Engine. Built 
 ### 1. Install Dependencies
 Ensure you have the required libraries installed in your Python environment. Run the following command from the project root:
 
-```bash
-pip install -r requirements.txt
+```powershell
+python -m venv .venv
+.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
-*(This will install `streamlit`, `pdfplumber`, `pandas`, and other required libraries.)*
+*(This will install Flask, `pdfplumber`, `pandas`, and other required libraries.)*
 
-### 2. Start the Admin Dashboard
-Launch the Streamlit interface using:
+### 2. Upload CSV Data to Cloudflare R2
+After setting the R2 environment variables, seed Cloudflare R2 with the current portal data:
 
-```bash
-streamlit run admin_engine/app.py
+```powershell
+.venv\Scripts\python.exe upload_csv_to_r2.py
 ```
 
-Streamlit will compile and open the interface automatically in your web browser (typically at `http://localhost:8501`).
+### 3. Start the Admin Dashboard
+Launch the Flask app using:
+
+```powershell
+python main.py
+```
+
+Open the admin panel in your browser at `http://localhost:5000/login`.
 
 ---
 

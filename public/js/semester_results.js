@@ -244,16 +244,10 @@ async function updateStudentInfo(studentId) {
     document.getElementById('batch').textContent = batch;
     document.getElementById('regulation').textContent = regulation;
 
-    try {
-        const response = await fetch(`/api/cgpa/${studentId}`);
-        if (!response.ok) {
-            throw new Error('Failed to fetch CGPA data');
-        }
-        const data = await response.json();
-        document.getElementById('cgpa').textContent = data.CGPA || 'N/A';
-        document.getElementById('total-credits').textContent = data['Total Credits'] || 'N/A';
-    } catch (error) {
-        console.error('Error fetching CGPA data:', error);
+    if (currentStudentData) {
+        document.getElementById('cgpa').textContent = currentStudentData.CGPA || 'N/A';
+        document.getElementById('total-credits').textContent = currentStudentData['Total Credits'] || 'N/A';
+    } else {
         document.getElementById('cgpa').textContent = 'N/A';
         document.getElementById('total-credits').textContent = 'N/A';
     }
@@ -337,35 +331,23 @@ function updateSemesterVisibility(studentId) {
 async function loadAllSemesterData(studentId) {
     showLoading();
     allSemesterData = {};
+    currentStudentData = null;
     
     try {
-        // Load data for all semesters (assuming 8 semesters)
-        for (let semester = 1; semester <= 9; semester++) {
-            // console.log(`Loading data for semester ${semester}...`);
-            const response = await fetch(`/api/semester/${semester}?student_id=${studentId}`);
-            if (!response.ok) {
-                if (response.status === 400) {
-                    alert('Invalid student ID pattern. Please enter a valid roll number.');
-                    hideLoading();
-                    return false;
-                }
-                // If we get a 404 for the first semester, stop loading further
-                if (semester === 1 && response.status === 404) {
-                    alert('No data found for the given Roll Number.');
-                    hideLoading();
-                    return false;
-                }
-                continue; // Skip if semester data not found
+        const response = await fetch(`/api/student-results/${studentId}`);
+        if (!response.ok) {
+            if (response.status === 400) {
+                alert('Invalid student ID pattern. Please enter a valid roll number.');
+            } else {
+                alert('No data found for the given Roll Number.');
             }
-            const csvData = await response.text();
-            const studentData = getStudentData(studentId, parseCSV(csvData));
-            // console.log(`Semester ${semester} data:`, studentData);
-            if (studentData.length > 0) {
-                allSemesterData[semester] = studentData;
-            }
+            hideLoading();
+            return false;
         }
 
-        // console.log('All semester data loaded:', allSemesterData);
+        const payload = await response.json();
+        currentStudentData = payload.cgpaData || null;
+        allSemesterData = payload.semesterData || {};
 
         if (Object.keys(allSemesterData).length === 0) {
             alert('No data found for the given Roll Number in any semester.');

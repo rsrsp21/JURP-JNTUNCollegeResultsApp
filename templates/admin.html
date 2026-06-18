@@ -38,14 +38,14 @@
             background-color: #b71c1c;
         }
         .content-container {
-            max-width: 900px;
+            max-width: 1280px;
             margin: 2rem auto;
-            padding: 2rem;
             background-color: #1e1e1e;
-            border-radius: 12px;
+            border-radius: 10px;
             box-shadow: 0 8px 32px rgba(0,0,0,0.3);
             height: fit-content;
             border: 1px solid rgba(255,255,255,0.05);
+            overflow: hidden;
         }
         .input-group {
             display: flex;
@@ -80,39 +80,68 @@
             border-radius: 4px;
         }
 
-        /* Tabs styling */
+        .admin-shell {
+            display: grid;
+            grid-template-columns: 260px minmax(0, 1fr);
+            min-height: 720px;
+        }
+
+        .admin-nav-title {
+            padding: 4px 12px 12px;
+            color: #94a3b8;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
+
+        /* Left admin navigation */
         .admin-tabs {
             display: flex;
-            gap: 8px;
-            border-bottom: 2px solid #2e2e2e;
-            margin-bottom: 2rem;
-            padding-bottom: 1px;
-            overflow-x: auto;
-            white-space: nowrap;
+            flex-direction: column;
+            gap: 6px;
+            padding: 18px 12px;
+            margin: 0;
+            background: #0f172a;
+            border-right: 1px solid #334155;
+            overflow: visible;
+            white-space: normal;
         }
         .tab-btn {
-            background: none;
+            width: 100%;
+            background: transparent;
             border: none;
             color: var(--text-secondary);
-            padding: 12px 20px;
-            font-size: 15px;
+            padding: 12px 14px;
+            font-size: 14px;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s;
-            border-radius: 6px 6px 0 0;
+            transition: all 0.2s ease;
+            border-radius: 6px;
             display: flex;
             align-items: center;
+            justify-content: flex-start;
             gap: 8px;
-            border-bottom: 3px solid transparent;
+            border-left: 3px solid transparent;
+            text-align: left;
         }
         .tab-btn:hover {
             color: var(--text-primary);
-            background-color: rgba(255,255,255,0.03);
+            background-color: rgba(255,255,255,0.04);
         }
         .tab-btn.active {
             color: var(--accent-color);
-            border-bottom: 3px solid var(--accent-color);
-            background-color: rgba(76, 201, 240, 0.05);
+            border-left-color: var(--accent-color);
+            background-color: rgba(76, 201, 240, 0.09);
+        }
+        .tab-btn i {
+            width: 18px;
+            text-align: center;
+        }
+        .admin-workspace {
+            min-width: 0;
+            padding: 24px;
+            background: #1e1e1e;
         }
         .tab-pane {
             display: none;
@@ -229,6 +258,209 @@
             padding: 1.25rem;
             margin-top: 1rem;
         }
+        .csv-manager-grid {
+            display: grid;
+            grid-template-columns: 340px minmax(0, 1fr);
+            min-height: 680px;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #111827;
+        }
+        .csv-sidebar {
+            display: flex;
+            flex-direction: column;
+            min-height: 680px;
+            border-right: 1px solid #334155;
+            background: #0f172a;
+        }
+        .csv-sidebar-header {
+            padding: 14px;
+            border-bottom: 1px solid #263246;
+            background: #111827;
+        }
+        .csv-sidebar-header label {
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: #cbd5e1;
+        }
+        .csv-sidebar-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .csv-file-list {
+            flex: 1;
+            min-height: 0;
+            max-height: none;
+            overflow-y: auto;
+            border: none;
+            border-radius: 0;
+            background-color: #0f172a;
+            padding: 6px 0;
+        }
+        .csv-folder, .csv-tree-file {
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .csv-folder-header {
+            width: 100%;
+            border: none;
+            background: transparent;
+            color: var(--text-primary);
+            padding: 8px 12px;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            font-weight: 600;
+        }
+        .csv-folder-header:hover {
+            background: #182235;
+        }
+        .csv-folder-title {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            overflow-wrap: anywhere;
+            min-width: 0;
+        }
+        .csv-folder-title span {
+            overflow-wrap: anywhere;
+        }
+        .csv-folder-count {
+            color: #94a3b8;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        .csv-folder-children {
+            display: none;
+        }
+        .csv-folder.open > .csv-folder-children {
+            display: block;
+        }
+        .csv-file-item {
+            width: 100%;
+            border: none;
+            background: transparent;
+            color: #cbd5e1;
+            padding: 8px 12px;
+            text-align: left;
+            cursor: pointer;
+            display: block;
+            transition: background-color 0.2s, color 0.2s;
+            min-height: 42px;
+        }
+        .csv-file-item:hover, .csv-file-item.active {
+            background-color: #173044;
+            color: var(--text-primary);
+        }
+        .csv-file-name {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            overflow-wrap: anywhere;
+        }
+        .csv-file-folder {
+            display: block;
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 2px;
+            overflow-wrap: anywhere;
+        }
+        .csv-editor-panel {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            min-height: 680px;
+            background: #151515;
+        }
+        .csv-editor-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 14px 16px;
+            border-bottom: 1px solid #334155;
+            background: #1b1b1b;
+        }
+        .csv-editor-title-block {
+            min-width: 0;
+            overflow: hidden;
+        }
+        #csv-editor-title {
+            overflow-wrap: anywhere;
+        }
+        .csv-editor-textarea {
+            flex: 1;
+            width: 100%;
+            min-height: 560px;
+            height: 560px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            line-height: 1.45;
+            white-space: pre;
+            resize: vertical;
+            border: none;
+            border-radius: 0;
+            background: #0b1020;
+            color: #e5e7eb;
+            tab-size: 4;
+            overflow: auto;
+        }
+        .csv-editor-textarea:disabled {
+            color: #94a3b8;
+            background: #0b1020;
+        }
+        .csv-meta {
+            color: #94a3b8;
+            font-size: 13px;
+            overflow-wrap: anywhere;
+        }
+        #csv-status {
+            min-height: 34px;
+            padding: 10px 16px;
+            border-top: 1px solid #334155;
+            background: #111827;
+            font-style: normal;
+            color: #4db6ac;
+            font-weight: 500;
+        }
+        @media (max-width: 900px) {
+            .admin-shell {
+                grid-template-columns: 1fr;
+            }
+            .admin-tabs {
+                border-right: none;
+                border-bottom: 1px solid #334155;
+            }
+            .admin-workspace {
+                padding: 18px;
+            }
+            .csv-manager-grid {
+                grid-template-columns: 1fr;
+                min-height: auto;
+            }
+            .csv-sidebar {
+                min-height: 360px;
+                border-right: none;
+                border-bottom: 1px solid #334155;
+            }
+            .csv-file-list {
+                max-height: 320px;
+            }
+            .csv-editor-panel {
+                min-height: 520px;
+            }
+            .csv-editor-textarea {
+                height: 420px;
+                min-height: 420px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -264,24 +496,31 @@
     <main>
         <div class="container">
             <div class="content-container">
-                <!-- Navigation Tabs -->
-                <div class="admin-tabs" id="adminTabs">
-                    <button class="tab-btn active" data-pane="pane-download">
-                        <i class="fas fa-file-download"></i> Bulk Download
-                    </button>
-                    <button class="tab-btn" data-pane="pane-ingest">
-                        <i class="fas fa-file-upload"></i> Ingest Results CSV
-                    </button>
-                    <button class="tab-btn" data-pane="pane-reports">
-                        <i class="fas fa-calculator"></i> CGPA & Toppers
-                    </button>
-                    <button class="tab-btn" data-pane="pane-pdf">
-                        <i class="fas fa-file-pdf"></i> PDF to CSV
-                    </button>
-                    <button class="tab-btn" data-pane="pane-notifications">
-                        <i class="fas fa-bell"></i> Notifications
-                    </button>
-                </div>
+                <div class="admin-shell">
+                    <!-- Admin Sidebar -->
+                    <aside class="admin-tabs" id="adminTabs" aria-label="Admin tools">
+                        <div class="admin-nav-title">Admin Tools</div>
+                        <button class="tab-btn active" data-pane="pane-download">
+                            <i class="fas fa-file-download"></i> Bulk Download
+                        </button>
+                        <button class="tab-btn" data-pane="pane-ingest">
+                            <i class="fas fa-file-upload"></i> Ingest Results CSV
+                        </button>
+                        <button class="tab-btn" data-pane="pane-reports">
+                            <i class="fas fa-calculator"></i> CGPA & Toppers
+                        </button>
+                        <button class="tab-btn" data-pane="pane-pdf">
+                            <i class="fas fa-file-pdf"></i> PDF to CSV
+                        </button>
+                        <button class="tab-btn" data-pane="pane-csv-files">
+                            <i class="fas fa-table"></i> CSV Files
+                        </button>
+                        <button class="tab-btn" data-pane="pane-notifications">
+                            <i class="fas fa-bell"></i> Notifications
+                        </button>
+                    </aside>
+
+                    <section class="admin-workspace">
 
                 <!-- Tab 1: Bulk Download -->
                 <div class="tab-pane active" id="pane-download">
@@ -391,7 +630,43 @@
                     <div id="pdf-downloads-container" class="mt-3"></div>
                 </div>
 
-                <!-- Tab 5: Manage Notifications -->
+                <!-- Tab 5: CSV File Manager -->
+                <div class="tab-pane" id="pane-csv-files">
+                    <h3>CSV File Manager</h3>
+                    <p class="text-muted mb-4">Browse and edit Cloudflare R2 CSV files directly from the admin panel.</p>
+                    <div class="csv-manager-grid">
+                        <aside class="csv-sidebar">
+                            <div class="csv-sidebar-header">
+                                <label for="csv-search">Find CSV File</label>
+                                <input type="text" id="csv-search" class="form-control" placeholder="Search by folder or file name">
+                                <div class="csv-sidebar-actions">
+                                    <span id="csv-count" class="csv-meta">Loading files...</span>
+                                    <button id="csv-refresh-btn" class="button btn-sm" type="button">
+                                        <i class="fas fa-sync-alt"></i> Refresh
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="csv-file-list" class="csv-file-list">
+                                <div class="text-center py-3 text-muted"><i class="fas fa-spinner fa-spin"></i> Loading CSV files...</div>
+                            </div>
+                        </aside>
+                        <section class="csv-editor-panel">
+                            <div class="csv-editor-topbar">
+                                <div class="csv-editor-title-block">
+                                    <h5 id="csv-editor-title" class="mb-1" style="color: var(--text-primary);">Select a CSV file</h5>
+                                    <div id="csv-editor-meta" class="csv-meta">Choose a file from the list to load it here.</div>
+                                </div>
+                                <button id="csv-save-btn" class="button btn-sm" type="button" disabled>
+                                    <i class="fas fa-save"></i> Save CSV
+                                </button>
+                            </div>
+                            <textarea id="csv-editor" class="form-control csv-editor-textarea" spellcheck="false" disabled></textarea>
+                            <div id="csv-status"></div>
+                        </section>
+                    </div>
+                </div>
+
+                <!-- Tab 6: Manage Notifications -->
                 <div class="tab-pane" id="pane-notifications">
                     <h3>Manage Portal Notifications</h3>
                     <p class="text-muted mb-4">Add a new notification to push it to the top of all pages instantly, or delete older ones.</p>
@@ -422,6 +697,8 @@
                     </div>
                 </div>
 
+                    </section>
+                </div>
             </div>
         </div>
     </main>
@@ -709,6 +986,259 @@
             } catch (err) {
                 pdfStatus.innerHTML = `<span style="color: var(--danger-color)"><i class="fas fa-exclamation-circle"></i> Connection Error: ${err.message}</span>`;
             }
+        });
+
+        // --- CSV File Manager Script ---
+        const csvFileList = document.getElementById('csv-file-list');
+        const csvSearch = document.getElementById('csv-search');
+        const csvCount = document.getElementById('csv-count');
+        const csvRefreshBtn = document.getElementById('csv-refresh-btn');
+        const csvEditor = document.getElementById('csv-editor');
+        const csvEditorTitle = document.getElementById('csv-editor-title');
+        const csvEditorMeta = document.getElementById('csv-editor-meta');
+        const csvSaveBtn = document.getElementById('csv-save-btn');
+        const csvStatus = document.getElementById('csv-status');
+        let csvFiles = [];
+        let selectedCsvPath = '';
+        let csvDirty = false;
+        const openCsvFolders = new Set(['csv', 'data']);
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return `${bytes} B`;
+            if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+            return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+        }
+
+        function buildCsvTree(files) {
+            const root = { name: '', path: '', folders: new Map(), files: [], count: 0 };
+
+            files.forEach(file => {
+                const parts = file.path.split('/').filter(Boolean);
+                const fileName = parts.pop() || file.name;
+                let node = root;
+                let currentPath = '';
+
+                parts.forEach(part => {
+                    currentPath = currentPath ? `${currentPath}/${part}` : part;
+                    if (!node.folders.has(part)) {
+                        node.folders.set(part, { name: part, path: currentPath, folders: new Map(), files: [], count: 0 });
+                    }
+                    node = node.folders.get(part);
+                });
+
+                node.files.push({ ...file, name: fileName });
+            });
+
+            function countFiles(node) {
+                let count = node.files.length;
+                node.folders.forEach(child => {
+                    count += countFiles(child);
+                });
+                node.count = count;
+                return count;
+            }
+
+            countFiles(root);
+            return root;
+        }
+
+        function shouldOpenFolder(node, query) {
+            return Boolean(query) || openCsvFolders.has(node.path) || selectedCsvPath.startsWith(`${node.path}/`);
+        }
+
+        function renderCsvTreeNode(node, container, level, query) {
+            const folders = Array.from(node.folders.values()).sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+            folders.forEach(folder => {
+                const folderEl = document.createElement('div');
+                const isOpen = shouldOpenFolder(folder, query);
+                folderEl.className = `csv-folder${isOpen ? ' open' : ''}`;
+
+                const header = document.createElement('button');
+                header.type = 'button';
+                header.className = 'csv-folder-header';
+                header.style.paddingLeft = `${12 + (level * 18)}px`;
+
+                const title = document.createElement('span');
+                title.className = 'csv-folder-title';
+
+                const chevron = document.createElement('i');
+                chevron.className = `fas ${isOpen ? 'fa-chevron-down' : 'fa-chevron-right'}`;
+
+                const folderIcon = document.createElement('i');
+                folderIcon.className = `fas ${isOpen ? 'fa-folder-open' : 'fa-folder'}`;
+
+                const titleText = document.createElement('span');
+                titleText.textContent = folder.name;
+
+                title.appendChild(chevron);
+                title.appendChild(folderIcon);
+                title.appendChild(titleText);
+
+                const count = document.createElement('span');
+                count.className = 'csv-folder-count';
+                count.textContent = `${folder.count}`;
+
+                header.appendChild(title);
+                header.appendChild(count);
+                header.addEventListener('click', () => {
+                    if (openCsvFolders.has(folder.path)) {
+                        openCsvFolders.delete(folder.path);
+                    } else {
+                        openCsvFolders.add(folder.path);
+                    }
+                    renderCsvFiles();
+                });
+
+                const children = document.createElement('div');
+                children.className = 'csv-folder-children';
+                renderCsvTreeNode(folder, children, level + 1, query);
+
+                folderEl.appendChild(header);
+                folderEl.appendChild(children);
+                container.appendChild(folderEl);
+            });
+
+            node.files
+                .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }))
+                .forEach(file => {
+                    const row = document.createElement('div');
+                    row.className = 'csv-tree-file';
+
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = `csv-file-item${file.path === selectedCsvPath ? ' active' : ''}`;
+                    button.dataset.path = file.path;
+                    button.style.paddingLeft = `${12 + (level * 18)}px`;
+
+                    const fileName = document.createElement('span');
+                    fileName.className = 'csv-file-name';
+                    const fileIcon = document.createElement('i');
+                    fileIcon.className = 'fas fa-file-csv';
+                    const fileText = document.createElement('span');
+                    fileText.textContent = file.name;
+                    fileName.appendChild(fileIcon);
+                    fileName.appendChild(fileText);
+
+                    const fileMeta = document.createElement('span');
+                    fileMeta.className = 'csv-file-folder';
+                    fileMeta.textContent = `${formatFileSize(file.size)} | ${file.path}`;
+
+                    button.appendChild(fileName);
+                    button.appendChild(fileMeta);
+                    button.addEventListener('click', () => loadCsvFile(file.path));
+                    row.appendChild(button);
+                    container.appendChild(row);
+                });
+        }
+
+        function renderCsvFiles() {
+            const query = csvSearch.value.trim().toLowerCase();
+            const filtered = csvFiles.filter(file => file.path.toLowerCase().includes(query));
+            csvCount.textContent = `${filtered.length} of ${csvFiles.length} CSV files`;
+            csvFileList.innerHTML = '';
+
+            if (filtered.length === 0) {
+                csvFileList.innerHTML = '<div class="text-center py-3 text-muted">No CSV files found.</div>';
+                return;
+            }
+
+            const fragment = document.createDocumentFragment();
+            renderCsvTreeNode(buildCsvTree(filtered), fragment, 0, query);
+            csvFileList.appendChild(fragment);
+        }
+
+        async function fetchCsvFiles() {
+            csvFileList.innerHTML = '<div class="text-center py-3 text-muted"><i class="fas fa-spinner fa-spin"></i> Loading CSV files...</div>';
+            csvStatus.textContent = '';
+            try {
+                const response = await fetch('/api/admin/csv-files');
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Unable to load CSV files');
+                csvFiles = data.files || [];
+                renderCsvFiles();
+            } catch (err) {
+                csvFileList.innerHTML = `<div class="text-danger py-3 text-center"><i class="fas fa-exclamation-triangle"></i> ${err.message}</div>`;
+                csvCount.textContent = 'Unable to load files';
+            }
+        }
+
+        async function loadCsvFile(path) {
+            if (csvDirty && !confirm('You have unsaved changes. Continue without saving them?')) {
+                return;
+            }
+
+            selectedCsvPath = path;
+            csvDirty = false;
+            csvSaveBtn.disabled = true;
+            csvEditor.disabled = true;
+            csvStatus.textContent = 'Loading CSV file...';
+            csvStatus.style.color = '#4db6ac';
+            renderCsvFiles();
+
+            try {
+                const response = await fetch(`/api/admin/csv-file?path=${encodeURIComponent(path)}`);
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Unable to load CSV file');
+
+                csvEditor.value = data.content;
+                csvEditor.disabled = false;
+                csvSaveBtn.disabled = false;
+                csvEditorTitle.textContent = data.path;
+                csvEditorMeta.textContent = `${data.line_count} lines | ${formatFileSize(data.size)}`;
+                csvStatus.textContent = 'CSV loaded. Edit the text and save when ready.';
+                csvStatus.style.color = 'var(--success-color)';
+            } catch (err) {
+                csvEditor.value = '';
+                csvEditorTitle.textContent = 'Unable to load CSV';
+                csvEditorMeta.textContent = path;
+                csvStatus.textContent = `Error: ${err.message}`;
+                csvStatus.style.color = 'var(--danger-color)';
+            }
+        }
+
+        csvEditor.addEventListener('input', () => {
+            if (!selectedCsvPath) return;
+            csvDirty = true;
+            csvStatus.textContent = 'Unsaved changes';
+            csvStatus.style.color = '#ffc107';
+        });
+
+        csvSaveBtn.addEventListener('click', async () => {
+            if (!selectedCsvPath) return;
+            csvSaveBtn.disabled = true;
+            csvStatus.textContent = 'Saving CSV file...';
+            csvStatus.style.color = '#4db6ac';
+
+            try {
+                const response = await fetch('/api/admin/csv-file', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        path: selectedCsvPath,
+                        content: csvEditor.value
+                    })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Unable to save CSV file');
+
+                csvDirty = false;
+                csvSaveBtn.disabled = false;
+                csvStatus.textContent = data.message || 'CSV file saved successfully';
+                csvStatus.style.color = 'var(--success-color)';
+                await fetchCsvFiles();
+                selectedCsvPath = data.path;
+                renderCsvFiles();
+            } catch (err) {
+                csvSaveBtn.disabled = false;
+                csvStatus.textContent = `Error: ${err.message}`;
+                csvStatus.style.color = 'var(--danger-color)';
+            }
+        });
+
+        csvSearch.addEventListener('input', renderCsvFiles);
+        csvRefreshBtn.addEventListener('click', fetchCsvFiles);
+        document.querySelector('.tab-btn[data-pane="pane-csv-files"]').addEventListener('click', () => {
+            if (csvFiles.length === 0) fetchCsvFiles();
         });
 
         // --- Bulk download ZIP generation listener (Original logic preserved) ---

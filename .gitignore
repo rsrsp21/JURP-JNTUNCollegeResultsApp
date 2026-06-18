@@ -1,5 +1,10 @@
 # Ignore the resenv folder
 resenv/
+.venv/
+.r2_work/
+__pycache__/
+*.pyc
+*.pyo
 
 # Other common ignore patterns
 *.log

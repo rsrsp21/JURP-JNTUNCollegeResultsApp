@@ -3,7 +3,7 @@ import pdfplumber
 import re
 import os
 import io
-import shutil
+from utils.r2_storage import write_text_key
 
 SEM_MAP = {
     "1-1": "1", "1-2": "2", "2-1": "3", "2-2": "4",
@@ -823,12 +823,8 @@ def convert_pdf_to_csv(pdf_source, output_path=None, required_columns=None, mode
 def sync_semester_to_flask(batch, semester, base_path):
     """
     Finds the latest processed semester CSV in base_path and copies it 
-    to the Flask app's data/semesters/{batch}/semester{sem_num}.csv directory.
+    to Cloudflare R2 as data/semesters/{batch}/semester{sem_num}.csv.
     """
-    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-    flask_sem_dir = os.path.join(project_root, "data", "semesters", batch)
-    os.makedirs(flask_sem_dir, exist_ok=True)
-    
     # Mapping semesters
     mapping = {
         "1-1": "1", "1-2": "2", "2-1": "3", "2-2": "4",
@@ -854,22 +850,19 @@ def sync_semester_to_flask(batch, semester, base_path):
     if not source_file or not os.path.exists(source_file):
         return False, f"Source processed file not found at {source_file}"
         
-    target_file = os.path.join(flask_sem_dir, f"semester{sem_num}.csv")
+    target_key = f"data/semesters/{batch}/semester{sem_num}.csv"
     try:
-        shutil.copy2(source_file, target_file)
-        return True, f"Successfully synchronized semester {semester} to {target_file}"
+        with open(source_file, 'r', encoding='utf-8-sig', newline='') as f:
+            write_text_key(target_key, f.read())
+        return True, f"Successfully synchronized semester {semester} to R2 {target_key}"
     except Exception as e:
-        return False, f"Failed to copy semester file: {str(e)}"
+        return False, f"Failed to sync semester file to R2: {str(e)}"
 
 def sync_cgpa_to_flask(batch, base_path):
     """
     Reads merged_cgpas2.csv, renames columns to match the Flask app's cgpa_data_{batch}.csv format,
-    and writes it directly to the Flask app's data/ directory.
+    and writes it to Cloudflare R2 under data/.
     """
-    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-    flask_data_dir = os.path.join(project_root, "data")
-    os.makedirs(flask_data_dir, exist_ok=True)
-    
     source_file = os.path.join(base_path, batch, "merged_cgpas2.csv")
     if not os.path.exists(source_file):
         return False, f"CGPA source file not found at {source_file}"
@@ -903,27 +896,24 @@ def sync_cgpa_to_flask(batch, base_path):
                 df[col] = ""
                 
         df = df[standard_cols]
-        target_file = os.path.join(flask_data_dir, f"cgpa_data_{batch}.csv")
-        df.to_csv(target_file, index=False)
-        return True, f"Successfully synchronized CGPA master report to {target_file}"
+        target_key = f"data/cgpa_data_{batch}.csv"
+        write_text_key(target_key, df.to_csv(index=False))
+        return True, f"Successfully synchronized CGPA master report to R2 {target_key}"
     except Exception as e:
-        return False, f"Failed to sync CGPA: {str(e)}"
+        return False, f"Failed to sync CGPA to R2: {str(e)}"
 
 def sync_toppers_to_flask(batch, base_path):
     """
-    Copies top_10_students.csv to the Flask app's data/toppers_{batch}.csv.
+    Copies top_10_students.csv to Cloudflare R2 as data/toppers_{batch}.csv.
     """
-    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-    flask_data_dir = os.path.join(project_root, "data")
-    os.makedirs(flask_data_dir, exist_ok=True)
-    
     source_file = os.path.join(base_path, batch, "top_10_students.csv")
     if not os.path.exists(source_file):
         return False, f"Toppers source file not found at {source_file}"
         
-    target_file = os.path.join(flask_data_dir, f"toppers_{batch}.csv")
+    target_key = f"data/toppers_{batch}.csv"
     try:
-        shutil.copy2(source_file, target_file)
-        return True, f"Successfully synchronized toppers list to {target_file}"
+        with open(source_file, 'r', encoding='utf-8-sig', newline='') as f:
+            write_text_key(target_key, f.read())
+        return True, f"Successfully synchronized toppers list to R2 {target_key}"
     except Exception as e:
-        return False, f"Failed to copy toppers: {str(e)}"
+        return False, f"Failed to sync toppers to R2: {str(e)}"
