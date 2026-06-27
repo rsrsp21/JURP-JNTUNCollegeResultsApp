@@ -3,6 +3,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     const overlay = document.getElementById('ask-ai-modal');
     if (!overlay) return;
+    const storageKey = 'hasSeenAskAiModal';
 
     const closeBtn = overlay.querySelector('.modal-close-btn');
     const actionBtn = overlay.querySelector('.modal-action-btn');
@@ -17,6 +18,22 @@ document.addEventListener('DOMContentLoaded', function () {
     const totalSlides = slides.length;
     let autoSlideInterval;
 
+    function hasSeenModal() {
+        try {
+            return localStorage.getItem(storageKey) === 'true';
+        } catch (error) {
+            return sessionStorage.getItem(storageKey) === 'true';
+        }
+    }
+
+    function markModalSeen() {
+        try {
+            localStorage.setItem(storageKey, 'true');
+        } catch (error) {
+            sessionStorage.setItem(storageKey, 'true');
+        }
+    }
+
     // --- Modal Display Logic ---
     function showModal() {
         overlay.classList.remove('hidden');
@@ -29,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function closeModal() {
         overlay.classList.remove('active');
-        sessionStorage.setItem('hasSeenAskAiModal', 'true');
+        markModalSeen();
         stopAutoSlide();
 
         // Hide overlay after animation finishes
@@ -42,8 +59,8 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Check sessionStorage and show modal only once
-    if (!sessionStorage.getItem('hasSeenAskAiModal')) {
+    // Show the announcement only once across visits.
+    if (!hasSeenModal()) {
         // Optional slight delay for polished page-load entrance
         setTimeout(showModal, 1000);
     }
@@ -51,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Modal Close Event Listeners
     if (closeBtn) closeBtn.addEventListener('click', closeModal);
     if (actionBtn) actionBtn.addEventListener('click', function () {
-        sessionStorage.setItem('hasSeenAskAiModal', 'true');
+        markModalSeen();
     });
     if (dismissLink) dismissLink.addEventListener('click', closeModal);
 

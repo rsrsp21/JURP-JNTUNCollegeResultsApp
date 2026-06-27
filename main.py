@@ -554,7 +554,7 @@ def call_gemini_with_context(question, student_context, history=None, max_tokens
     if not api_key or api_key == 'your_gemini_api_key_here':
         return None, 'GEMINI_API_KEY is not configured'
 
-    model = os.environ.get('GEMINI_MODEL', 'gemini-2.5-flash')
+    model = get_configured_gemini_model()
     api_url = f'https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent'
 
     system_instruction_text = f"""
@@ -645,8 +645,26 @@ Provide clear, detailed, and highly factual academic results analysis based on t
         if not answer:
             return None, 'Gemini returned an empty response'
         return answer, None
+    except requests.HTTPError as error:
+        detail = ''
+        response = error.response
+        if response is not None:
+            try:
+                detail = response.json().get('error', {}).get('message', '')
+            except ValueError:
+                detail = response.text[:300]
+        suffix = f' - {detail}' if detail else ''
+        return None, f'Gemini API request failed: HTTP {response.status_code if response is not None else "unknown"}{suffix}'
     except requests.RequestException as error:
         return None, f'Gemini API request failed: {str(error)}'
+
+
+def get_configured_gemini_model():
+    configured_model = (os.environ.get('GEMINI_MODEL') or '').strip()
+    model_aliases = {
+        'gemini-3-flash': 'gemini-2.5-flash',
+    }
+    return model_aliases.get(configured_model, configured_model or 'gemini-2.5-flash')
 
 # --- Page Serving Routes ---
 
@@ -765,7 +783,7 @@ def ask_ai():
         print(f"Gemini Service Error: {error}")
         return jsonify({'error': 'Results AI is currently offline or undergoing maintenance. Please try again in a few moments.'}), 503
 
-    return jsonify({'answer': answer, 'model': os.environ.get('GEMINI_MODEL', 'gemini-2.5-flash')})
+    return jsonify({'answer': answer, 'model': get_configured_gemini_model()})
 
 @app.route('/api/chat-ai', methods=['POST'])
 def chat_ai():
@@ -801,7 +819,7 @@ def chat_ai():
             return jsonify({'error': 'Results AI is currently offline or undergoing maintenance. Please try again in a few moments.'}), 503
         return jsonify({
             'answer': answer,
-            'model': os.environ.get('GEMINI_MODEL', 'gemini-2.5-flash')
+            'model': get_configured_gemini_model()
         })
 
     elif len(all_roll_numbers) == 1:
@@ -819,7 +837,7 @@ def chat_ai():
         return jsonify({
             'answer': answer,
             'studentId': student_id,
-            'model': os.environ.get('GEMINI_MODEL', 'gemini-2.5-flash')
+            'model': get_configured_gemini_model()
         })
 
     else:
@@ -832,7 +850,7 @@ def chat_ai():
                 return jsonify({'error': 'Results AI is currently offline or undergoing maintenance. Please try again in a few moments.'}), 503
             return jsonify({
                 'answer': answer,
-                'model': os.environ.get('GEMINI_MODEL', 'gemini-2.5-flash')
+                'model': get_configured_gemini_model()
             })
 
         return jsonify({
