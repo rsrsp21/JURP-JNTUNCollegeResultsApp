@@ -258,34 +258,25 @@ function createResultsTable(studentData, container) {
 
     const table = document.createElement('table');
     table.className = 'results-table';
+    const displayColumns = ['Subject Code', 'Subject Name', 'Grade', 'Credits'];
 
     const tableHeader = document.createElement('thead');
     const tableBody = document.createElement('tbody');
 
-    const headers = Object.keys(studentData[0]);
     const headerRow = document.createElement('tr');
-    headers.forEach(header => {
-        if (header !== 'ID') {
-            const th = document.createElement('th');
-            th.textContent = header;
-            headerRow.appendChild(th);
-        }
+    displayColumns.forEach(header => {
+        const th = document.createElement('th');
+        th.textContent = header;
+        headerRow.appendChild(th);
     });
     tableHeader.appendChild(headerRow);
 
     studentData.forEach(subject => {
         const row = document.createElement('tr');
-        Object.entries(subject).forEach(([key, value]) => {
-            if (key !== 'ID') {
-                const td = document.createElement('td');
-                td.textContent = value;
-                // if (key === 'Grade') {
-                //     let gradeClass = value.toLowerCase().replace('+', '-plus');
-                //     console.log(`Setting class name to: grade-${gradeClass}`);
-                //     td.className = `grade-${gradeClass}`;
-                // }
-                row.appendChild(td);
-            }
+        displayColumns.forEach(column => {
+            const td = document.createElement('td');
+            td.textContent = subject[column] || '';
+            row.appendChild(td);
         });
         tableBody.appendChild(row);
     });
@@ -439,6 +430,17 @@ function downloadSemester(semester) {
     // Get the results table
     const resultsContainer = document.getElementById(`results-container-${semester}`);
     const table = resultsContainer.querySelector('table');
+    const tableHeaders = table ? Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim()) : [];
+    const columnIndex = {};
+    tableHeaders.forEach((header, index) => {
+        columnIndex[header.toLowerCase()] = index;
+    });
+
+    const getCellValue = (cells, headerName) => {
+        const index = columnIndex[headerName.toLowerCase()];
+        if (typeof index !== 'number' || !cells[index]) return '';
+        return cells[index].textContent.trim();
+    };
     
     // Create new jsPDF instance
     const { jsPDF } = window.jspdf;
@@ -494,10 +496,10 @@ function downloadSemester(semester) {
     const tableData = Array.from(table.querySelectorAll('tr')).slice(1).map(row => {
         const cells = Array.from(row.querySelectorAll('td'));
         return [
-            cells[0].textContent.trim(), // Subject Code
-            cells[1].textContent.trim(), // Subject Name
-            cells[2].textContent.trim(), // Credits
-            cells[3].textContent.trim()  // Grade
+            getCellValue(cells, 'Subject Code'),
+            getCellValue(cells, 'Subject Name'),
+            getCellValue(cells, 'Credits'),
+            getCellValue(cells, 'Grade')
         ];
     });
     

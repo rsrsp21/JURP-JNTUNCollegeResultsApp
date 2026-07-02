@@ -795,7 +795,7 @@ def _extract_new_model_from_text(pdf):
                 pending_line = ""
                 just_added_record = True
                 continue
-        
+
         page_stats.append({"page": page_num, "rows_extracted": page_row_count})
     
     if not records:
