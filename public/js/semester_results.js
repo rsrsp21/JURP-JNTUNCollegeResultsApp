@@ -498,15 +498,15 @@ function downloadSemester(semester) {
         return [
             getCellValue(cells, 'Subject Code'),
             getCellValue(cells, 'Subject Name'),
-            getCellValue(cells, 'Credits'),
-            getCellValue(cells, 'Grade')
+            getCellValue(cells, 'Grade'),
+            getCellValue(cells, 'Credits')
         ];
     });
     
     // Add table using autoTable
     doc.autoTable({
         startY: 170,
-        head: [['Subject Code', 'Subject Name', 'Credits', 'Grade']],
+        head: [['Subject Code', 'Subject Name', 'Grade', 'Credits']],
         body: tableData,
         theme: 'grid',
         headStyles: {
@@ -522,8 +522,8 @@ function downloadSemester(semester) {
         columnStyles: {
             0: { cellWidth: 20 }, // Subject Code
             1: { cellWidth: 100 }, // Subject Name
-            2: { cellWidth: 20 }, // Credits
-            3: { cellWidth: 20 }  // Grade
+            2: { cellWidth: 20 }, // Grade
+            3: { cellWidth: 20 }  // Credits
         },
         alternateRowStyles: { fillColor: [240, 240, 240] },
         margin: { top: 10 }
