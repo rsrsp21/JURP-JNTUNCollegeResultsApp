@@ -146,7 +146,7 @@ export default function HomePage() {
                 <span className="typing-cursor" aria-hidden="true" />
               </h1>
               <p className="hero-description">
-                JURP (JNTUK UCEN Results Portal) is a comprehensive tool to check your academic performance, access your complete course history, and calculate your CGPA with just your roll number.
+                <strong>JURP</strong> (<strong>J</strong>NTUK <strong>U</strong>CEN <strong>R</strong>esults <strong>P</strong>ortal) is a comprehensive tool to check your academic performance, access your complete course history, and calculate your CGPA with just your roll number.
               </p>
               <div className="download-row home-hero-actions">
                 <Link href="/cgpa" className="ink-button">
@@ -275,7 +275,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section>
+      <section className="section">
         <div className="page-container section-pad">
           <h2 className="section-title">How it works</h2>
           <div className="step-grid home-steps">
