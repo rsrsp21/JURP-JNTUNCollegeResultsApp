@@ -1511,6 +1511,12 @@ section > .page-container > .download-row {
   opacity: 0;
   stroke: var(--hairline);
   stroke-width: 20;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sgpa-point-group {
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
 }
 
 .sgpa-dot-ring {
