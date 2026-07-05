@@ -1,0 +1,385 @@
+/* Common styles for all pages */
+:root {
+    --primary-color: #4361ee;
+    --secondary-color: #3a0ca3;
+    --accent-color: #4cc9f0;
+    --success-color: #4ade80;
+    --warning-color: #fb8500;
+    --danger-color: #ef476f;
+    --dark-color: #0f172a;
+    --card-bg: #1e293b;
+    --card-header: #334155;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --gold: #ffd700;
+    --silver: #c0c0c0;
+    --bronze: #cd7f32;
+}
+
+body {
+    background-color: var(--dark-color);
+    color: var(--text-primary);
+    font-family: 'Poppins', sans-serif;
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding-top: 4.5rem; /* Height of navbar + some extra space */
+}
+
+main {
+    flex: 1;
+}
+
+/* Navigation */
+.navigation-bar {
+    background: rgba(30, 41, 59, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+}
+
+/* Add scroll class for JavaScript */
+.navigation-bar.scrolled {
+    background: var(--card-bg);
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
+}
+
+.nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 1.2rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.nav-brand:hover {
+    color: var(--primary-color);
+}
+
+.nav-link {
+    color: var(--text-secondary);
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.nav-link:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.nav-link.active {
+    color: var(--primary-color);
+    background: rgba(67, 97, 238, 0.1);
+}
+
+.nav-link i {
+    font-size: 0.9rem;
+}
+
+/* Ask AI launch button */
+.ask-ai-quick-launch {
+    display: flex;
+    justify-content: center;
+    margin: 1.5rem auto 0;
+    padding: 0 1rem;
+}
+
+.ask-ai-glow-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: white;
+    background: linear-gradient(135deg, #22d3ee, #6366f1, #a855f7);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 999px;
+    padding: 1rem 1.6rem;
+    font-size: 1rem;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+    box-shadow: 0 0 0 0 rgba(76, 201, 240, 0.5), 0 0 28px rgba(76, 201, 240, 0.28);
+    animation: askAiGlow 2.2s ease-in-out infinite;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ask-ai-glow-button:hover {
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 0 0 8px rgba(76, 201, 240, 0.08), 0 0 36px rgba(76, 201, 240, 0.38);
+}
+
+@keyframes askAiGlow {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(76, 201, 240, 0.45), 0 0 28px rgba(76, 201, 240, 0.26);
+    }
+    50% {
+        box-shadow: 0 0 0 10px rgba(76, 201, 240, 0), 0 0 38px rgba(67, 97, 238, 0.42);
+    }
+}
+
+.nav-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    transition: color 0.2s ease;
+}
+
+.nav-toggle:hover {
+    color: var(--primary-color);
+}
+
+.nav-menu {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Footer */
+.footer {
+    margin-top: 4rem;
+    padding: 2rem 0;
+    background: var(--card-bg);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.footer-text {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.footer-highlight {
+    color: var(--primary-color);
+    font-weight: 500;
+}
+
+/* Helpers */
+.hidden {
+    display: none !important;
+}
+
+/* Animation for fade in */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+    opacity: 0;
+}
+
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.3s; }
+.delay-4 { animation-delay: 0.4s; }
+.delay-5 { animation-delay: 0.5s; }
+
+/* Card styling */
+.card {
+    background: var(--card-bg);
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.card-header {
+    background: var(--card-header);
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Button styling */
+.btn {
+    font-weight: 500;
+    padding: 0.5rem 1.25rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    color: white;
+    border: 1px solid var(--primary-color);
+}
+
+.btn-primary:hover {
+    background: var(--secondary-color);
+    border-color: var(--secondary-color);
+}
+
+.btn-outline-primary {
+    background: transparent;
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+}
+
+.btn-outline-primary:hover {
+    background: rgba(67, 97, 238, 0.1);
+}
+
+/* Page Header Styling */
+.page-header {
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+    padding: 2rem 1.5rem;
+    padding-bottom: 1rem;
+    background: linear-gradient(180deg, rgba(67, 97, 238, 0.1), transparent);
+    border-radius: 0 0 2rem 2rem;
+    margin-top: 0; /* Remove negative margin */
+    z-index: 1;
+}
+
+.page-title {
+    font-size: 3rem;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 1;
+    background: linear-gradient(135deg, #fff, rgba(255,255,255,0.8));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    letter-spacing: -0.5px;
+    /* animation: titleFloat 3s ease-in-out infinite; */
+}
+
+.page-subtitle {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.9);
+    text-align: center;
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin: 0 auto;
+    line-height: 1.6;
+    font-weight: 400;
+    letter-spacing: 0.2px;
+    backdrop-filter: blur(5px);
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+@keyframes titleFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 767px) {
+    body {
+        padding-top: 4rem; /* Slightly less padding for mobile */
+    }
+
+    .page-header {
+        margin-top: 0; /* Remove negative margin for mobile */
+    }
+
+    .navigation-bar {
+        padding: 0.75rem 0;
+    }
+    
+    .nav-toggle {
+        display: block;
+    }
+
+    .nav-menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--card-bg);
+        padding: 1rem;
+        flex-direction: column;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+    }
+
+    .nav-menu.active {
+        display: flex !important;
+    }
+
+    .nav-link {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        justify-content: flex-start;
+        color: var(--text-primary);
+    }
+    
+    .nav-link:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .page-title {
+        font-size: 2rem;
+    }
+    
+    .page-subtitle {
+        font-size: 0.8rem;
+    }
+    
+    .footer {
+        margin-top: 3rem;
+        padding: 1.5rem 0;
+    }
+}
+
+/* Blinking Note and Animations */
+@keyframes blinker {
+    50% { opacity: 0; }
+}
+
+.blinking-note {
+    animation: blinker 1.2s linear infinite;
+    color: #ffc107 !important;
+    font-weight: 600;
+}
+
