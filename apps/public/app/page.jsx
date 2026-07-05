@@ -16,7 +16,7 @@ let notificationsMemoryCache = null;
 
 const features = [
   { icon: 'bookOpen', title: 'Detailed Results', points: ['Semester-wise performance breakdown', 'Subject-wise grades and marks'] },
-  { icon: 'lineChart', title: 'CGPA Calculator', points: ['Automatic CGPA from database', 'Percentage and classification'] },
+  { icon: 'calculator', title: 'CGPA Calculator', points: ['Automatic CGPA from database', 'Percentage and classification'] },
   { icon: 'trophy', title: 'Toppers Rankings', points: ['Overall college rankings', 'Branch-wise leaderboards'] },
   { icon: 'sparkles', title: 'AI Assistant', points: ['Ask about results and credits', 'Compare students and backlogs'] }
 ];
@@ -431,6 +431,21 @@ function Icon({ name }) {
 
 function iconPath(name) {
   switch (name) {
+    case 'calculator':
+      return (
+        <>
+          <rect x="4" y="2" width="16" height="20" rx="2" />
+          <path d="M8 6h8" />
+          <path d="M16 14v4" />
+          <path d="M16 10h.01" />
+          <path d="M12 10h.01" />
+          <path d="M8 10h.01" />
+          <path d="M12 14h.01" />
+          <path d="M8 14h.01" />
+          <path d="M12 18h.01" />
+          <path d="M8 18h.01" />
+        </>
+      );
     case 'graduationCap':
       return (
         <>
