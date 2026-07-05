@@ -8,6 +8,15 @@ export default function UiIcon({ name, className = 'ui-icon' }) {
 
 function iconPath(name) {
   switch (name) {
+    case 'lineChart':
+      return (
+        <>
+          <path d="M4 19V5" />
+          <path d="M4 19h16" />
+          <path d="m7 15 3.5-4 3 2.5L19 7" />
+          <path d="M19 7v4h-4" />
+        </>
+      );
     case 'search':
       return (
         <>
