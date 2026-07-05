@@ -7,6 +7,10 @@ from common import ADMIN_STATIC_DIR, ADMIN_TEMPLATE_DIR, create_base_app, extern
 def create_app():
     app = create_base_app(__name__, static_folder=ADMIN_STATIC_DIR, template_folder=ADMIN_TEMPLATE_DIR)
 
+    @app.context_processor
+    def inject_template_vars():
+        return {'main_portal_url': 'https://jurp.vercel.app'}
+
     app.add_url_rule('/', endpoint='admin_root', view_func=lambda: redirect(url_for('admin_panel')))
     app.add_url_rule('/login', methods=['GET', 'POST'], view_func=routes.login)
     app.add_url_rule('/logout', view_func=routes.logout)
