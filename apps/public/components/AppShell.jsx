@@ -247,13 +247,13 @@ export default function AppShell({ children }) {
           <div className="footer-creator">
             Created by <span>Sri Ram Sai Pavan Relangi</span>
             <div className="footer-socials">
-              <a href="#" target="_blank" rel="noreferrer" aria-label="LinkedIn">
+              <a href="https://linkedin.com/in/sriramsaipavanrelangi" target="_blank" rel="noreferrer" aria-label="LinkedIn">
                 <UiIcon name="linkedin" />
               </a>
-              <a href="#" target="_blank" rel="noreferrer" aria-label="Twitter">
+              <a href="https://x.com/sriram_relangi" target="_blank" rel="noreferrer" aria-label="Twitter">
                 <UiIcon name="twitter" />
               </a>
-              <a href="#" target="_blank" rel="noreferrer" aria-label="Instagram">
+              <a href="https://instagram.com/sram_217" target="_blank" rel="noreferrer" aria-label="Instagram">
                 <UiIcon name="instagram" />
               </a>
             </div>
