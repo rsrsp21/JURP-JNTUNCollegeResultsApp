@@ -205,8 +205,12 @@ export async function getToppersRagData() {
   return data;
 }
 
-export async function listNotifications() {
-  const rows = await d1Query('SELECT id, text, date_text, is_new FROM notifications ORDER BY sort_order ASC, id DESC LIMIT 10');
+export async function listNotifications(limit = 3) {
+  let query = 'SELECT id, text, date_text, is_new FROM notifications ORDER BY sort_order ASC, id DESC';
+  if (limit > 0) {
+    query += ` LIMIT ${Number(limit)}`;
+  }
+  const rows = await d1Query(query);
   return rows.map((row) => ({
     text: row.text || '',
     date: row.date_text || '',
