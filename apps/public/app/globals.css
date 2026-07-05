@@ -2615,7 +2615,7 @@ section > .page-container > .download-row {
 
   .typing-title {
     min-height: 1.08em;
-    font-size: clamp(20px, 7.5vw, 36px);
+    font-size: clamp(20px, 8.5vw, 36px);
   }
 
   .hero-description {
@@ -3358,19 +3358,19 @@ section > .page-container > .download-row {
 }
 
 .view-all-button {
-  background: transparent;
-  border: 0;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
   color: var(--ink);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   padding: 8px 16px;
-  border-radius: 6px;
-  transition: background 0.2s;
+  border-radius: 0;
+  transition: background 0.2s, border-color 0.2s;
 }
 
 .view-all-button:hover {
-  background: var(--surface);
+  background: var(--hairline);
 }
 
 @keyframes skeletonPulse {
