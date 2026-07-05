@@ -1,7 +1,7 @@
 from flask import redirect, send_from_directory, url_for
 
-from . import routes
-from .common import ADMIN_STATIC_DIR, ADMIN_TEMPLATE_DIR, create_base_app, external_url
+import routes
+from common import ADMIN_STATIC_DIR, ADMIN_TEMPLATE_DIR, create_base_app, external_url
 
 
 def create_app():
