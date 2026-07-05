@@ -3,7 +3,7 @@ import pdfplumber
 import re
 import os
 import io
-from apps.admin.utils.portal_db import (
+from ..utils.portal_db import (
     replace_cgpa_from_dataframe,
     replace_semester_from_dataframe,
     replace_toppers_from_dataframe,
