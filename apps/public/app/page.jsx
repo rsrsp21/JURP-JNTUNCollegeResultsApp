@@ -60,7 +60,7 @@ export default function HomePage() {
     setIsModalOpen(true);
     if (allNotifications.length === 0 && !loadingAll) {
       setLoadingAll(true);
-      fetch('/api/notifications?limit=all')
+      fetch(`/api/notifications?limit=all&t=${Date.now()}`, { cache: 'no-store' })
         .then((res) => res.json())
         .then((data) => setAllNotifications(Array.isArray(data) ? data : []))
         .finally(() => setLoadingAll(false));
@@ -75,7 +75,7 @@ export default function HomePage() {
       return;
     }
 
-    fetch('/api/notifications?limit=3')
+    fetch(`/api/notifications?limit=3&t=${Date.now()}`, { cache: 'no-store' })
       .then((response) => response.json())
       .then((data) => {
         const nextNotifications = Array.isArray(data) ? data : [];
@@ -354,6 +354,9 @@ function QuickAccessPanel() {
 }
 
 function readNotificationsCache() {
+  if (typeof window !== 'undefined') {
+    notificationsMemoryCache = null;
+  }
   if (notificationsMemoryCache) return notificationsMemoryCache;
   return null;
 }

@@ -4,7 +4,7 @@ import { listNotifications } from '@/lib/results-data';
 export const dynamic = 'force-dynamic';
 
 const notificationCacheHeaders = {
-  'Cache-Control': 'public, max-age=120, s-maxage=600, stale-while-revalidate=86400'
+  'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0'
 };
 
 export async function GET(request) {

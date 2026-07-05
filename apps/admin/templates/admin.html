@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+<html lang="en" data-bs-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,8 +13,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Common CSS -->
-    <link rel="stylesheet" href="../public/css/common.css">
+    <script>
+        (function () {
+            var theme = localStorage.getItem('jntuk-theme') || 'light';
+            document.documentElement.dataset.theme = theme;
+            document.documentElement.style.colorScheme = theme;
+        })();
+    </script>
+    <!-- Admin UI CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin-public-ui.css') }}">
     
     <!-- JavaScript Libraries for PDF & ZIP generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -463,38 +471,55 @@
         }
     </style>
 </head>
-<body>
+<body class="admin-public-ui">
 
-    <!-- Navigation Bar -->
-    <nav class="navigation-bar">
-        <div class="container">
-            <div class="d-flex align-items-center justify-content-between">
-                <a href="/" class="nav-brand">
-                    <img src="images/university_logo.png" alt="University Logo" class="nav-logo" style="width: 50px;">
-                    <span>JNTUK UCEN Results Portal</span>
-                </a>
-                <div class="nav-menu">
-                    <a href="/logout" class="logout-btn">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </a>
-                </div>
+    <header class="site-header">
+        <div class="site-header-inner">
+            <a href="/" class="brand-lockup">
+                <span class="brand-mark" aria-hidden="true">
+                    <img class="brand-logo brand-logo-light" src="{{ url_for('static', filename='images/logo-light.svg') }}" alt="">
+                    <img class="brand-logo brand-logo-dark" src="{{ url_for('static', filename='images/logo-dark.svg') }}" alt="">
+                </span>
+                <span class="brand-copy">
+                    <span class="brand-title">JURP</span>
+                    <span class="brand-subtitle">Admin Portal</span>
+                </span>
+            </a>
+
+            <div class="header-actions">
+                <nav class="desktop-nav" aria-label="Primary navigation">
+                    <a href="{{ main_portal_url }}" class="nav-link" target="_blank" rel="noreferrer">Go to main portal</a>
+                </nav>
+                <button class="theme-toggle" type="button" aria-label="Switch theme">
+                    <i class="fas fa-sun theme-toggle-icon"></i>
+                </button>
+                <button class="mobile-menu-button" type="button" aria-label="Open navigation" aria-expanded="false">
+                    <span class="hamburger-line" aria-hidden="true"></span>
+                    <span class="hamburger-line" aria-hidden="true"></span>
+                    <span class="hamburger-line" aria-hidden="true"></span>
+                </button>
             </div>
         </div>
-    </nav>
+        <nav class="mobile-nav" aria-label="Mobile navigation">
+            <div class="mobile-nav-inner">
+                <a href="{{ main_portal_url }}" class="mobile-nav-link" target="_blank" rel="noreferrer">Go to main portal</a>
+            </div>
+        </nav>
+    </header>
 
-    <!-- Page Header -->
-    <header class="page-header">
-        <div class="container">
-            <h1 class="page-title"><i class="fas fa-user-shield"></i> Admin Panel</h1>
-            <p class="page-subtitle">
+    <section class="page-hero">
+        <div class="page-container page-hero-inner">
+            <div class="eyebrow">Results Operations</div>
+            <h1 class="hero-title"><i class="fas fa-user-shield"></i> Admin Panel</h1>
+            <p class="hero-description">
                 Manage semester results, parse PDFs, run CGPA reports, and export toppers listings.
             </p>
         </div>
-    </header>
+    </section>
 
     <!-- Main Content -->
-    <main>
-        <div class="container">
+    <main class="site-main admin-content">
+        <div class="page-container">
             <div class="content-container">
                 <div class="admin-shell">
                     <!-- Admin Sidebar -->
@@ -704,25 +729,44 @@
     </main>
 
     <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-4 text-center text-md-start">
-                    <p class="footer-text mb-0">© 2025 JNTUK UCEN Results Portal</p>
-                </div>
-                <div class="col-md-4 text-center my-2 my-md-0">
-                    <p class="footer-text mb-0">Created by <span class="footer-highlight">Sri Ram Sai Pavan Relangi</span></p>
-                </div>
-                <div class="col-md-4 text-center text-md-end d-flex align-items-center justify-content-center justify-content-md-end gap-3">
-                    <p class="footer-text mb-0">Created for <span class="footer-highlight">JNTUK UCEN</span> Students</p>
-                    <a href="/login" class="admin-login-link" style="font-size: 11px; color: rgba(255,255,255,0.45); text-decoration: none; padding: 2px 6px; border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; transition: all 0.2s;" onmouseover="this.style.color='#ffc107'; this.style.borderColor='#ffc107';" onmouseout="this.style.color='rgba(255,255,255,0.45)'; this.style.borderColor='rgba(255,255,255,0.15)';"><i class="fas fa-key" style="font-size: 9px; margin-right: 3px;"></i>Admin</a>
-                </div>
+    <footer class="site-footer">
+        <div class="site-footer-inner">
+            <div>2026 JURP - JNTUK UCEN Results Portal</div>
+            <div class="footer-creator">
+                Created by <span>Sri Ram Sai Pavan Relangi</span>
             </div>
         </div>
     </footer>
 
     <!-- Interactive Dashboards JS Script -->
     <script>
+        function syncThemeIcon() {
+            const button = document.querySelector('.theme-toggle');
+            const icon = button?.querySelector('i');
+            if (!icon) return;
+            const isDark = document.documentElement.dataset.theme === 'dark';
+            icon.className = isDark ? 'fas fa-sun theme-toggle-icon' : 'fas fa-moon theme-toggle-icon';
+            button.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+        }
+
+        syncThemeIcon();
+
+        document.querySelector('.theme-toggle')?.addEventListener('click', () => {
+            const current = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
+            const next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.dataset.theme = next;
+            document.documentElement.style.colorScheme = next;
+            localStorage.setItem('jntuk-theme', next);
+            syncThemeIcon();
+        });
+
+        document.querySelector('.mobile-menu-button')?.addEventListener('click', function () {
+            const nav = document.querySelector('.mobile-nav');
+            const isOpen = nav.classList.toggle('open');
+            this.classList.toggle('open', isOpen);
+            this.setAttribute('aria-expanded', String(isOpen));
+        });
+
         // --- Tabs Handler ---
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', () => {

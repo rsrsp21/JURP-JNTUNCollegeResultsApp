@@ -513,25 +513,66 @@ def replace_cgpa_from_dataframe(batch_year, dataframe):
     batch_year = str(batch_year)
     sync_token = _sync_token('cgpa', batch_year)
     rows = _cgpa_rows_from_dataframe(batch_year, dataframe, sync_token)
-
-    if not rows:
-        return 0
-
-    _bulk_upsert(
-        table='student_cgpa',
-        columns=CGPA_INSERT_COLUMNS,
-        rows=rows,
-        conflict_columns=['student_id'],
-        chunk_size=25,
-    )
-    d1_storage.execute(
-        'DELETE FROM student_cgpa WHERE batch_year = ? AND (sync_token IS NULL OR sync_token != ?)',
-        [batch_year, sync_token],
+    existing_rows = d1_storage.query(
+        'SELECT * FROM student_cgpa WHERE batch_year = ? ORDER BY student_id',
+        [batch_year],
         timeout=60
     )
-    refresh_academic_summaries_for_batch(batch_year)
+
+    if not rows:
+        if existing_rows:
+            d1_storage.execute(
+                'DELETE FROM student_cgpa WHERE batch_year = ?',
+                [batch_year],
+                timeout=60
+            )
+            refresh_academic_summaries_for_batch(batch_year, cgpa_rows=[])
+            clear_runtime_cache()
+        return 0
+
+    changed_rows = _changed_rows_from_scope(
+        existing_rows,
+        rows,
+        key_columns=['student_id'],
+        compare_columns=[
+            'student_id', 'batch_year', 'batch_label', 'regulation',
+            'sgpa_1_1', 'credits_1_1', 'sgpa_1_2', 'credits_1_2',
+            'sgpa_2_1', 'credits_2_1', 'sgpa_2_2', 'credits_2_2',
+            'sgpa_3_1', 'credits_3_1', 'sgpa_3_2', 'credits_3_2',
+            'sgpa_4_1', 'credits_4_1', 'sgpa_4_2', 'credits_4_2',
+            'total_credits', 'cgpa', 'supplementary_appearances',
+        ],
+        numeric_columns=[
+            'sgpa_1_1', 'credits_1_1', 'sgpa_1_2', 'credits_1_2',
+            'sgpa_2_1', 'credits_2_1', 'sgpa_2_2', 'credits_2_2',
+            'sgpa_3_1', 'credits_3_1', 'sgpa_3_2', 'credits_3_2',
+            'sgpa_4_1', 'credits_4_1', 'sgpa_4_2', 'credits_4_2',
+            'total_credits', 'cgpa',
+        ],
+    )
+    stale_rows = _stale_keys_from_scope(existing_rows, rows, key_columns=['student_id'])
+
+    if changed_rows:
+        _bulk_upsert(
+            table='student_cgpa',
+            columns=CGPA_INSERT_COLUMNS,
+            rows=changed_rows,
+            conflict_columns=['student_id'],
+            chunk_size=25,
+        )
+
+    if stale_rows:
+        _delete_scope_rows_not_in_keys(
+            table='student_cgpa',
+            scope_sql='batch_year = ?',
+            scope_params=[batch_year],
+            key_expression='student_id',
+            desired_keys=[key[0] for key in _row_keys(rows, ['student_id'])],
+        )
+
+    refresh_academic_summaries_for_batch(batch_year, cgpa_rows=rows)
     clear_runtime_cache()
-    return len(rows)
+    return len(changed_rows)
 
 
 def replace_cgpa_from_csv(batch_year, csv_text):
@@ -573,14 +614,15 @@ def insert_missing_cgpa_from_dataframe(batch_year, dataframe):
     return _migration_result(len(rows), before_count, after_count)
 
 
-def refresh_academic_summaries_for_batch(batch_year, _schema_retry=False):
+def refresh_academic_summaries_for_batch(batch_year, _schema_retry=False, cgpa_rows=None):
     batch_year = str(batch_year)
     try:
-        cgpa_rows = d1_storage.query(
-            'SELECT * FROM student_cgpa WHERE batch_year = ? ORDER BY student_id',
-            [batch_year],
-            timeout=60
-        )
+        if cgpa_rows is None:
+            cgpa_rows = d1_storage.query(
+                'SELECT * FROM student_cgpa WHERE batch_year = ? ORDER BY student_id',
+                [batch_year],
+                timeout=60
+            )
 
         if not cgpa_rows:
             d1_storage.execute(
@@ -596,28 +638,46 @@ def refresh_academic_summaries_for_batch(batch_year, _schema_retry=False):
             _academic_summary_row_from_cgpa_row(row, sync_token)
             for row in cgpa_rows
         ]
-
-        _bulk_upsert(
-            table='student_academic_summary',
-            columns=ACADEMIC_SUMMARY_INSERT_COLUMNS,
-            rows=rows,
-            conflict_columns=['student_id'],
-            chunk_size=25,
-        )
-        d1_storage.execute(
-            """
-            DELETE FROM student_academic_summary
-            WHERE batch_year = ? AND (sync_token IS NULL OR sync_token != ?)
-            """,
-            [batch_year, sync_token],
+        existing_rows = d1_storage.query(
+            'SELECT * FROM student_academic_summary WHERE batch_year = ? ORDER BY student_id',
+            [batch_year],
             timeout=60
         )
+        changed_rows = _changed_rows_from_scope(
+            existing_rows,
+            rows,
+            key_columns=['student_id'],
+            compare_columns=[
+                'student_id', 'batch_year', 'regulation', 'percentage',
+                'percentage_value', 'division', 'division_class',
+                'progress_percentage', 'progress_class', 'supplementary_count',
+            ],
+            numeric_columns=['percentage_value', 'progress_percentage', 'supplementary_count'],
+        )
+        stale_rows = _stale_keys_from_scope(existing_rows, rows, key_columns=['student_id'])
+
+        if changed_rows:
+            _bulk_upsert(
+                table='student_academic_summary',
+                columns=ACADEMIC_SUMMARY_INSERT_COLUMNS,
+                rows=changed_rows,
+                conflict_columns=['student_id'],
+                chunk_size=25,
+            )
+        if stale_rows:
+            _delete_scope_rows_not_in_keys(
+                table='student_academic_summary',
+                scope_sql='batch_year = ?',
+                scope_params=[batch_year],
+                key_expression='student_id',
+                desired_keys=[key[0] for key in _row_keys(rows, ['student_id'])],
+            )
         clear_runtime_cache()
-        return len(rows)
+        return len(changed_rows)
     except RuntimeError as exc:
         if not _schema_retry and _is_missing_academic_summary_table_error(exc):
             apply_schema()
-            return refresh_academic_summaries_for_batch(batch_year, _schema_retry=True)
+            return refresh_academic_summaries_for_batch(batch_year, _schema_retry=True, cgpa_rows=cgpa_rows)
         raise
 
 
@@ -646,31 +706,71 @@ def replace_semester_from_dataframe(batch_year, semester_number, dataframe, is_h
         is_honors_minor=is_honors_minor,
         sync_token=sync_token,
     )
-
-    if not rows:
-        return 0
-
-    _bulk_upsert(
-        table='semester_results',
-        columns=[
-            'student_id', 'batch_year', 'semester_number', 'subject_code',
-            'subject_name', 'grade', 'credits', 'row_order',
-            'is_honors_minor', 'sync_token',
-        ],
-        rows=rows,
-        conflict_columns=['batch_year', 'semester_number', 'student_id', 'subject_code'],
-        chunk_size=75,
-    )
-    d1_storage.execute(
+    existing_rows = d1_storage.query(
         """
-        DELETE FROM semester_results
-        WHERE batch_year = ? AND semester_number = ? AND (sync_token IS NULL OR sync_token != ?)
+        SELECT * FROM semester_results
+        WHERE batch_year = ? AND semester_number = ?
+        ORDER BY student_id, row_order, id
         """,
-        [batch_year, semester_number, sync_token],
+        [batch_year, semester_number],
         timeout=60
     )
+
+    if not rows:
+        if existing_rows:
+            d1_storage.execute(
+                """
+                DELETE FROM semester_results
+                WHERE batch_year = ? AND semester_number = ?
+                """,
+                [batch_year, semester_number],
+                timeout=60
+            )
+            clear_runtime_cache()
+        return 0
+
+    changed_rows = _changed_rows_from_scope(
+        existing_rows,
+        rows,
+        key_columns=['batch_year', 'semester_number', 'student_id', 'subject_code'],
+        compare_columns=[
+            'student_id', 'batch_year', 'semester_number', 'subject_code',
+            'subject_name', 'grade', 'credits', 'row_order',
+            'is_honors_minor',
+        ],
+        numeric_columns=['semester_number', 'credits', 'row_order', 'is_honors_minor'],
+    )
+    stale_rows = _stale_keys_from_scope(
+        existing_rows,
+        rows,
+        key_columns=['batch_year', 'semester_number', 'student_id', 'subject_code'],
+    )
+
+    if changed_rows:
+        _bulk_upsert(
+            table='semester_results',
+            columns=[
+                'student_id', 'batch_year', 'semester_number', 'subject_code',
+                'subject_name', 'grade', 'credits', 'row_order',
+                'is_honors_minor', 'sync_token',
+            ],
+            rows=changed_rows,
+            conflict_columns=['batch_year', 'semester_number', 'student_id', 'subject_code'],
+            chunk_size=75,
+        )
+    if stale_rows:
+        _delete_scope_rows_not_in_keys(
+            table='semester_results',
+            scope_sql='batch_year = ? AND semester_number = ?',
+            scope_params=[batch_year, semester_number],
+            key_expression="COALESCE(student_id, '') || char(31) || COALESCE(subject_code, '')",
+            desired_keys=[
+                f"{key[2]}\x1f{key[3]}"
+                for key in _row_keys(rows, ['batch_year', 'semester_number', 'student_id', 'subject_code'])
+            ],
+        )
     clear_runtime_cache()
-    return len(rows)
+    return len(changed_rows)
 
 
 def replace_semester_from_csv(batch_year, semester_number, csv_text, is_honors_minor=False):
@@ -737,24 +837,49 @@ def replace_toppers_from_dataframe(batch_year, dataframe):
     batch_year = str(batch_year)
     sync_token = _sync_token('toppers', batch_year)
     rows = _toppers_rows_from_dataframe(batch_year, dataframe, sync_token)
-
-    if not rows:
-        return 0
-
-    _bulk_upsert(
-        table='toppers',
-        columns=['batch_year', 'category', 'roll_number', 'cgpa', 'rank_order', 'sync_token'],
-        rows=rows,
-        conflict_columns=['batch_year', 'category', 'rank_order'],
-        chunk_size=100,
-    )
-    d1_storage.execute(
-        'DELETE FROM toppers WHERE batch_year = ? AND (sync_token IS NULL OR sync_token != ?)',
-        [batch_year, sync_token],
+    existing_rows = d1_storage.query(
+        'SELECT * FROM toppers WHERE batch_year = ? ORDER BY category, rank_order, id',
+        [batch_year],
         timeout=60
     )
+
+    if not rows:
+        if existing_rows:
+            d1_storage.execute(
+                'DELETE FROM toppers WHERE batch_year = ?',
+                [batch_year],
+                timeout=60
+            )
+            clear_runtime_cache()
+        return 0
+
+    changed_rows = _changed_rows_from_scope(
+        existing_rows,
+        rows,
+        key_columns=['batch_year', 'category', 'rank_order'],
+        compare_columns=['batch_year', 'category', 'roll_number', 'cgpa', 'rank_order'],
+        numeric_columns=['cgpa', 'rank_order'],
+    )
+    stale_rows = _stale_keys_from_scope(existing_rows, rows, key_columns=['batch_year', 'category', 'rank_order'])
+
+    if changed_rows:
+        _bulk_upsert(
+            table='toppers',
+            columns=['batch_year', 'category', 'roll_number', 'cgpa', 'rank_order', 'sync_token'],
+            rows=changed_rows,
+            conflict_columns=['batch_year', 'category', 'rank_order'],
+            chunk_size=100,
+        )
+    if stale_rows:
+        _delete_scope_rows_not_in_keys(
+            table='toppers',
+            scope_sql='batch_year = ?',
+            scope_params=[batch_year],
+            key_expression="COALESCE(category, '') || char(31) || CAST(rank_order AS TEXT)",
+            desired_keys=[f"{key[1]}\x1f{int(_number_or_zero(key[2]))}" for key in _row_keys(rows, ['batch_year', 'category', 'rank_order'], numeric_key_columns=['rank_order'])],
+        )
     clear_runtime_cache()
-    return len(rows)
+    return len(changed_rows)
 
 
 def replace_toppers_from_csv(batch_year, csv_text):
@@ -1147,6 +1272,77 @@ def _bulk_insert_ignore(table, columns, rows, chunk_size=50):
         VALUES {', '.join(placeholders)}
         """
         d1_storage.execute(sql, params=params, timeout=60)
+
+
+def _sync_value(value, numeric=False):
+    if numeric:
+        number = _number_or_none(value)
+        return '' if number is None else number
+    if value is None or (isinstance(value, float) and math.isnan(value)):
+        return ''
+    return str(value).strip()
+
+
+def _row_keys(rows, key_columns, numeric_key_columns=()):
+    numeric_key_columns = set(numeric_key_columns or [])
+    keys = []
+    for row in rows or []:
+        keys.append(
+            tuple(_sync_value(row.get(column), column in numeric_key_columns) for column in key_columns)
+        )
+    return keys
+
+
+def _row_signature(row, columns, numeric_columns=()):
+    numeric_columns = set(numeric_columns or [])
+    return tuple(_sync_value(row.get(column), column in numeric_columns) for column in columns)
+
+
+def _changed_rows_from_scope(existing_rows, desired_rows, key_columns, compare_columns, numeric_columns=(), numeric_key_columns=()):
+    existing_by_key = {
+        key: row
+        for key, row in zip(_row_keys(existing_rows, key_columns, numeric_key_columns), existing_rows or [])
+    }
+    changed_rows = []
+    for row in desired_rows or []:
+        key = tuple(_sync_value(row.get(column), column in set(numeric_key_columns or [])) for column in key_columns)
+        existing_row = existing_by_key.get(key)
+        if existing_row is None:
+            changed_rows.append(row)
+            continue
+        if _row_signature(existing_row, compare_columns, numeric_columns) != _row_signature(row, compare_columns, numeric_columns):
+            changed_rows.append(row)
+    return changed_rows
+
+
+def _stale_keys_from_scope(existing_rows, desired_rows, key_columns, numeric_key_columns=()):
+    desired_keys = set(_row_keys(desired_rows, key_columns, numeric_key_columns))
+    return [
+        key
+        for key in _row_keys(existing_rows, key_columns, numeric_key_columns)
+        if key not in desired_keys
+    ]
+
+
+def _delete_scope_rows_not_in_keys(table, scope_sql, scope_params, key_expression, desired_keys):
+    if not scope_sql:
+        raise ValueError('scope_sql is required')
+
+    scope_params = list(scope_params or [])
+    if not desired_keys:
+        d1_storage.execute(
+            f'DELETE FROM {table} WHERE {scope_sql}',
+            scope_params,
+            timeout=60
+        )
+        return
+
+    placeholders = ', '.join(['?'] * len(desired_keys))
+    d1_storage.execute(
+        f'DELETE FROM {table} WHERE {scope_sql} AND {key_expression} NOT IN ({placeholders})',
+        scope_params + list(desired_keys),
+        timeout=60
+    )
 
 
 def _cache_get(key):
