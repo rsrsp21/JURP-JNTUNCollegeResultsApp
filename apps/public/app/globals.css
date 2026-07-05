@@ -3273,3 +3273,48 @@ section > .page-container > .download-row {
     gap: 6px;
   }
 }
+
+@keyframes skeletonPulse {
+  0% { opacity: 0.8; }
+  50% { opacity: 0.4; }
+  100% { opacity: 0.8; }
+}
+
+.page-loading-skeleton .typing-title,
+.page-loading-skeleton .hero-description,
+.page-loading-skeleton .ink-button,
+.page-loading-skeleton .outline-button,
+.page-loading-skeleton .home-metric,
+.page-loading-skeleton .chart-preview-header,
+.page-loading-skeleton .home-chart-svg,
+.page-loading-skeleton .grade-chip,
+.page-loading-skeleton .quick-access-card,
+.page-loading-skeleton .feature-cell,
+.page-loading-skeleton .step-card,
+.page-loading-skeleton .notification-row,
+.page-loading-skeleton .section-title {
+  background: var(--hairline) !important;
+  color: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  animation: skeletonPulse 1.5s ease-in-out infinite;
+  pointer-events: none;
+  border-radius: 8px;
+}
+
+.page-loading-skeleton .typing-title *,
+.page-loading-skeleton .hero-description *,
+.page-loading-skeleton .ink-button *,
+.page-loading-skeleton .outline-button *,
+.page-loading-skeleton .home-metric *,
+.page-loading-skeleton .chart-preview-header *,
+.page-loading-skeleton .home-chart-svg *,
+.page-loading-skeleton .grade-chip *,
+.page-loading-skeleton .quick-access-card *,
+.page-loading-skeleton .feature-cell *,
+.page-loading-skeleton .step-card *,
+.page-loading-skeleton .notification-row *,
+.page-loading-skeleton .section-title * {
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
