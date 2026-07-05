@@ -56,6 +56,20 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [heroText, setHeroText] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [allNotifications, setAllNotifications] = useState([]);
+  const [loadingAll, setLoadingAll] = useState(false);
+
+  function openAllNotifications() {
+    setIsModalOpen(true);
+    if (allNotifications.length === 0 && !loadingAll) {
+      setLoadingAll(true);
+      fetch('/api/notifications?limit=all')
+        .then((res) => res.json())
+        .then((data) => setAllNotifications(Array.isArray(data) ? data : []))
+        .finally(() => setLoadingAll(false));
+    }
+  }
 
   useEffect(() => {
     const cached = readNotificationsCache();
@@ -65,7 +79,7 @@ export default function HomePage() {
       return;
     }
 
-    fetch('/api/notifications')
+    fetch('/api/notifications?limit=3')
       .then((response) => response.json())
       .then((data) => {
         const nextNotifications = Array.isArray(data) ? data : [];
@@ -213,6 +227,7 @@ export default function HomePage() {
                 loading={loading}
                 error={error}
                 notifications={visibleNotifications}
+                onViewAll={openAllNotifications}
               />
             </motion.div>
 
@@ -284,6 +299,52 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      </section>
+      
+      <AnimatePresence>
+        {isModalOpen && (
+          <motion.div
+            className="modal-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setIsModalOpen(false);
+            }}
+          >
+            <motion.div
+              className="modal-content"
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            >
+              <div className="modal-header">
+                <h3 className="modal-title">All Notifications</h3>
+                <button className="modal-close" onClick={() => setIsModalOpen(false)} aria-label="Close modal">
+                  <Icon name="x" />
+                </button>
+              </div>
+              <div className="modal-body divider-list">
+                {loadingAll ? (
+                  <div className="empty-state">Loading all notifications...</div>
+                ) : (
+                  allNotifications.map((item, index) => (
+                    <div className="notification-row divider-row" key={`modal-notif-${index}`}>
+                      <span className="notification-icon"><Icon name={isNewNotification(item) ? 'bell' : 'clock'} /></span>
+                      <p className="notification-text">
+                        {item.text || ''}
+                        {isNewNotification(item) ? <span className="new-tag">New</span> : null}
+                      </p>
+                      {item.date ? <span className="notification-date">{item.date}</span> : null}
+                    </div>
+                  ))
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -337,7 +398,7 @@ function isNewNotification(item) {
   return ['1', 'true', 'yes'].includes(String(value || '').trim().toLowerCase());
 }
 
-function NotificationsPanel({ loading, error, notifications }) {
+function NotificationsPanel({ loading, error, notifications, onViewAll }) {
   return (
     <div className="hero-notification-panel">
       <div className="hero-notification-header">
@@ -377,6 +438,13 @@ function NotificationsPanel({ loading, error, notifications }) {
             {item.date ? <span className="notification-date">{item.date}</span> : null}
           </motion.div>
         ))}
+        {!loading && !error && notifications.length > 0 ? (
+          <div className="view-all-row">
+            <button type="button" className="view-all-button" onClick={onViewAll}>
+              View All Notifications
+            </button>
+          </div>
+        ) : null}
       </div>
     </div>
   );
