@@ -14,7 +14,7 @@ const navItems = [
   { href: '/toppers', label: 'Toppers' }
 ];
 
-const adminAppUrl = 'http://localhost:5001/login';
+const adminAppUrl = 'https://jntunresultsadmin.onrender.com/login';
 const externalLinks = [
   { href: 'https://jntukucen.ac.in', label: 'Official Website' },
   { href: adminAppUrl, label: 'Admin Portal' }
