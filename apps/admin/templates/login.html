@@ -12,7 +12,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script>
         (function () {
-            var theme = localStorage.getItem('jntuk-theme') || 'light';
+            var storedTheme = localStorage.getItem('jntuk-theme');
+            var systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            var theme = storedTheme || (systemDark ? 'dark' : 'light');
             document.documentElement.dataset.theme = theme;
             document.documentElement.style.colorScheme = theme;
         })();
