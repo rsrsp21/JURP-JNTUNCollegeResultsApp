@@ -79,6 +79,7 @@ export default function CgpaPage() {
         eyebrow="Cumulative GPA"
         title="Check CGPA"
         description="View your semester-wise SGPA and overall credits, percentage, and CGPA."
+        icon="lineChart"
       />
 
       <section>
@@ -138,14 +139,14 @@ export default function CgpaPage() {
                 transition={{ duration: 0.3, delay: 0.08 }}
               >
                 <div className="section-heading-row">
-                  <h2 className="section-title">Semester-wise performance</h2>
+                  <h2 className="section-title"><UiIcon name="lineChart" /> Semester-wise performance</h2>
                   <span className="section-kicker">SGPA / semester</span>
                 </div>
                 <SgpaChart rows={semesterRows} />
               </motion.div>
 
               <div className="semester-breakdown">
-                <h2 className="section-title">Semester breakdown</h2>
+                <h2 className="section-title"><UiIcon name="fileText" /> Semester breakdown</h2>
                 {semesterRows.length ? (
                   <div className="semester-list mt-32">
                     {semesterRows.map((row, index) => (

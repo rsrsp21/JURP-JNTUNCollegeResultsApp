@@ -569,6 +569,16 @@ table {
   font-size: 44px;
   font-weight: 600;
   line-height: 1.04;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hero-title .ui-icon {
+  width: 36px;
+  height: 36px;
+  color: var(--muted);
+  flex-shrink: 0;
 }
 
 .typing-title {
@@ -889,6 +899,16 @@ table {
   font-size: 29px;
   font-weight: 600;
   line-height: 1.15;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-title .ui-icon {
+  width: 26px;
+  height: 26px;
+  color: var(--muted);
+  flex-shrink: 0;
 }
 
 .section-kicker {
@@ -2611,11 +2631,19 @@ section > .page-container > .download-row {
   .hero-title {
     font-size: 27px;
     line-height: 1.04;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .hero-title .ui-icon {
+    width: 24px;
+    height: 24px;
   }
 
   .typing-title {
     min-height: 1.08em;
-    font-size: clamp(20px, 8.5vw, 36px);
+    font-size: clamp(20px, 8vw, 36px);
   }
 
   .hero-description {
@@ -3301,9 +3329,9 @@ section > .page-container > .download-row {
 }
 
 .modal-content {
-  background: var(--bg);
+  background: var(--paper);
   border: 1px solid var(--hairline);
-  border-radius: 12px;
+  border-radius: 0;
   width: 100%;
   max-width: 500px;
   max-height: 80vh;
@@ -3325,6 +3353,16 @@ section > .page-container > .download-row {
   font-size: 18px;
   font-weight: 600;
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modal-title .ui-icon {
+  width: 20px;
+  height: 20px;
+  color: var(--muted);
+  flex-shrink: 0;
 }
 
 .modal-close {
@@ -3341,7 +3379,7 @@ section > .page-container > .download-row {
 }
 
 .modal-close:hover {
-  background: var(--surface);
+  background: var(--soft);
   color: var(--ink);
 }
 
@@ -3349,6 +3387,23 @@ section > .page-container > .download-row {
   padding: 0;
   overflow-y: auto;
   flex: 1;
+}
+
+.modal-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+  background: var(--hairline);
+  border-radius: 3px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
 }
 
 .view-all-row {
