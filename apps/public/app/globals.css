@@ -1626,6 +1626,9 @@ section > .page-container > .download-row {
 
 .accordion-content {
   overflow: hidden;
+}
+
+.accordion-content > :last-child {
   padding-bottom: 40px;
 }
 
