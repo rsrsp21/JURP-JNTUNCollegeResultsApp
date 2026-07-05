@@ -21,11 +21,7 @@ const features = [
   { icon: 'sparkles', title: 'AI Assistant', points: ['Ask about results and credits', 'Compare students and backlogs'] }
 ];
 
-const howItWorks = [
-  { icon: 'search', n: '01', title: 'Enter Roll Number', desc: 'Simply enter your roll number in the search box.' },
-  { icon: 'scan', n: '02', title: 'View Your Results', desc: 'See your grades, subject details, and overall CGPA in an easy-to-read format.' },
-  { icon: 'download', n: '03', title: 'Download Results', desc: 'Save your results as a PDF for your records or future reference.' }
-];
+
 
 const heroMetrics = [
   { icon: 'zap', label: 'Lookup', value: 'Fast' },
@@ -275,30 +271,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="section">
-        <div className="page-container section-pad">
-          <h2 className="section-title">How it works</h2>
-          <div className="step-grid home-steps">
-            {howItWorks.map((step, index) => (
-              <motion.div
-                className="step-card"
-                key={step.n}
-                initial={{ opacity: 0, y: 14 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-80px' }}
-                transition={{ delay: index * 0.05, duration: 0.28 }}
-              >
-                <div className="step-head">
-                  <span className="step-icon"><Icon name={step.icon} /></span>
-                  <span className="step-number">{step.n}</span>
-                </div>
-                <h3 className="step-title">{step.title}</h3>
-                <p className="step-description">{step.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
       
       <AnimatePresence>
         {isModalOpen && (
