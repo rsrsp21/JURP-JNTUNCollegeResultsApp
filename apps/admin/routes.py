@@ -53,7 +53,7 @@ app.secret_key = os.getenv('FLASK_SECRET_KEY', 'jntun_results_secret_key')
 @app.context_processor
 def inject_template_vars():
     return {
-        'main_portal_url': external_url('PUBLIC_APP_URL', 'http://localhost:3000', '/')
+        'main_portal_url': external_url('PUBLIC_APP_URL')
     }
 
 ADMIN_USER = {
