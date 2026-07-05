@@ -57,9 +57,6 @@ export default function AppShell({ children }) {
             </span>
             <span className="brand-copy">
               <span className="brand-title">JURP</span>
-              <span className="brand-subtitle">
-                <span className="brand-subtitle-key">J</span>NTUK <span className="brand-subtitle-key">U</span>CEN <span className="brand-subtitle-key">R</span>esults <span className="brand-subtitle-key">P</span>ortal
-              </span>
             </span>
           </Link>
 
