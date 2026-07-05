@@ -361,9 +361,13 @@ table {
 }
 
 .mobile-nav {
+  overflow: hidden;
+  border-top: 1px solid var(--hairline);
+}
+
+.mobile-nav-inner {
   display: grid;
   gap: 4px;
-  border-top: 1px solid var(--hairline);
   padding: 12px 24px 18px;
 }
 
