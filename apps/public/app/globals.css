@@ -2800,8 +2800,6 @@ section > .page-container > .download-row {
   }
 
   .chat-panel {
-    border-inline: 0;
-    margin-inline: -18px;
     padding: 16px 18px;
   }
 

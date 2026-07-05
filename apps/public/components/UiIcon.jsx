@@ -8,6 +8,21 @@ export default function UiIcon({ name, className = 'ui-icon' }) {
 
 function iconPath(name) {
   switch (name) {
+    case 'calculator':
+      return (
+        <>
+          <rect x="4" y="2" width="16" height="20" rx="2" />
+          <path d="M8 6h8" />
+          <path d="M16 14v4" />
+          <path d="M16 10h.01" />
+          <path d="M12 10h.01" />
+          <path d="M8 10h.01" />
+          <path d="M12 14h.01" />
+          <path d="M8 14h.01" />
+          <path d="M12 18h.01" />
+          <path d="M8 18h.01" />
+        </>
+      );
     case 'graduationCap':
       return (
         <>
