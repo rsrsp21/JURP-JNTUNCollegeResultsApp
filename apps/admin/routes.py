@@ -13,8 +13,8 @@ from contextlib import contextmanager
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
 from flask import Flask, current_app, send_from_directory, jsonify, request, render_template, session, redirect, url_for
-from .common import ADMIN_ENV_PATH, ADMIN_TEMPLATE_DIR, PUBLIC_STATIC_DIR, ROOT_DIR, external_url
-from .utils.r2_storage import (
+from common import ADMIN_ENV_PATH, ADMIN_TEMPLATE_DIR, PUBLIC_STATIC_DIR, ROOT_DIR, external_url
+from utils.r2_storage import (
     is_r2_configured,
     download_prefix_to_folder,
     hash_folder_files,
@@ -25,8 +25,8 @@ from .utils.r2_storage import (
     write_text_key,
     write_csv_text as write_r2_csv_text
 )
-from .utils import portal_db
-from .engine.logic import (
+from utils import portal_db
+from engine.logic import (
     get_batch, save_processed_csv, apply_revaluation,
     merge_all_semesters, calculate_supple_appearances,
     get_toppers_list, convert_pdf_to_csv, extract_tables_from_pdf

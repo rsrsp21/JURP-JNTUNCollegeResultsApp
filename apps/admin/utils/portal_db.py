@@ -9,9 +9,9 @@ from collections import defaultdict
 
 import pandas as pd
 
-from ..common import ROOT_DIR
-from .academic_summary import calculate_academic_summary
-from . import d1_storage
+from common import ROOT_DIR
+from utils.academic_summary import calculate_academic_summary
+import utils.d1_storage as d1_storage
 
 
 BATCH_CONFIG = {
