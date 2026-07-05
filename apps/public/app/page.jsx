@@ -115,7 +115,7 @@ export default function HomePage() {
   const visibleNotifications = notifications.slice(0, 3);
 
   return (
-    <>
+    <div className={loading ? 'page-loading-skeleton' : ''}>
       <section className="page-hero home-hero">
         <div className="page-container page-hero-inner home-hero-grid">
           <div className="home-hero-left">
@@ -284,7 +284,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-    </>
+    </div>
   );
 }
 
@@ -346,18 +346,17 @@ function NotificationsPanel({ loading, error, notifications }) {
         </div>
       </div>
       <div className="divider-list notification-list hero-notification-list">
-        <AnimatePresence mode="wait">
-          {loading ? (
-            <motion.div
-              className="empty-state"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              Loading latest notifications...
-            </motion.div>
-          ) : null}
-        </AnimatePresence>
+        {loading ? (
+          <>
+            {[1, 2, 3].map((n) => (
+              <div className="notification-row divider-row" key={`skeleton-${n}`}>
+                <span className="notification-icon"><Icon name="clock" /></span>
+                <p className="notification-text">Loading notification...</p>
+                <span className="notification-date">Just now</span>
+              </div>
+            ))}
+          </>
+        ) : null}
         {error ? <div className="error-message">{error}</div> : null}
         {!loading && !error && !notifications.length ? (
           <div className="empty-state">No notifications available.</div>
