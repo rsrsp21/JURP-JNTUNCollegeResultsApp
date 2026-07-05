@@ -1,0 +1,518 @@
+/* Toppers CSS - Styled to match home and cgpa pages */
+.hidden {
+    display: none !important;
+}
+
+/* Card Styling */
+.toppers-card {
+    background: var(--card-bg);
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.toppers-card-header {
+    background: var(--card-header);
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.toppers-card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.toppers-card-body {
+    padding: 1.5rem;
+}
+
+/* Top Three Positions */
+.top-three {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    padding: 1.5rem 0;
+}
+
+@media (min-width: 769px) {
+    .top-three {
+        position: relative;
+    }
+    
+    .position-1 {
+        order: 2;
+    }
+    
+    .position-2 {
+        order: 1;
+    }
+    
+    .position-3 {
+        order: 3;
+    }
+}
+
+.top-position {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.25rem;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    transition: all 0.3s ease;
+    position: relative;
+    width: 150px;
+}
+
+.top-position:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.position-1 {
+    padding-top: 1.75rem;
+    padding-bottom: 1.75rem;
+    background: linear-gradient(to bottom, rgba(255, 215, 0, 0.1), rgba(255, 215, 0, 0.02));
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    z-index: 3;
+}
+
+.position-2 {
+    background: linear-gradient(to bottom, rgba(192, 192, 192, 0.1), rgba(192, 192, 192, 0.02));
+    border: 1px solid rgba(192, 192, 192, 0.2);
+    z-index: 2;
+}
+
+.position-3 {
+    background: linear-gradient(to bottom, rgba(205, 127, 50, 0.1), rgba(205, 127, 50, 0.02));
+    border: 1px solid rgba(205, 127, 50, 0.2);
+    z-index: 1;
+}
+
+.position-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    margin-bottom: 0.25rem;
+}
+
+.position-1 .position-icon {
+    background: linear-gradient(135deg, #ffd700, #ffaa33);
+    color: var(--dark-color);
+}
+
+.position-2 .position-icon {
+    background: linear-gradient(135deg, #c0c0c0, #a8a8a8);
+    color: var(--dark-color);
+}
+
+.position-3 .position-icon {
+    background: linear-gradient(135deg, #cd7f32, #8d5524);
+    color: var(--dark-color);
+}
+
+.position-rank {
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+    text-align: center;
+}
+
+.position-1 .position-rank {
+    color: #ffd700;
+}
+
+.position-2 .position-rank {
+    color: #c0c0c0;
+}
+
+.position-3 .position-rank {
+    color: #cd7f32;
+}
+
+.position-roll {
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+    color: var(--text-primary);
+    text-align: center;
+}
+
+.position-cgpa {
+    font-weight: 600;
+    font-size: 1rem;
+    color: #4CAF50;
+    padding: 0.25rem 0.75rem;
+    background: rgba(76, 175, 80, 0.15);
+    border-radius: 1rem;
+    text-align: center;
+    border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+/* Branch Tabs */
+.branch-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 1rem;
+}
+
+.branch-tab {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    background: rgba(255, 255, 255, 0.05);
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.branch-tab:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+}
+
+.branch-tab.active {
+    background: var(--primary-color);
+    color: white;
+}
+
+.branch-content {
+    display: none;
+}
+
+.branch-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Table Styling */
+.toppers-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 1rem;
+}
+
+.toppers-table th {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-secondary);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.9rem;
+}
+
+.toppers-table th:first-child {
+    border-top-left-radius: 8px;
+}
+
+.toppers-table th:last-child {
+    border-top-right-radius: 8px;
+    text-align: right;
+    width: 120px;
+}
+
+.toppers-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 0.95rem;
+}
+
+.toppers-table td:last-child {
+    text-align: right;
+    width: 120px;
+}
+
+.toppers-table tr:last-child td {
+    border-bottom: none;
+}
+
+.toppers-table tr:last-child td:first-child {
+    border-bottom-left-radius: 8px;
+}
+
+.toppers-table tr:last-child td:last-child {
+    border-bottom-right-radius: 8px;
+}
+
+.toppers-table tbody tr {
+    transition: all 0.2s ease;
+}
+
+.toppers-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Badges */
+.rank-badge {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.8rem;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+}
+
+.rank-badge-1, .rank-badge-2, .rank-badge-3 {
+    color: var(--dark-color);
+}
+
+.rank-badge-1 {
+    background: linear-gradient(135deg, #ffd700, #ffaa33);
+}
+
+.rank-badge-2 {
+    background: linear-gradient(135deg, #c0c0c0, #a8a8a8);
+}
+
+.rank-badge-3 {
+    background: linear-gradient(135deg, #cd7f32, #8d5524);
+}
+
+.cgpa-badge {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    background: rgba(76, 175, 80, 0.15);
+    color: #4CAF50;
+    border: 1px solid rgba(76, 175, 80, 0.3);
+    min-width: 60px;
+    text-align: center;
+}
+
+.roll-number {
+    font-family: 'Courier New', monospace;
+    font-weight: 500;
+}
+
+/* Loading Animation */
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(67, 97, 238, 0.3);
+    border-radius: 50%;
+    border-top-color: var(--primary-color);
+    animation: spin 1s ease-in-out infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Animation for fade in */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+    opacity: 0;
+}
+
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.3s; }
+
+/* Year Tabs */
+.year-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+
+.year-tab {
+    padding: 0.5rem 1.5rem;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    min-width: 120px;
+    text-align: center;
+}
+
+.year-tab:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.year-tab.active {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .toppers-card {
+        margin-bottom: 1.5rem;
+    }
+
+    .toppers-card-header {
+        padding: 1rem 1.25rem;
+    }
+
+    .toppers-card-title {
+        font-size: 1.1rem;
+        gap: 0.5rem;
+    }
+
+    .toppers-card-body {
+        padding: 1.25rem;
+    }
+
+    .top-three {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding: 1rem 0;
+    }
+    
+    .top-position {
+        width: 100%;
+        max-width: 300px;
+        padding: 1rem;
+        gap: 0.5rem;
+    }
+    
+    .position-1, .position-2, .position-3 {
+        padding: 1rem;
+    }
+
+    .position-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+
+    .position-rank {
+        font-size: 0.9rem;
+    }
+
+    .position-roll {
+        font-size: 0.8rem;
+    }
+
+    .position-cgpa {
+        font-size: 0.9rem;
+        padding: 0.2rem 0.5rem;
+    }
+    
+    .branch-tabs {
+        flex-direction: column;
+        gap: 0.4rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+    }
+    
+    .branch-tab {
+        width: 100%;
+        text-align: center;
+        padding: 0.35rem 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    .year-tabs {
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+
+    .year-tab {
+        padding: 0.3rem 0.75rem;
+        font-size: 0.8rem;
+        min-width: calc(33.33% - 0.5rem);
+        margin-bottom: 0.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .toppers-card-header {
+        padding: 0.75rem 1rem;
+    }
+
+    .toppers-card-title {
+        font-size: 1rem;
+    }
+
+    .toppers-card-body {
+        padding: 1rem;
+    }
+
+    .top-position {
+        max-width: 250px;
+        padding: 0.75rem;
+    }
+
+    .position-icon {
+        width: 35px;
+        height: 35px;
+        font-size: 0.9rem;
+    }
+
+    .position-rank {
+        font-size: 0.85rem;
+    }
+
+    .position-roll {
+        font-size: 0.75rem;
+    }
+
+    .position-cgpa {
+        font-size: 0.85rem;
+        padding: 0.15rem 0.4rem;
+    }
+
+    .branch-tab {
+        padding: 0.3rem 0.4rem;
+        font-size: 0.75rem;
+    }
+
+    .year-tabs {
+        gap: 0.4rem;
+    }
+
+    .year-tab {
+        padding: 0.25rem 0.6rem;
+        font-size: 0.75rem;
+        min-width: calc(33.33% - 0.4rem);
+        margin-bottom: 0.2rem;
+    }
+}
