@@ -181,6 +181,7 @@ export default function AppShell({ children }) {
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
             >
+              <div className="mobile-nav-inner">
               {navItems.map((item, index) => (
                 <motion.div
                   key={item.href}
@@ -218,6 +219,7 @@ export default function AppShell({ children }) {
                   </a>
                 </motion.div>
               ))}
+              </div>
             </motion.nav>
           ) : null}
         </AnimatePresence>
