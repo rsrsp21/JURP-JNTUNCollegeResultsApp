@@ -142,7 +142,7 @@ export default function HomePage() {
                 <span className="typing-cursor" aria-hidden="true" />
               </h1>
               <p className="hero-description">
-                <strong>JURP</strong> (<strong>J</strong>NTUK <strong>U</strong>CEN <strong>R</strong>esults <strong>P</strong>ortal) is a comprehensive tool to check your academic performance, access your complete course history, and calculate your CGPA with just your roll number.
+                <strong>JURP</strong> (<strong>J</strong>NTUK <strong>U</strong>CEN <strong>R</strong>esults <strong>P</strong>ortal) is a comprehensive tool to check your academic performance, access your complete course history, and calculate your SGPA &amp; CGPA with just your roll number.
               </p>
               <div className="download-row home-hero-actions">
                 <Link href="/cgpa" className="ink-button">
