@@ -3392,6 +3392,12 @@ section > .page-container > .download-row {
   padding-right: 20px;
 }
 
+.modal-body .empty-state {
+  padding: 32px 20px;
+  text-align: center;
+  color: var(--muted);
+}
+
 .modal-body::-webkit-scrollbar {
   width: 6px;
 }
@@ -3448,7 +3454,9 @@ section > .page-container > .download-row {
 .page-loading-skeleton .quick-access-card,
 .page-loading-skeleton .feature-cell,
 .page-loading-skeleton .step-card,
-.page-loading-skeleton .notification-row,
+.page-loading-skeleton .notification-icon,
+.page-loading-skeleton .notification-text,
+.page-loading-skeleton .notification-date,
 .page-loading-skeleton .section-title {
   background: var(--hairline) !important;
   color: transparent !important;
@@ -3470,7 +3478,9 @@ section > .page-container > .download-row {
 .page-loading-skeleton .quick-access-card *,
 .page-loading-skeleton .feature-cell *,
 .page-loading-skeleton .step-card *,
-.page-loading-skeleton .notification-row *,
+.page-loading-skeleton .notification-icon *,
+.page-loading-skeleton .notification-text *,
+.page-loading-skeleton .notification-date *,
 .page-loading-skeleton .section-title * {
   opacity: 0 !important;
   visibility: hidden !important;
