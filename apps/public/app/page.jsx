@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 const quickLinks = [
-  { href: '/cgpa', icon: 'lineChart', code: 'CG', label: 'CGPA', desc: 'Overall score, percentage, credits, and SGPA trend.', action: 'Check' },
+  { href: '/cgpa', icon: 'graduationCap', code: 'CG', label: 'CGPA', desc: 'Overall score, percentage, credits, and SGPA trend.', action: 'Check' },
   { href: '/results', icon: 'fileText', code: 'SR', label: 'Semester Results', desc: 'Subject grades, credits, and semester PDFs.', action: 'View' },
   { href: '/ask-ai', icon: 'sparkles', code: 'AI', label: 'Ask AI', desc: 'Compare students, backlogs, SGPA, and result questions.', action: 'Ask' },
   { href: '/toppers', icon: 'trophy', code: 'TP', label: 'Toppers', desc: 'Batch-wise and branch-wise rankings.', action: 'Rankings' }
@@ -431,6 +431,13 @@ function Icon({ name }) {
 
 function iconPath(name) {
   switch (name) {
+    case 'graduationCap':
+      return (
+        <>
+          <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+          <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5" />
+        </>
+      );
     case 'lineChart':
       return (
         <>
