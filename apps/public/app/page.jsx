@@ -559,6 +559,13 @@ function iconPath(name) {
           <path d="m3 16 9 5 9-5" />
         </>
       );
+    case 'x':
+      return (
+        <>
+          <path d="M18 6 6 18" />
+          <path d="m6 6 12 12" />
+        </>
+      );
     default:
       return <circle cx="12" cy="12" r="8" />;
   }
