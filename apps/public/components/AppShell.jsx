@@ -14,7 +14,7 @@ const navItems = [
   { href: '/toppers', label: 'Toppers' }
 ];
 
-const adminAppUrl = process.env.NEXT_PUBLIC_ADMIN_APP_URL || 'http://localhost:5001/login';
+const adminAppUrl = process.env.ADMIN_APP_URL || 'http://localhost:5001/login';
 const externalLinks = [
   { href: 'https://jntukucen.ac.in', label: 'Official Website' },
   { href: adminAppUrl, label: 'Admin Portal' }
