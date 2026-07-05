@@ -570,6 +570,10 @@ small {
     display: none;
   }
 
+  .header-actions > .logout-btn {
+    display: none;
+  }
+
   .mobile-menu-button {
     display: inline-flex;
   }
@@ -592,11 +596,56 @@ small {
 
   .admin-shell {
     grid-template-columns: 1fr !important;
+    min-height: auto !important;
   }
 
   .admin-tabs {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: stretch;
+    gap: 0 !important;
+    overflow-x: auto !important;
+    overscroll-behavior-x: contain;
     border-right: 0 !important;
     border-bottom: 1px solid var(--hairline) !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  .admin-tabs .admin-nav-title {
+    display: none;
+  }
+
+  .admin-tabs .tab-btn {
+    flex: 0 0 auto;
+    width: auto;
+    min-width: 132px;
+    justify-content: center;
+    border-bottom: 0 !important;
+    border-right: 1px solid var(--hairline) !important;
+    white-space: nowrap;
+  }
+
+  .admin-tabs .tab-btn:first-of-type {
+    border-top: 0 !important;
+    border-left: 1px solid var(--hairline) !important;
+  }
+
+  .admin-workspace,
+  .tab-pane,
+  .admin-card,
+  .csv-editor-panel,
+  .csv-sidebar,
+  .preview-table-container,
+  .log-console {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .preview-table-container,
+  .columns-grid,
+  .log-console {
+    overflow-x: auto;
   }
 }
 
@@ -641,10 +690,61 @@ small {
   }
 
   .admin-workspace {
-    padding: 18px !important;
+    padding: 14px !important;
+  }
+
+  .admin-content {
+    padding-block: 18px 28px;
+  }
+
+  .content-container {
+    border-inline: 0 !important;
+  }
+
+  .admin-tabs {
+    padding: 8px !important;
+  }
+
+  .admin-tabs .tab-btn {
+    min-width: 118px;
+    min-height: 40px;
+    padding: 10px 12px !important;
+    font-size: 11px !important;
+  }
+
+  .tab-pane h3 {
+    font-size: 22px;
+  }
+
+  .form-group {
+    margin-bottom: 1rem !important;
   }
 
   .input-group {
     display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+
+  .form-control,
+  .form-select,
+  .button,
+  .input-field,
+  .csv-editor-textarea {
+    min-width: 0;
+    width: 100% !important;
+  }
+
+  .csv-manager-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .csv-sidebar,
+  .csv-editor-panel {
+    min-height: auto !important;
+  }
+
+  .csv-editor-textarea {
+    min-height: 280px;
   }
 }
