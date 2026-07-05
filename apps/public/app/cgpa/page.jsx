@@ -79,7 +79,7 @@ export default function CgpaPage() {
         eyebrow="Cumulative GPA"
         title="Check CGPA"
         description="View your semester-wise SGPA and overall credits, percentage, and CGPA."
-        icon="lineChart"
+        icon="graduationCap"
       />
 
       <section>
