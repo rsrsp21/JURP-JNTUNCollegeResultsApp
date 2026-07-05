@@ -53,7 +53,7 @@ app.secret_key = os.getenv('FLASK_SECRET_KEY', 'jntun_results_secret_key')
 @app.context_processor
 def inject_template_vars():
     return {
-        'main_portal_url': external_url('PUBLIC_APP_URL', 'https://jurp.vercel.app', '/')
+        'main_portal_url': 'https://jurp.vercel.app'
     }
 
 ADMIN_USER = {
