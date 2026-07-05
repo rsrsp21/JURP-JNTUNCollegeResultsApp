@@ -243,7 +243,7 @@ export default function HomePage() {
         <div className="page-container section-pad">
           <div className="section-heading-row">
             <div>
-              <h2 className="section-title">Everything you need, nothing you don't.</h2>
+              <h2 className="section-title"><Icon name="layers" /> Everything you need, nothing you don't.</h2>
             </div>
           </div>
           <div className="feature-grid">
@@ -291,7 +291,7 @@ export default function HomePage() {
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             >
               <div className="modal-header">
-                <h3 className="modal-title">All Notifications</h3>
+                <h3 className="modal-title"><Icon name="bell" /> All Notifications</h3>
                 <button className="modal-close" onClick={() => setIsModalOpen(false)} aria-label="Close modal">
                   <Icon name="x" />
                 </button>
@@ -324,7 +324,7 @@ function QuickAccessPanel() {
   return (
     <div className="hero-quick-panel">
       <div className="hero-quick-header">
-        <h2 className="section-title">Quick access</h2>
+        <h2 className="section-title"><Icon name="zap" /> Quick access</h2>
       </div>
       <div className="quick-access-grid home-quick-access-grid hero-quick-grid">
         {quickLinks.map((link, index) => (
@@ -374,7 +374,7 @@ function NotificationsPanel({ loading, error, notifications, onViewAll }) {
     <div className="hero-notification-panel">
       <div className="hero-notification-header">
         <div>
-          <h2 className="section-title">Notifications</h2>
+          <h2 className="section-title"><Icon name="bell" /> Notifications</h2>
         </div>
       </div>
       <div className="divider-list notification-list hero-notification-list">

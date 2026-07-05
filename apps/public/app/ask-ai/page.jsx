@@ -149,6 +149,7 @@ export default function AskAiPage() {
         eyebrow="AI Assistant"
         title="Ask AI"
         description="Chat about results, CGPA, SGPA, credits, backlogs, compare students, toppers, downloads, and portal help."
+        icon="sparkles"
       />
 
       <section>
@@ -384,7 +385,7 @@ export default function AskAiPage() {
       <section className="section border-top">
         <div className="page-container narrow-container section-pad">
           <div className="eyebrow">Feedback</div>
-          <h2 className="section-title">Feedback: Results AI Feature</h2>
+          <h2 className="section-title"><UiIcon name="sparkles" /> Feedback: Results AI Feature</h2>
           <p className="hero-description feedback-description">
             Help us improve the new Results AI feature. Your feedback on its capabilities and user experience is highly valuable.
           </p>

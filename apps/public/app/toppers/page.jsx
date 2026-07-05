@@ -71,6 +71,7 @@ export default function ToppersPage() {
         eyebrow="Rankings"
         title="Toppers List"
         description="Academic excellence rankings across batches and branches."
+        icon="trophy"
       >
         <div className="download-row toppers-filter-row">
           <label className="filter-field">
@@ -118,7 +119,7 @@ export default function ToppersPage() {
           {error ? <div className="error-message">{error}</div> : null}
 
           <div className="section-heading-row">
-            <h2 className="section-title">Overall College Toppers</h2>
+            <h2 className="section-title"><UiIcon name="trophy" /> Overall College Toppers</h2>
             <span className="section-kicker">{selectedBatch}</span>
           </div>
 
@@ -155,7 +156,7 @@ export default function ToppersPage() {
       <section>
         <div className="page-container section-pad">
           <div className="section-heading-row">
-            <h2 className="section-title">Branch-wise Toppers</h2>
+            <h2 className="section-title"><UiIcon name="branch" /> Branch-wise Toppers</h2>
           </div>
           <div className="tabs-row mb-32">
             {branches.map(([value, label]) => (
