@@ -42,7 +42,7 @@ def _serve_public_image(filename):
 
 
 def _public_url(path):
-    return external_url('PUBLIC_APP_URL', 'http://localhost:3000', path)
+    return external_url('PUBLIC_APP_URL', 'https://jurp.vercel.app', path)
 
 
 app = create_app()
