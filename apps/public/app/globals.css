@@ -137,16 +137,16 @@ table {
 
 .brand-mark {
   display: grid;
-  width: 42px;
-  height: 42px;
+  width: 48px;
+  height: 48px;
   flex: 0 0 auto;
   place-items: center;
 }
 
 .brand-logo {
   display: block;
-  width: 42px;
-  height: 42px;
+  width: 48px;
+  height: 48px;
 }
 
 .brand-logo-dark {
@@ -168,7 +168,7 @@ table {
 
 .brand-title {
   font-family: var(--font-serif);
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 600;
   line-height: 1;
 }
@@ -403,6 +403,34 @@ table {
 
 .site-footer span {
   color: var(--ink);
+}
+
+.footer-creator {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.footer-socials {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.footer-socials a {
+  display: inline-flex;
+  color: var(--muted);
+  transition: color 0.15s;
+}
+
+.footer-socials a:hover {
+  color: var(--ink);
+}
+
+.footer-socials .ui-icon {
+  width: 16px;
+  height: 16px;
 }
 
 .footer-end {
@@ -2449,6 +2477,12 @@ section > .page-container > .download-row {
     text-align: left;
   }
 
+  .footer-creator {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
   .feature-grid,
   .stat-grid,
   .meta-grid,
@@ -2506,12 +2540,12 @@ section > .page-container > .download-row {
 
   .brand-mark,
   .brand-logo {
-    width: 36px;
-    height: 36px;
+    width: 42px;
+    height: 42px;
   }
 
   .brand-title {
-    font-size: 17px;
+    font-size: 20px;
   }
 
   .brand-subtitle {

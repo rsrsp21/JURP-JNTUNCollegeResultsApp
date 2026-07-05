@@ -244,8 +244,19 @@ export default function AppShell({ children }) {
       >
         <div className="site-footer-inner">
           <div>© 2026 JURP - JNTUK UCEN Results Portal</div>
-          <div>
+          <div className="footer-creator">
             Created by <span>Sri Ram Sai Pavan Relangi</span>
+            <div className="footer-socials">
+              <a href="#" target="_blank" rel="noreferrer" aria-label="LinkedIn">
+                <UiIcon name="linkedin" />
+              </a>
+              <a href="#" target="_blank" rel="noreferrer" aria-label="Twitter">
+                <UiIcon name="twitter" />
+              </a>
+              <a href="#" target="_blank" rel="noreferrer" aria-label="Instagram">
+                <UiIcon name="instagram" />
+              </a>
+            </div>
           </div>
         </div>
       </motion.footer>
