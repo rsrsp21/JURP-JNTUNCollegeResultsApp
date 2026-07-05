@@ -368,7 +368,8 @@ table {
 }
 
 .mobile-nav-link {
-  padding-block: 8px;
+  display: block;
+  padding-block: 10px;
 }
 
 .mobile-external-link {
@@ -2544,12 +2545,14 @@ section > .page-container > .download-row {
   }
 
   .mobile-nav-link {
+    display: flex;
+    align-items: center;
     border-bottom: 1px solid var(--hairline);
-    padding-block: 14px;
-    font-size: 15px;
+    padding-block: 16px;
+    font-size: 16px;
   }
 
-  .mobile-nav-link:last-child {
+  .mobile-nav > div:last-child .mobile-nav-link {
     border-bottom: 0;
   }
 
