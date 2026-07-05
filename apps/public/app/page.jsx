@@ -132,7 +132,7 @@ export default function HomePage() {
                 <span className="typing-cursor" aria-hidden="true" />
               </h1>
               <p className="hero-description">
-                Check your academic performance, access your complete course history, and calculate your CGPA with just your roll number.
+                JURP (JNTUK UCEN Results Portal) is a comprehensive tool to check your academic performance, access your complete course history, and calculate your CGPA with just your roll number.
               </p>
               <div className="download-row home-hero-actions">
                 <Link href="/cgpa" className="ink-button">
