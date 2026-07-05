@@ -84,6 +84,7 @@ export default function SemesterResultsPage() {
         eyebrow="Transcript"
         title="Semester-wise Results"
         description="View your semester grades, SGPA, and credits earned across your academic journey."
+        icon="fileText"
       />
 
       <section>
