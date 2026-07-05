@@ -594,10 +594,7 @@ table {
 
 .typing-text {
   display: inline-block;
-  max-width: calc(100% - 14px);
-  overflow: hidden;
   white-space: nowrap;
-  text-overflow: clip;
 }
 
 .typing-cursor {
