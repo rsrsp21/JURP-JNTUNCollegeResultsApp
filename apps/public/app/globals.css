@@ -3386,6 +3386,11 @@ section > .page-container > .download-row {
   flex: 1;
 }
 
+.modal-body .notification-row {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
 .modal-body::-webkit-scrollbar {
   width: 6px;
 }
