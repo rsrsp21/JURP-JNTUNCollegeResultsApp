@@ -11,7 +11,7 @@ const quickLinks = [
   { href: '/toppers', icon: 'trophy', code: 'TP', label: 'Toppers', desc: 'Batch-wise and branch-wise rankings.', action: 'Rankings' }
 ];
 
-const whatsappGroupUrl = process.env.WHATSAPP_GROUP_URL || 'https://chat.whatsapp.com/Flaf1SsPaL4DDhMRKIghlS';
+const whatsappGroupUrl = 'https://chat.whatsapp.com/Flaf1SsPaL4DDhMRKIghlS';
 let notificationsMemoryCache = null;
 
 const features = [
