@@ -13,7 +13,7 @@ from contextlib import contextmanager
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
 from flask import Flask, current_app, send_from_directory, jsonify, request, render_template, session, redirect, url_for
-from apps.admin.common import ADMIN_ENV_PATH, ADMIN_TEMPLATE_DIR, PUBLIC_STATIC_DIR, ROOT_DIR
+from apps.admin.common import ADMIN_ENV_PATH, ADMIN_TEMPLATE_DIR, PUBLIC_STATIC_DIR, ROOT_DIR, external_url
 from apps.admin.utils.r2_storage import (
     is_r2_configured,
     download_prefix_to_folder,
@@ -48,6 +48,13 @@ app = Flask(
     template_folder=ADMIN_TEMPLATE_DIR,
 )
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'jntun_results_secret_key')
+
+
+@app.context_processor
+def inject_template_vars():
+    return {
+        'main_portal_url': external_url('PUBLIC_APP_URL', 'http://localhost:3000', '/')
+    }
 
 ADMIN_USER = {
     "username": os.getenv("ADMIN_USERNAME"),
