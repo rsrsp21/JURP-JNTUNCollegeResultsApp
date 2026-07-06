@@ -48,8 +48,9 @@ const heroPhrases = [
 ];
 
 export default function HomePage() {
-  const [notifications, setNotifications] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const cached = readNotificationsCache();
+  const [notifications, setNotifications] = useState(cached || []);
+  const [loading, setLoading] = useState(!cached);
   const [error, setError] = useState('');
   const [heroText, setHeroText] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -68,22 +69,16 @@ export default function HomePage() {
   }
 
   useEffect(() => {
-    const cached = readNotificationsCache();
-    if (cached) {
-      setNotifications(cached);
-      setLoading(false);
-      return;
-    }
-
     fetch(`/api/notifications?limit=3&t=${Date.now()}`, { cache: 'no-store' })
       .then((response) => response.json())
       .then((data) => {
         const nextNotifications = Array.isArray(data) ? data : [];
         setNotifications(nextNotifications);
         writeNotificationsCache(nextNotifications);
+        setError('');
       })
       .catch(() => {
-        if (!cached) setError('Unable to load notifications right now.');
+        if (!notificationsMemoryCache) setError('Unable to load notifications right now.');
       })
       .finally(() => setLoading(false));
   }, []);
@@ -354,11 +349,7 @@ function QuickAccessPanel() {
 }
 
 function readNotificationsCache() {
-  if (typeof window !== 'undefined') {
-    notificationsMemoryCache = null;
-  }
-  if (notificationsMemoryCache) return notificationsMemoryCache;
-  return null;
+  return notificationsMemoryCache;
 }
 
 function writeNotificationsCache(items) {
