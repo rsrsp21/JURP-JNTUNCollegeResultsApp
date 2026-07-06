@@ -13,6 +13,7 @@ export function AppContextProvider({ children }) {
     }
   ]);
   const [askAiInput, setAskAiInput] = useState('');
+  const [activeStudentId, setActiveStudentId] = useState('');
 
   // Semester Results State
   const [resultsRollNumber, setResultsRollNumber] = useState('');
@@ -30,6 +31,8 @@ export function AppContextProvider({ children }) {
         setMessages,
         askAiInput,
         setAskAiInput,
+        activeStudentId,
+        setActiveStudentId,
         resultsRollNumber,
         setResultsRollNumber,
         resultsPayload,
