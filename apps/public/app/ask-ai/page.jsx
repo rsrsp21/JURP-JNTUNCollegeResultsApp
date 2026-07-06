@@ -24,9 +24,10 @@ export default function AskAiPage() {
     messages,
     setMessages,
     askAiInput: input,
-    setAskAiInput: setInput
+    setAskAiInput: setInput,
+    activeStudentId,
+    setActiveStudentId
   } = useApp();
-  const [activeStudentId, setActiveStudentId] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [rollPrompt, setRollPrompt] = useState(null);
