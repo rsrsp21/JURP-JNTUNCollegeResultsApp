@@ -148,3 +148,11 @@ Use real credentials only in local `.env` or `.env.local` files. Those files are
 - Apply the D1 schema before using public APIs in production.
 - Keep admin credentials, Cloudflare tokens, and Gemini keys in deployment secrets.
 - Update production URLs consistently in environment variables and app link constants when changing domains.
+
+## Credits
+
+Developed by Sri Ram Sai Pavan Relangi.
+
+If you like this project, please give it a star ⭐ and connect with me on LinkedIn:
+
+- https://linkedin.com/in/sriramsaipavanrelangi
