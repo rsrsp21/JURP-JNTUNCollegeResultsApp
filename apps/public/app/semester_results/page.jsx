@@ -8,13 +8,19 @@ import RollSearch from '@/components/RollSearch';
 import UiIcon from '@/components/UiIcon';
 import { batchDisplay, branchFromRoll, displayValue, isValidRollNumber, normalizeRollNumber, semesters } from '@/lib/client-utils';
 import { downloadAllSemestersPdf, downloadSemesterPdf } from '@/lib/pdf';
+import { useApp } from '@/components/AppContext';
 
 const semesterResultsMemoryCache = new Map();
 
 export default function SemesterResultsPage() {
-  const [rollNumber, setRollNumber] = useState('');
-  const [payload, setPayload] = useState(null);
-  const [openSemesters, setOpenSemesters] = useState({});
+  const {
+    resultsRollNumber: rollNumber,
+    setResultsRollNumber: setRollNumber,
+    resultsPayload: payload,
+    setResultsPayload: setPayload,
+    resultsOpenSemesters: openSemesters,
+    setResultsOpenSemesters: setOpenSemesters
+  } = useApp();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 

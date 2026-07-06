@@ -9,12 +9,17 @@ import SgpaChart from '@/components/SgpaChart';
 import UiIcon from '@/components/UiIcon';
 import { batchDisplay, branchFromRoll, displayValue, isValidRollNumber, normalizeRollNumber, semesters } from '@/lib/client-utils';
 import { downloadCgpaPdf } from '@/lib/pdf';
+import { useApp } from '@/components/AppContext';
 
 const cgpaMemoryCache = new Map();
 
 export default function CgpaPage() {
-  const [rollNumber, setRollNumber] = useState('');
-  const [student, setStudent] = useState(null);
+  const {
+    cgpaRollNumber: rollNumber,
+    setCgpaRollNumber: setRollNumber,
+    cgpaStudent: student,
+    setCgpaStudent: setStudent
+  } = useApp();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 

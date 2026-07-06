@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import UiIcon from '@/components/UiIcon';
+import { AppContextProvider } from '@/components/AppContext';
 
 const navItems = [
   { href: '/', label: 'Home' },
@@ -42,7 +43,8 @@ export default function AppShell({ children }) {
   }
 
   return (
-    <div className="site-shell">
+    <AppContextProvider>
+      <div className="site-shell">
       <motion.header
         className="site-header"
         initial={{ y: -16, opacity: 0 }}
@@ -262,7 +264,8 @@ export default function AppShell({ children }) {
           </div>
         </div>
       </motion.footer>
-    </div>
+      </div>
+    </AppContextProvider>
   );
 }
 

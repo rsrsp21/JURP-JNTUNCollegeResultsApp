@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import PageHeader from '@/components/PageHeader';
 import UiIcon from '@/components/UiIcon';
 import { isValidRollNumber, normalizeRollNumber } from '@/lib/client-utils';
+import { useApp } from '@/components/AppContext';
 
 const suggestions = [
   { type: 'send', icon: 'alert', message: 'Do I have any backlogs?', label: 'Do I have any backlogs?' },
@@ -19,13 +20,12 @@ const suggestions = [
 ];
 
 export default function AskAiPage() {
-  const [messages, setMessages] = useState([
-    {
-      role: 'assistant',
-      text: "Hi! I'm your Results AI assistant. I can help you with CGPA and SGPA queries, semester performance, backlogs, topper lists, and portal navigation. What would you like to know?"
-    }
-  ]);
-  const [input, setInput] = useState('');
+  const {
+    messages,
+    setMessages,
+    askAiInput: input,
+    setAskAiInput: setInput
+  } = useApp();
   const [activeStudentId, setActiveStudentId] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
