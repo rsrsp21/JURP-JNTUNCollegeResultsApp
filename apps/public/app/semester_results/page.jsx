@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
 import PageHeader from '@/components/PageHeader';
 import RollSearch from '@/components/RollSearch';
@@ -89,6 +90,23 @@ export default function SemesterResultsPage() {
 
       <section>
         <div className="page-container section-pad">
+          <div className="search-tabs">
+            <Link
+              href={`/results${rollNumber ? `?id=${rollNumber}` : ''}`}
+              className="search-tab active"
+            >
+              <UiIcon name="fileText" />
+              Semester Results
+            </Link>
+            <Link
+              href={`/cgpa${rollNumber ? `?id=${rollNumber}` : ''}`}
+              className="search-tab"
+            >
+              <UiIcon name="graduationCap" />
+              CGPA & SGPA Trend
+            </Link>
+          </div>
+
           <RollSearch value={rollNumber} onValueChange={setRollNumber} onSearch={loadResults} loading={loading} />
 
           {loading ? <div className="status-message">Fetching semester records from database...</div> : null}

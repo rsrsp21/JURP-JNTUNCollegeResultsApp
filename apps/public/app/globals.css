@@ -1,14 +1,14 @@
 :root {
-  --paper: #fbfaf7;
+  --paper: #f5f3eb;
   --ink: #25262b;
   --muted: #737277;
-  --hairline: #dedbd2;
-  --white: #ffffff;
-  --soft: #f3f1ec;
+  --hairline: #dcd9cf;
+  --white: #faf9f5;
+  --soft: #ebe9df;
   --danger: #b42318;
   --success: #207a50;
   --warning: #946200;
-  --header-bg: rgba(251, 250, 247, 0.88);
+  --header-bg: rgba(245, 243, 235, 0.88);
   --placeholder: rgba(115, 114, 119, 0.55);
   --danger-border: rgba(180, 35, 24, 0.35);
   --success-ring: rgba(32, 122, 80, 0.12);
@@ -3483,3 +3483,57 @@ section > .page-container > .download-row {
   opacity: 0 !important;
   visibility: hidden !important;
 }
+
+/* Page Switcher Navigation Tabs */
+.search-tabs {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  max-width: var(--form-width);
+  margin: 0 auto 16px;
+}
+
+.search-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: var(--white);
+  border: 1px solid var(--hairline);
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 0;
+  transition: all 0.18s ease;
+  cursor: pointer;
+  text-align: center;
+}
+
+.search-tab:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+  background: var(--soft);
+}
+
+.search-tab.active {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .search-tabs {
+    padding-inline: 4px;
+    gap: 6px;
+  }
+  .search-tab {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+}
+
