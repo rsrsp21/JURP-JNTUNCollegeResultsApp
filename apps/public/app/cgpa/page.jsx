@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import PageHeader from '@/components/PageHeader';
 import RollSearch from '@/components/RollSearch';
@@ -84,6 +85,23 @@ export default function CgpaPage() {
 
       <section>
         <div className="page-container section-pad">
+          <div className="search-tabs">
+            <Link
+              href={`/results${rollNumber ? `?id=${rollNumber}` : ''}`}
+              className="search-tab"
+            >
+              <UiIcon name="fileText" />
+              Semester Results
+            </Link>
+            <Link
+              href={`/cgpa${rollNumber ? `?id=${rollNumber}` : ''}`}
+              className="search-tab active"
+            >
+              <UiIcon name="graduationCap" />
+              CGPA & SGPA Trend
+            </Link>
+          </div>
+
           <RollSearch value={rollNumber} onValueChange={setRollNumber} onSearch={loadStudent} loading={loading} />
 
           {loading ? <div className="status-message">Fetching CGPA from database...</div> : null}
