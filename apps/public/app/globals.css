@@ -2350,10 +2350,17 @@ section > .page-container > .download-row {
 }
 
 .prompt-modal {
+  position: relative;
   width: min(100%, 520px);
   border: 1px solid var(--hairline);
   background: var(--paper);
   box-shadow: 0 24px 70px var(--shadow-soft);
+}
+
+.prompt-modal .modal-close {
+  position: absolute;
+  top: 24px;
+  right: 24px;
 }
 
 .prompt-modal-header {
