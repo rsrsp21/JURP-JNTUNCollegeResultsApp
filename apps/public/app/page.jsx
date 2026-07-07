@@ -44,7 +44,8 @@ const chartPoints = [
 const heroPhrases = [
   'JURP for quick results',
   'JURP with AI help',
-  'JURP for CGPA'
+  'JURP for CGPA',
+  'JURP for SGPA trends'
 ];
 
 export default function HomePage() {
