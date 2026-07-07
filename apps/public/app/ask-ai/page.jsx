@@ -330,9 +330,8 @@ export default function AskAiPage() {
                       {rollPrompt === 'compare' ? 'Compare students' : 'Ask by roll number'}
                     </h2>
                   </div>
-                  <button className="subtle-button" type="button" onClick={closeRollPrompt}>
+                  <button className="modal-close" type="button" onClick={closeRollPrompt} aria-label="Close modal">
                     <UiIcon name="x" />
-                    Close
                   </button>
                 </div>
 
@@ -385,31 +384,47 @@ export default function AskAiPage() {
 
       <section className="section border-top">
         <div className="page-container narrow-container section-pad">
-          <div className="eyebrow">Feedback</div>
-          <h2 className="section-title"><UiIcon name="sparkles" /> Feedback: Results AI Feature</h2>
+          <h2 className="section-title">Feedback: Results AI Feature</h2>
           <p className="hero-description feedback-description">
             Help us improve the new Results AI feature. Your feedback on its capabilities and user experience is highly valuable.
           </p>
-          {feedbackOpen ? (
-            <iframe
-              className="feedback-frame"
-              src="https://docs.google.com/forms/d/e/1FAIpQLSfZPbsIAYu-azK04t0GUs8Rxc8M6pLVIa3S8EYxyDmi9PkvRg/viewform?embedded=true"
-              width="640"
-              height="2765"
-              frameBorder="0"
-              marginHeight="0"
-              marginWidth="0"
-              title="Ask AI Google Form"
-              loading="lazy"
+          
+          <div className="feedback-accordion">
+            <button
+              className="outline-button feedback-open-button"
+              type="button"
+              onClick={() => setFeedbackOpen((prev) => !prev)}
             >
-              Loading...
-            </iframe>
-          ) : (
-            <button className="outline-button feedback-open-button" type="button" onClick={() => setFeedbackOpen(true)}>
-              <UiIcon name="external" />
-              Open feedback form
+              <UiIcon name={feedbackOpen ? 'chevronUp' : 'chevronDown'} />
+              {feedbackOpen ? 'Close feedback form' : 'Open feedback form'}
             </button>
-          )}
+
+            <AnimatePresence initial={false}>
+              {feedbackOpen ? (
+                <motion.div
+                  style={{ overflow: 'hidden' }}
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  <iframe
+                    className="feedback-frame mt-24"
+                    src="https://docs.google.com/forms/d/e/1FAIpQLSfZPbsIAYu-azK04t0GUs8Rxc8M6pLVIa3S8EYxyDmi9PkvRg/viewform?embedded=true"
+                    width="640"
+                    height="2765"
+                    frameBorder="0"
+                    marginHeight="0"
+                    marginWidth="0"
+                    title="Ask AI Google Form"
+                    loading="lazy"
+                  >
+                    Loading...
+                  </iframe>
+                </motion.div>
+              ) : null}
+            </AnimatePresence>
+          </div>
         </div>
       </section>
     </>
