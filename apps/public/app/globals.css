@@ -14,6 +14,9 @@
   --success-ring: rgba(32, 122, 80, 0.12);
   --overlay: rgba(37, 38, 43, 0.28);
   --shadow-soft: rgba(37, 38, 43, 0.16);
+  --scrollbar-track: var(--soft);
+  --scrollbar-thumb: #9a9589;
+  --scrollbar-thumb-hover: var(--muted);
   --page-width: 1040px;
   --surface-width: 920px;
   --form-width: 720px;
@@ -38,10 +41,39 @@
   --success-ring: rgba(103, 210, 157, 0.14);
   --overlay: rgba(0, 0, 0, 0.5);
   --shadow-soft: rgba(0, 0, 0, 0.36);
+  --scrollbar-track: #1b1a18;
+  --scrollbar-thumb: #5f5a52;
+  --scrollbar-thumb-hover: #8d857a;
 }
 
 * {
   box-sizing: border-box;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  scrollbar-width: thin;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+*::-webkit-scrollbar-thumb {
+  min-height: 36px;
+  border: 2px solid var(--scrollbar-track);
+  border-radius: 2px;
+  background: var(--scrollbar-thumb);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+*::-webkit-scrollbar-corner {
+  background: var(--scrollbar-track);
 }
 
 html {
@@ -3420,23 +3452,6 @@ section > .page-container > .download-row {
   color: var(--muted);
 }
 
-.modal-body::-webkit-scrollbar {
-  width: 6px;
-}
-
-.modal-body::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.modal-body::-webkit-scrollbar-thumb {
-  background: var(--hairline);
-  border-radius: 3px;
-}
-
-.modal-body::-webkit-scrollbar-thumb:hover {
-  background: var(--muted);
-}
-
 .view-all-row {
   padding: 12px;
   text-align: center;
@@ -3507,60 +3522,6 @@ section > .page-container > .download-row {
   opacity: 0 !important;
   visibility: hidden !important;
 }
-
-/* Page Switcher Navigation Tabs */
-.search-tabs {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  max-width: var(--form-width);
-  margin: 0 auto 16px;
-}
-
-.search-tab {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px 16px;
-  background: var(--white);
-  border: 1px solid var(--hairline);
-  color: var(--muted);
-  font-size: 14px;
-  font-weight: 500;
-  border-radius: 0;
-  transition: all 0.18s ease;
-  cursor: pointer;
-  text-align: center;
-}
-
-.search-tab:hover {
-  border-color: var(--ink);
-  color: var(--ink);
-  background: var(--soft);
-}
-
-.search-tab.active {
-  background: var(--ink);
-  color: var(--paper);
-  border-color: var(--ink);
-  font-weight: 600;
-}
-
-@media (max-width: 640px) {
-  .search-tabs {
-    padding-inline: 4px;
-    gap: 6px;
-  }
-  .search-tab {
-    padding: 10px 12px;
-    font-size: 12px;
-  }
-}
-
 
 /* Page Switcher Navigation Tabs */
 .search-tabs {
