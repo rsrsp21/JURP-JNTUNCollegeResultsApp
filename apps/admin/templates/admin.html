@@ -474,6 +474,220 @@
                 min-height: 420px;
             }
         }
+        .id-images-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .id-image-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 0.75rem;
+            padding: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .id-image-card img {
+            width: 100%;
+            max-height: 170px;
+            object-fit: contain;
+            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .id-image-meta {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            word-break: break-all;
+        }
+
+        .id-image-roll {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-family: monospace;
+        }
+
+        .id-image-reject-btn {
+            background: var(--danger-color);
+            border: none;
+            color: #fff;
+            border-radius: 0.5rem;
+            padding: 0.45rem 0.75rem;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .id-image-reject-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .id-image-name-label {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .id-image-name-input {
+            margin-bottom: 0;
+            font-weight: 600;
+        }
+
+        .id-image-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .id-image-actions button {
+            flex: 1;
+        }
+
+        .id-image-approve-btn {
+            background: var(--success-color);
+            border: none;
+            color: #06281a;
+            border-radius: 0.5rem;
+            padding: 0.45rem 0.75rem;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .id-image-approve-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .db-table-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .db-chip {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: var(--text-secondary);
+            border-radius: 999px;
+            padding: 0.4rem 0.9rem;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .db-chip:hover {
+            border-color: var(--accent-color);
+            color: var(--text-primary);
+        }
+
+        .db-chip.active {
+            background: linear-gradient(120deg, var(--primary-color), var(--secondary-color));
+            border-color: transparent;
+            color: #fff;
+        }
+
+        .db-chip .db-chip-count {
+            opacity: 0.75;
+            font-family: monospace;
+            margin-left: 0.35rem;
+        }
+
+        .db-controls {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .db-control label {
+            display: block;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            margin-bottom: 0.3rem;
+        }
+
+        .db-control .form-control {
+            margin-bottom: 0;
+            min-width: 120px;
+        }
+
+        .db-control-grow {
+            flex: 1 1 220px;
+        }
+
+        .db-meta {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .db-table-wrap {
+            overflow-x: auto;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 0.75rem;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .db-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .db-table thead th {
+            position: sticky;
+            top: 0;
+            background: var(--card-header);
+            color: var(--text-primary);
+            text-align: left;
+            padding: 0.6rem 0.85rem;
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+            z-index: 1;
+        }
+
+        .db-table thead th:hover {
+            color: var(--accent-color);
+        }
+
+        .db-table thead th .sort-arrow {
+            margin-left: 0.3rem;
+            color: var(--accent-color);
+        }
+
+        .db-table tbody td {
+            padding: 0.5rem 0.85rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            white-space: nowrap;
+            max-width: 320px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .db-table tbody tr:hover td {
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-primary);
+        }
+
+        .db-pagination {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
     </style>
 </head>
 <body class="admin-public-ui">
@@ -552,6 +766,12 @@
                         </button>
                         <button class="tab-btn" data-pane="pane-notifications">
                             <i class="fas fa-bell"></i> Notifications
+                        </button>
+                        <button class="tab-btn" data-pane="pane-id-images">
+                            <i class="fas fa-id-card"></i> ID Images
+                        </button>
+                        <button class="tab-btn" data-pane="pane-database">
+                            <i class="fas fa-database"></i> Database
                         </button>
                     </aside>
 
@@ -729,6 +949,83 @@
                     <h5 class="mt-4 mb-3" style="color: var(--text-primary);"><i class="fas fa-list"></i> Current Notifications</h5>
                     <div id="admin-notifications-list" class="admin-card" style="max-height: 400px; overflow-y: auto; padding: 0.5rem;">
                         <div class="text-center py-3 text-muted"><i class="fas fa-spinner fa-spin"></i> Loading notifications...</div>
+                    </div>
+                </div>
+
+                <!-- Tab 7: Student ID Images -->
+                <div class="tab-pane" id="pane-id-images">
+                    <h3>Student ID Images</h3>
+                    <p class="text-muted mb-4">Cropped ID uploads students used to verify their names (stored in R2 under <code>idsImages/</code>). Rejecting an image deletes it and clears that student's name on the portal.</p>
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <span id="id-images-count" class="csv-meta">Loading images...</span>
+                        <button id="id-images-refresh-btn" class="button btn-sm" type="button">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                    <div id="id-images-status" style="font-style: italic; color: #4db6ac; font-weight: 500;"></div>
+                    <div id="id-images-grid" class="id-images-grid"></div>
+
+                    <h5 class="mt-4 mb-2" style="color: var(--text-primary);"><i class="fas fa-envelope"></i> Email change requests</h5>
+                    <div id="email-requests-grid" class="id-images-grid">
+                        <div class="text-muted">No email change requests.</div>
+                    </div>
+
+                    <h5 class="mt-4 mb-2" style="color: var(--text-primary);"><i class="fas fa-check-circle"></i> Approved names</h5>
+                    <div class="db-table-wrap" style="max-height: 320px;">
+                        <table class="db-table" id="approved-names-table">
+                            <thead><tr><th>#</th><th>Roll Number</th><th>Name</th></tr></thead>
+                            <tbody><tr><td colspan="3" class="text-center text-muted py-3">No approved names yet.</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab 8: Database Browser -->
+                <div class="tab-pane" id="pane-database">
+                    <h3>Database Browser</h3>
+                    <p class="text-muted mb-4">Browse every table in the portal D1 database — search across all columns, filter by a specific column, sort by clicking headers, and page through rows.</p>
+
+                    <div id="db-table-chips" class="db-table-chips">
+                        <span class="text-muted"><i class="fas fa-spinner fa-spin"></i> Loading tables...</span>
+                    </div>
+
+                    <div class="db-controls">
+                        <div class="db-control db-control-grow">
+                            <label>Search all columns</label>
+                            <input type="text" id="db-search" class="form-control" placeholder="Type and press Enter...">
+                        </div>
+                        <div class="db-control">
+                            <label>Filter column</label>
+                            <select id="db-filter-col" class="form-control"><option value="">Any</option></select>
+                        </div>
+                        <div class="db-control">
+                            <label>Filter value</label>
+                            <input type="text" id="db-filter-val" class="form-control" placeholder="contains...">
+                        </div>
+                        <div class="db-control">
+                            <label>Rows</label>
+                            <select id="db-per-page" class="form-control">
+                                <option>10</option>
+                                <option selected>25</option>
+                                <option>50</option>
+                                <option>100</option>
+                            </select>
+                        </div>
+                        <button id="db-apply-btn" class="button btn-sm" type="button"><i class="fas fa-filter"></i> Apply</button>
+                        <button id="db-clear-btn" class="button btn-sm" type="button"><i class="fas fa-eraser"></i> Clear</button>
+                    </div>
+
+                    <div id="db-meta" class="db-meta"></div>
+                    <div class="db-table-wrap">
+                        <table class="db-table" id="db-table">
+                            <thead></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+
+                    <div class="db-pagination">
+                        <button id="db-prev-btn" class="button btn-sm" type="button" disabled><i class="fas fa-chevron-left"></i> Prev</button>
+                        <span id="db-page-info" class="db-meta"></span>
+                        <button id="db-next-btn" class="button btn-sm" type="button" disabled>Next <i class="fas fa-chevron-right"></i></button>
                     </div>
                 </div>
 
@@ -1567,6 +1864,352 @@
         });
         
         document.querySelector('.tab-btn[data-pane="pane-notifications"]').addEventListener('click', fetchAdminNotifications);
+
+        // --- Student ID Images review ---
+        const idImagesGrid = document.getElementById('id-images-grid');
+        const idImagesCount = document.getElementById('id-images-count');
+        const idImagesStatus = document.getElementById('id-images-status');
+        let idImagesLoaded = false;
+
+        async function loadIdImages() {
+            idImagesCount.textContent = 'Loading images...';
+            idImagesGrid.innerHTML = '<div class="text-center py-3 text-muted"><i class="fas fa-spinner fa-spin"></i> Loading ID images...</div>';
+            try {
+                const response = await fetch('/api/admin/id-images');
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Failed to load ID images');
+                renderIdImages(data.images || []);
+                renderApprovedNames(data.approved || []);
+            } catch (err) {
+                idImagesCount.textContent = 'Failed to load';
+                idImagesGrid.innerHTML = `<div class="text-muted">${err.message}</div>`;
+            }
+        }
+
+        function renderIdImages(images) {
+            idImagesCount.textContent = `${images.length} image${images.length === 1 ? '' : 's'}`;
+            if (!images.length) {
+                idImagesGrid.innerHTML = '<div class="text-muted">No student ID images uploaded yet.</div>';
+                return;
+            }
+            idImagesGrid.innerHTML = '';
+            images.forEach(image => {
+                const card = document.createElement('div');
+                card.className = 'id-image-card';
+
+                const img = document.createElement('img');
+                img.loading = 'lazy';
+                img.alt = `ID upload for ${image.roll_number || image.name}`;
+                img.src = `/api/admin/id-image?path=${encodeURIComponent(image.path)}`;
+
+                const meta = document.createElement('div');
+                meta.className = 'id-image-meta';
+                meta.innerHTML = `<span class="id-image-roll">${image.roll_number || 'Unknown roll'}</span><br>${image.name} · ${(image.size / 1024).toFixed(1)} KB`;
+
+                const nameLabel = document.createElement('label');
+                nameLabel.className = 'id-image-name-label';
+                nameLabel.textContent = 'Extracted name (editable)';
+                const nameInput = document.createElement('input');
+                nameInput.type = 'text';
+                nameInput.className = 'form-control id-image-name-input';
+                nameInput.value = image.db_name || '';
+                nameInput.placeholder = 'Student name';
+
+                const actions = document.createElement('div');
+                actions.className = 'id-image-actions';
+
+                const approveBtn = document.createElement('button');
+                approveBtn.className = 'id-image-approve-btn';
+                approveBtn.innerHTML = '<i class="fas fa-check-circle"></i> Approve';
+                approveBtn.addEventListener('click', async () => {
+                    approveBtn.disabled = true;
+                    approveBtn.textContent = 'Approving...';
+                    try {
+                        const response = await fetch('/api/admin/approve-id-image', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ path: image.path, name: nameInput.value })
+                        });
+                        const data = await response.json();
+                        if (!response.ok) throw new Error(data.error || 'Approve failed');
+                        idImagesStatus.textContent = data.message;
+                        loadIdImages();
+                    } catch (err) {
+                        approveBtn.disabled = false;
+                        approveBtn.innerHTML = '<i class="fas fa-check-circle"></i> Approve';
+                        idImagesStatus.textContent = `Error: ${err.message}`;
+                    }
+                });
+
+                const rejectBtn = document.createElement('button');
+                rejectBtn.className = 'id-image-reject-btn';
+                rejectBtn.innerHTML = '<i class="fas fa-times-circle"></i> Reject';
+                rejectBtn.addEventListener('click', async () => {
+                    if (!confirm(`Reject this ID image and clear the portal name for ${image.roll_number || 'this student'}?`)) return;
+                    rejectBtn.disabled = true;
+                    rejectBtn.textContent = 'Rejecting...';
+                    try {
+                        const response = await fetch('/api/admin/reject-id-image', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ path: image.path })
+                        });
+                        const data = await response.json();
+                        if (!response.ok) throw new Error(data.error || 'Reject failed');
+                        idImagesStatus.textContent = data.message;
+                        loadIdImages();
+                    } catch (err) {
+                        rejectBtn.disabled = false;
+                        rejectBtn.innerHTML = '<i class="fas fa-times-circle"></i> Reject';
+                        idImagesStatus.textContent = `Error: ${err.message}`;
+                    }
+                });
+
+                actions.appendChild(approveBtn);
+                actions.appendChild(rejectBtn);
+                card.appendChild(img);
+                card.appendChild(meta);
+                card.appendChild(nameLabel);
+                card.appendChild(nameInput);
+                card.appendChild(actions);
+                idImagesGrid.appendChild(card);
+            });
+        }
+
+        async function loadEmailRequests() {
+            const grid = document.getElementById('email-requests-grid');
+            try {
+                const response = await fetch('/api/admin/email-requests');
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Failed to load email requests');
+                if (!data.requests.length) {
+                    grid.innerHTML = '<div class="text-muted">No email change requests.</div>';
+                    return;
+                }
+                grid.innerHTML = '';
+                data.requests.forEach(req => {
+                    const card = document.createElement('div');
+                    card.className = 'id-image-card';
+
+                    const meta = document.createElement('div');
+                    meta.className = 'id-image-meta';
+                    meta.innerHTML = `<span class="id-image-roll">${req.student_id}</span>${req.name ? ` · ${req.name}` : ''}<br>` +
+                        `Current: <strong>${req.email || '—'}</strong><br>Requested: <strong style="color: var(--accent-color);">${req.pending_email}</strong>`;
+
+                    const actions = document.createElement('div');
+                    actions.className = 'id-image-actions';
+
+                    const approveBtn = document.createElement('button');
+                    approveBtn.className = 'id-image-approve-btn';
+                    approveBtn.innerHTML = '<i class="fas fa-check-circle"></i> Approve';
+                    const rejectBtn = document.createElement('button');
+                    rejectBtn.className = 'id-image-reject-btn';
+                    rejectBtn.innerHTML = '<i class="fas fa-times-circle"></i> Reject';
+
+                    async function resolve(action, btn) {
+                        btn.disabled = true;
+                        try {
+                            const response = await fetch('/api/admin/email-request', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ roll_number: req.student_id, action })
+                            });
+                            const result = await response.json();
+                            if (!response.ok) throw new Error(result.error || 'Failed');
+                            idImagesStatus.textContent = result.message;
+                            loadEmailRequests();
+                        } catch (err) {
+                            btn.disabled = false;
+                            idImagesStatus.textContent = `Error: ${err.message}`;
+                        }
+                    }
+
+                    approveBtn.addEventListener('click', () => resolve('approve', approveBtn));
+                    rejectBtn.addEventListener('click', () => resolve('reject', rejectBtn));
+
+                    actions.appendChild(approveBtn);
+                    actions.appendChild(rejectBtn);
+                    card.appendChild(meta);
+                    card.appendChild(actions);
+                    grid.appendChild(card);
+                });
+            } catch (err) {
+                grid.innerHTML = `<div class="text-muted">${err.message}</div>`;
+            }
+        }
+
+        function renderApprovedNames(rows) {
+            const tbody = document.querySelector('#approved-names-table tbody');
+            if (!rows.length) {
+                tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted py-3">No approved names yet.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = rows.map((row, index) =>
+                `<tr><td class="text-muted">${index + 1}</td><td style="font-family: monospace;">${row.student_id}</td><td>${row.name}</td></tr>`
+            ).join('');
+        }
+
+        document.getElementById('id-images-refresh-btn').addEventListener('click', () => {
+            loadIdImages();
+            loadEmailRequests();
+        });
+
+        // --- Database Browser ---
+        const dbState = { table: null, page: 1, perPage: 25, search: '', filterCol: '', filterVal: '', sort: '', dir: 'asc', columns: [] };
+        const dbChips = document.getElementById('db-table-chips');
+        const dbMeta = document.getElementById('db-meta');
+        const dbTableEl = document.getElementById('db-table');
+        const dbPageInfo = document.getElementById('db-page-info');
+        const dbPrevBtn = document.getElementById('db-prev-btn');
+        const dbNextBtn = document.getElementById('db-next-btn');
+        let dbTablesLoaded = false;
+
+        async function loadDbTables() {
+            try {
+                const response = await fetch('/api/admin/db-tables');
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Failed to load tables');
+                dbChips.innerHTML = '';
+                data.tables.forEach(table => {
+                    const chip = document.createElement('button');
+                    chip.className = 'db-chip';
+                    chip.type = 'button';
+                    chip.innerHTML = `${table.name}<span class="db-chip-count">${table.rows.toLocaleString()}</span>`;
+                    chip.addEventListener('click', () => {
+                        document.querySelectorAll('.db-chip').forEach(c => c.classList.remove('active'));
+                        chip.classList.add('active');
+                        Object.assign(dbState, { table: table.name, page: 1, search: '', filterCol: '', filterVal: '', sort: '', dir: 'asc' });
+                        document.getElementById('db-search').value = '';
+                        document.getElementById('db-filter-val').value = '';
+                        loadDbRows();
+                    });
+                    dbChips.appendChild(chip);
+                });
+                if (data.tables.length && !dbState.table) dbChips.firstChild.click();
+            } catch (err) {
+                dbChips.innerHTML = `<span class="text-muted">${err.message}</span>`;
+            }
+        }
+
+        async function loadDbRows() {
+            if (!dbState.table) return;
+            dbMeta.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading rows...';
+            const params = new URLSearchParams({
+                name: dbState.table,
+                page: dbState.page,
+                per_page: dbState.perPage,
+                search: dbState.search,
+                filter_col: dbState.filterCol,
+                filter_val: dbState.filterVal,
+                sort: dbState.sort,
+                dir: dbState.dir
+            });
+            try {
+                const response = await fetch(`/api/admin/db-table?${params}`);
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Failed to load rows');
+                dbState.columns = data.columns;
+                renderDbFilterOptions(data.columns);
+                renderDbTable(data);
+                const start = data.total === 0 ? 0 : (data.page - 1) * data.per_page + 1;
+                const end = Math.min(data.total, data.page * data.per_page);
+                dbMeta.textContent = `${data.table} — showing ${start}-${end} of ${data.total.toLocaleString()} rows`;
+                dbPageInfo.textContent = `Page ${data.page} of ${data.pages}`;
+                dbPrevBtn.disabled = data.page <= 1;
+                dbNextBtn.disabled = data.page >= data.pages;
+            } catch (err) {
+                dbMeta.textContent = `Error: ${err.message}`;
+                dbTableEl.querySelector('thead').innerHTML = '';
+                dbTableEl.querySelector('tbody').innerHTML = '';
+            }
+        }
+
+        function renderDbFilterOptions(columns) {
+            const select = document.getElementById('db-filter-col');
+            const current = dbState.filterCol;
+            select.innerHTML = '<option value="">Any</option>' + columns.map(c => `<option value="${c}" ${c === current ? 'selected' : ''}>${c}</option>`).join('');
+        }
+
+        function renderDbTable(data) {
+            const thead = dbTableEl.querySelector('thead');
+            const tbody = dbTableEl.querySelector('tbody');
+            thead.innerHTML = '';
+            const headRow = document.createElement('tr');
+            data.columns.forEach(col => {
+                const th = document.createElement('th');
+                th.textContent = col;
+                if (dbState.sort === col) {
+                    th.innerHTML = `${col}<span class="sort-arrow">${dbState.dir === 'asc' ? '▲' : '▼'}</span>`;
+                }
+                th.addEventListener('click', () => {
+                    if (dbState.sort === col) {
+                        dbState.dir = dbState.dir === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        dbState.sort = col;
+                        dbState.dir = 'asc';
+                    }
+                    dbState.page = 1;
+                    loadDbRows();
+                });
+                headRow.appendChild(th);
+            });
+            thead.appendChild(headRow);
+
+            tbody.innerHTML = '';
+            if (!data.rows.length) {
+                tbody.innerHTML = `<tr><td colspan="${data.columns.length}" class="text-center text-muted py-3">No rows match.</td></tr>`;
+                return;
+            }
+            data.rows.forEach(row => {
+                const tr = document.createElement('tr');
+                data.columns.forEach(col => {
+                    const td = document.createElement('td');
+                    const value = row[col];
+                    td.textContent = value === null || value === undefined ? '' : String(value);
+                    td.title = td.textContent;
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+        }
+
+        function applyDbFilters() {
+            dbState.search = document.getElementById('db-search').value.trim();
+            dbState.filterCol = document.getElementById('db-filter-col').value;
+            dbState.filterVal = document.getElementById('db-filter-val').value.trim();
+            dbState.perPage = parseInt(document.getElementById('db-per-page').value, 10);
+            dbState.page = 1;
+            loadDbRows();
+        }
+
+        document.getElementById('db-apply-btn').addEventListener('click', applyDbFilters);
+        document.getElementById('db-clear-btn').addEventListener('click', () => {
+            document.getElementById('db-search').value = '';
+            document.getElementById('db-filter-val').value = '';
+            document.getElementById('db-filter-col').value = '';
+            applyDbFilters();
+        });
+        ['db-search', 'db-filter-val'].forEach(id => {
+            document.getElementById(id).addEventListener('keydown', e => {
+                if (e.key === 'Enter') applyDbFilters();
+            });
+        });
+        document.getElementById('db-per-page').addEventListener('change', applyDbFilters);
+        dbPrevBtn.addEventListener('click', () => { dbState.page -= 1; loadDbRows(); });
+        dbNextBtn.addEventListener('click', () => { dbState.page += 1; loadDbRows(); });
+        document.querySelector('.tab-btn[data-pane="pane-database"]').addEventListener('click', () => {
+            if (!dbTablesLoaded) {
+                dbTablesLoaded = true;
+                loadDbTables();
+            }
+        });
+        document.querySelector('.tab-btn[data-pane="pane-id-images"]').addEventListener('click', () => {
+            if (!idImagesLoaded) {
+                idImagesLoaded = true;
+                loadIdImages();
+                loadEmailRequests();
+            }
+        });
     </script>
 </body>
 </html>

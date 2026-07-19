@@ -19,6 +19,9 @@ from utils.r2_storage import (
     download_prefix_to_folder,
     hash_folder_files,
     list_csv_files as list_r2_csv_files,
+    list_keys_under as list_r2_keys_under,
+    read_bytes_key as read_r2_bytes_key,
+    delete_key as delete_r2_key,
     read_csv_text as read_r2_csv_text,
     read_text_key,
     upload_changed_files_to_prefix,
@@ -26,6 +29,7 @@ from utils.r2_storage import (
     write_csv_text as write_r2_csv_text
 )
 from utils import portal_db
+from utils import d1_storage
 from engine.logic import (
     get_batch, save_processed_csv, apply_revaluation,
     merge_all_semesters, calculate_supple_appearances,
@@ -999,6 +1003,245 @@ def admin_save_csv_file():
         })
     except FileNotFoundError:
         return jsonify({'error': 'CSV file not found or not editable'}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# --- Database Browser ---
+def _db_list_table_names():
+    rows = d1_storage.query(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE '_cf_%' ORDER BY name"
+    )
+    return [row['name'] for row in rows]
+
+@app.route('/api/admin/db-tables', methods=['GET'])
+def admin_db_tables():
+    if not session.get('logged_in'):
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    try:
+        tables = []
+        for name in _db_list_table_names():
+            count_rows = d1_storage.query(f'SELECT COUNT(*) AS c FROM "{name}"')
+            tables.append({'name': name, 'rows': count_rows[0]['c'] if count_rows else 0})
+        return jsonify({'success': True, 'tables': tables})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/admin/db-table', methods=['GET'])
+def admin_db_table():
+    if not session.get('logged_in'):
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    name = request.args.get('name', '')
+    try:
+        tables = _db_list_table_names()
+        if name not in tables:
+            return jsonify({'error': 'Unknown table'}), 404
+
+        columns = [row['name'] for row in d1_storage.query(f'PRAGMA table_info("{name}")')]
+
+        page = max(1, int(request.args.get('page', 1) or 1))
+        per_page = min(100, max(10, int(request.args.get('per_page', 25) or 25)))
+        search = (request.args.get('search') or '').strip()
+        filter_col = (request.args.get('filter_col') or '').strip()
+        filter_val = (request.args.get('filter_val') or '').strip()
+        sort_col = (request.args.get('sort') or '').strip()
+        sort_dir = 'DESC' if (request.args.get('dir') or '').lower() == 'desc' else 'ASC'
+
+        where = []
+        params = []
+        if search:
+            like = f'%{search}%'
+            clauses = [f'CAST("{col}" AS TEXT) LIKE ?' for col in columns]
+            where.append('(' + ' OR '.join(clauses) + ')')
+            params.extend([like] * len(columns))
+        if filter_col in columns and filter_val:
+            where.append(f'CAST("{filter_col}" AS TEXT) LIKE ?')
+            params.append(f'%{filter_val}%')
+
+        where_sql = (' WHERE ' + ' AND '.join(where)) if where else ''
+        order_sql = f' ORDER BY "{sort_col}" {sort_dir}' if sort_col in columns else ''
+        offset = (page - 1) * per_page
+
+        total_rows = d1_storage.query(f'SELECT COUNT(*) AS c FROM "{name}"{where_sql}', params)
+        total = total_rows[0]['c'] if total_rows else 0
+        rows = d1_storage.query(
+            f'SELECT * FROM "{name}"{where_sql}{order_sql} LIMIT ? OFFSET ?',
+            params + [per_page, offset]
+        )
+
+        return jsonify({
+            'success': True,
+            'table': name,
+            'columns': columns,
+            'rows': rows,
+            'total': total,
+            'page': page,
+            'per_page': per_page,
+            'pages': max(1, (total + per_page - 1) // per_page)
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# --- Email Change Requests ---
+@app.route('/api/admin/email-requests', methods=['GET'])
+def admin_email_requests():
+    if not session.get('logged_in'):
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    try:
+        rows = d1_storage.query(
+            'SELECT student_id, name, email, pending_email FROM student_cgpa WHERE pending_email IS NOT NULL ORDER BY student_id'
+        )
+        return jsonify({'success': True, 'requests': rows})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/admin/email-request', methods=['POST'])
+def admin_resolve_email_request():
+    if not session.get('logged_in'):
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    data = request.get_json(silent=True) or {}
+    roll_number = str(data.get('roll_number', '')).strip().upper()
+    action = str(data.get('action', '')).strip().lower()
+    if not re.fullmatch(r'[0-9]{2}[0-9A-Z]{3}A[0-9A-Z]{4}', roll_number):
+        return jsonify({'error': 'Invalid roll number'}), 400
+    if action not in ('approve', 'reject'):
+        return jsonify({'error': 'Action must be approve or reject'}), 400
+
+    try:
+        if action == 'approve':
+            d1_storage.execute(
+                'UPDATE student_cgpa SET email = pending_email, pending_email = NULL WHERE student_id = ? AND pending_email IS NOT NULL',
+                [roll_number]
+            )
+            message = f'Approved email change for {roll_number}.'
+        else:
+            d1_storage.execute(
+                'UPDATE student_cgpa SET pending_email = NULL WHERE student_id = ?',
+                [roll_number]
+            )
+            message = f'Rejected email change for {roll_number}.'
+        portal_db.clear_runtime_cache()
+        return jsonify({'success': True, 'roll_number': roll_number, 'message': message})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# --- Student ID Image Review ---
+ID_IMAGES_PREFIX = 'idsImages'
+ID_IMAGE_ROLL_PATTERN = re.compile(r'^([0-9]{2}[0-9A-Z]{3}A[0-9A-Z]{4})\.(jpg|jpeg|png|webp)$', re.IGNORECASE)
+
+@app.route('/api/admin/id-images', methods=['GET'])
+def admin_list_id_images():
+    if not session.get('logged_in'):
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    if not is_r2_configured():
+        return jsonify({'error': 'Cloudflare R2 is not configured'}), 500
+
+    try:
+        images = []
+        for item in list_r2_keys_under(ID_IMAGES_PREFIX):
+            if not item['name'].lower().endswith(('.jpg', '.jpeg', '.png', '.webp')):
+                continue
+            match = ID_IMAGE_ROLL_PATTERN.match(item['name'])
+            images.append({**item, 'roll_number': match.group(1).upper() if match else None})
+
+        rolls = [image['roll_number'] for image in images if image['roll_number']]
+        names_by_roll = {}
+        if rolls:
+            placeholders = ','.join('?' * len(rolls))
+            for row in d1_storage.query(
+                f'SELECT student_id, name, name_status FROM student_cgpa WHERE student_id IN ({placeholders})', rolls
+            ):
+                names_by_roll[row['student_id']] = {'name': row.get('name') or '', 'status': row.get('name_status') or 'pending'}
+
+        for image in images:
+            record = names_by_roll.get(image['roll_number'], {'name': '', 'status': 'pending'})
+            image['db_name'] = record['name']
+            image['status'] = record['status']
+
+        pending = [image for image in images if image['status'] != 'approved']
+        approved = d1_storage.query(
+            "SELECT student_id, name FROM student_cgpa WHERE name_status = 'approved' AND name IS NOT NULL ORDER BY student_id"
+        )
+        return jsonify({'success': True, 'images': pending, 'approved': approved})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/admin/approve-id-image', methods=['POST'])
+def admin_approve_id_image():
+    if not session.get('logged_in'):
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    data = request.get_json(silent=True) or {}
+    requested_path = data.get('path', '')
+    name = ' '.join(str(data.get('name', '')).upper().split())
+    if not requested_path.startswith(ID_IMAGES_PREFIX + '/'):
+        return jsonify({'error': 'Invalid image path'}), 400
+    if not re.fullmatch(r"[A-Z][A-Z .]{1,58}[A-Z.]", name):
+        return jsonify({'error': 'Enter a valid name (letters, spaces, and dots only)'}), 400
+
+    filename = requested_path.rsplit('/', 1)[-1]
+    match = ID_IMAGE_ROLL_PATTERN.match(filename)
+    if not match:
+        return jsonify({'error': 'Could not extract a roll number from the image filename'}), 400
+    roll_number = match.group(1).upper()
+
+    try:
+        d1_storage.execute(
+            "UPDATE student_cgpa SET name = ?, name_status = 'approved' WHERE student_id = ?",
+            [name, roll_number]
+        )
+        portal_db.clear_runtime_cache()
+        return jsonify({'success': True, 'roll_number': roll_number, 'name': name,
+                        'message': f'Approved {roll_number} as "{name}".'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/admin/id-image', methods=['GET'])
+def admin_get_id_image():
+    if not session.get('logged_in'):
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    requested_path = request.args.get('path', '')
+    if not requested_path.startswith(ID_IMAGES_PREFIX + '/'):
+        return jsonify({'error': 'Invalid image path'}), 400
+
+    try:
+        _, data, content_type = read_r2_bytes_key(requested_path)
+        return app.response_class(data, mimetype=content_type)
+    except FileNotFoundError:
+        return jsonify({'error': 'Image not found'}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/admin/reject-id-image', methods=['POST'])
+def admin_reject_id_image():
+    if not session.get('logged_in'):
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    data = request.get_json(silent=True) or {}
+    requested_path = data.get('path', '')
+    if not requested_path.startswith(ID_IMAGES_PREFIX + '/'):
+        return jsonify({'error': 'Invalid image path'}), 400
+
+    filename = requested_path.rsplit('/', 1)[-1]
+    match = ID_IMAGE_ROLL_PATTERN.match(filename)
+    if not match:
+        return jsonify({'error': 'Could not extract a roll number from the image filename'}), 400
+    roll_number = match.group(1).upper()
+
+    try:
+        d1_storage.execute("UPDATE student_cgpa SET name = NULL, name_status = 'rejected' WHERE student_id = ?", [roll_number])
+        portal_db.clear_runtime_cache()
+        delete_r2_key(requested_path)
+        return jsonify({
+            'success': True,
+            'roll_number': roll_number,
+            'message': f'Rejected ID image and cleared the name for {roll_number}.'
+        })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

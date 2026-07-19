@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
 import PageHeader from '@/components/PageHeader';
 import RollSearch from '@/components/RollSearch';
+import IdNameUpload from '@/components/IdNameUpload';
+import EmailSubscribe from '@/components/EmailSubscribe';
 import UiIcon from '@/components/UiIcon';
 import { batchDisplay, branchFromRoll, displayValue, isValidRollNumber, normalizeRollNumber, semesters } from '@/lib/client-utils';
 import { downloadAllSemestersPdf, downloadSemesterPdf } from '@/lib/pdf';
@@ -54,7 +56,7 @@ export default function SemesterResultsPage() {
         return;
       }
 
-      const response = await fetch(`/api/student-results/${encodeURIComponent(normalized)}`);
+      const response = await fetch(`/api/student-results/${encodeURIComponent(normalized)}`, { cache: 'no-store' });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'No data found for this roll number.');
       setRollNumber(normalized);
@@ -134,14 +136,55 @@ export default function SemesterResultsPage() {
                   <div className="roll-display">{payload.studentId}</div>
                 </div>
                 <div>
-                  <div className="data-block-label">Branch</div>
-                  <div className="branch-display">{branchFromRoll(payload.studentId)}</div>
+                  <div className="data-block-label">{cgpaData.Name ? 'Name' : 'Branch'}</div>
+                  <div className="branch-display">
+                    {cgpaData.Name || branchFromRoll(payload.studentId)}
+                    {cgpaData.Name && cgpaData.NameStatus !== 'approved' ? <span className="pending-tag">Pending approval</span> : null}
+                  </div>
                 </div>
-                <div>
-                  <div className="data-block-label">Batch</div>
-                  <div className="mini-meta-value">{batchDisplay(cgpaData.Batch)}</div>
+                <div className="mini-meta-row">
+                  <div>
+                    <div className="data-block-label">Batch</div>
+                    <div className="mini-meta-value">{batchDisplay(cgpaData.Batch)}</div>
+                  </div>
+                  <div>
+                    <div className="data-block-label">Reg</div>
+                    <div className="mini-meta-value">{displayValue(cgpaData.Regulation)}</div>
+                  </div>
                 </div>
+                {cgpaData.Name ? (
+                  <div className="student-header-sub">
+                    <div className="data-block-label">Branch</div>
+                    <div className="branch-display sub">{branchFromRoll(payload.studentId)}</div>
+                  </div>
+                ) : null}
               </motion.div>
+
+              <div className="profile-actions">
+                {!cgpaData.Name ? (
+                  <IdNameUpload
+                    studentId={payload.studentId}
+                    onVerified={(name) => {
+                      const next = { ...payload, cgpaData: { ...payload.cgpaData, Name: name } };
+                      setPayload(next);
+                      writeSemesterResultsCache(payload.studentId, next);
+                    }}
+                  />
+                ) : null}
+                <EmailSubscribe
+                  studentId={payload.studentId}
+                  currentEmail={cgpaData.Email || ''}
+                  pendingEmail={cgpaData.PendingEmail || ''}
+                  onSaved={(result) => {
+                    const next = {
+                      ...payload,
+                      cgpaData: { ...payload.cgpaData, Email: result.email, PendingEmail: result.pendingEmail || '' }
+                    };
+                    setPayload(next);
+                    writeSemesterResultsCache(payload.studentId, next);
+                  }}
+                />
+              </div>
 
               <motion.div
                 className="meta-grid"
@@ -149,7 +192,7 @@ export default function SemesterResultsPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.28, delay: 0.04 }}
               >
-                <Meta label="Regulation" value={displayValue(cgpaData.Regulation)} />
+                <Meta label="Percentage" value={displayValue(cgpaData.academicSummary?.percentage)} />
                 <Meta label="CGPA" value={displayValue(cgpaData.CGPA)} />
                 <Meta label="Total Credits Earned" value={displayValue(cgpaData['Total Credits'])} />
               </motion.div>

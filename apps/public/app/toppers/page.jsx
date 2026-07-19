@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import PageHeader from '@/components/PageHeader';
 import UiIcon from '@/components/UiIcon';
@@ -111,6 +112,10 @@ export default function ToppersPage() {
               ) : null}
             </div>
           </label>
+          <Link href="/#name-email-setup" className="outline-button glow-attract toppers-name-email-button">
+            <UiIcon name="user" />
+            Add name &amp; email
+          </Link>
         </div>
       </PageHeader>
 
@@ -136,6 +141,8 @@ export default function ToppersPage() {
                       index={index}
                       rank={rank}
                       roll={row.roll_number}
+                      name={row.name}
+                      nameStatus={row.name_status}
                       cgpa={row.cgpa}
                       highlight={rank === 1}
                     />
@@ -229,7 +236,7 @@ function BranchLoading() {
   );
 }
 
-function PodiumCard({ rank, roll, cgpa, highlight = false }) {
+function PodiumCard({ rank, roll, name = '', nameStatus = 'pending', cgpa, highlight = false }) {
   return (
     <motion.div
       className={`podium-card rank-${rank} ${highlight ? 'highlight' : ''}`}
@@ -242,6 +249,12 @@ function PodiumCard({ rank, roll, cgpa, highlight = false }) {
       <div className="rank-index">Rank</div>
       <div className="podium-rank">{rankLabel(rank)}</div>
       <div className="podium-roll">{roll}</div>
+      {name ? (
+        <div className="podium-name">
+          {name}
+          {nameStatus !== 'approved' ? <span className="pending-tag">Pending approval</span> : null}
+        </div>
+      ) : null}
       <div className="podium-cgpa">{formatCgpa(cgpa)}</div>
       <div className="rank-index">CGPA</div>
     </motion.div>
@@ -267,7 +280,15 @@ function TopperTable({ rows }) {
             transition={{ delay: index * 0.025, duration: 0.18 }}
           >
             <td className="mono muted" data-label="Rank">{String(index + 1).padStart(2, '0')}</td>
-            <td className="mono" data-label="Roll Number">{item.roll_number}</td>
+            <td className="mono" data-label="Roll Number">
+              {item.roll_number}
+              {item.name ? (
+                <span className="topper-name">
+                  {item.name}
+                  {item.name_status !== 'approved' ? <span className="pending-tag">Pending approval</span> : null}
+                </span>
+              ) : null}
+            </td>
             <td className="numeric serif topper-cgpa-value" data-label="CGPA">{formatCgpa(item.cgpa)}</td>
           </motion.tr>
         ))}

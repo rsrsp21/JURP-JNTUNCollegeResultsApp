@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import PageHeader from '@/components/PageHeader';
 import RollSearch from '@/components/RollSearch';
+import IdNameUpload from '@/components/IdNameUpload';
+import EmailSubscribe from '@/components/EmailSubscribe';
 import SgpaChart from '@/components/SgpaChart';
 import UiIcon from '@/components/UiIcon';
 import { batchDisplay, branchFromRoll, displayValue, isValidRollNumber, normalizeRollNumber, semesters } from '@/lib/client-utils';
@@ -51,7 +53,7 @@ export default function CgpaPage() {
         return;
       }
 
-      const response = await fetch(`/api/cgpa/${encodeURIComponent(normalized)}`);
+      const response = await fetch(`/api/cgpa/${encodeURIComponent(normalized)}`, { cache: 'no-store' });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'No data found for this roll number.');
       setRollNumber(normalized);
@@ -128,8 +130,11 @@ export default function CgpaPage() {
                   <div className="roll-display">{student.ID}</div>
                 </div>
                 <div>
-                  <div className="data-block-label">Branch</div>
-                  <div className="branch-display">{branchFromRoll(student.ID)}</div>
+                  <div className="data-block-label">{student.Name ? 'Name' : 'Branch'}</div>
+                  <div className="branch-display">
+                    {student.Name || branchFromRoll(student.ID)}
+                    {student.Name && student.NameStatus !== 'approved' ? <span className="pending-tag">Pending approval</span> : null}
+                  </div>
                 </div>
                 <div className="mini-meta-row">
                   <div>
@@ -141,7 +146,36 @@ export default function CgpaPage() {
                     <div className="mini-meta-value">{displayValue(student.Regulation)}</div>
                   </div>
                 </div>
+                {student.Name ? (
+                  <div className="student-header-sub">
+                    <div className="data-block-label">Branch</div>
+                    <div className="branch-display sub">{branchFromRoll(student.ID)}</div>
+                  </div>
+                ) : null}
               </motion.div>
+
+              <div className="profile-actions">
+                {!student.Name ? (
+                  <IdNameUpload
+                    studentId={student.ID}
+                    onVerified={(name) => {
+                      const next = { ...student, Name: name };
+                      setStudent(next);
+                      writeCgpaCache(student.ID, next);
+                    }}
+                  />
+                ) : null}
+                <EmailSubscribe
+                  studentId={student.ID}
+                  currentEmail={student.Email || ''}
+                  pendingEmail={student.PendingEmail || ''}
+                  onSaved={(result) => {
+                    const next = { ...student, Email: result.email, PendingEmail: result.pendingEmail || '' };
+                    setStudent(next);
+                    writeCgpaCache(student.ID, next);
+                  }}
+                />
+              </div>
 
               <motion.div
                 className="stat-grid"
