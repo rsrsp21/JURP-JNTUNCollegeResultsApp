@@ -35,6 +35,9 @@ const cgpaSelectColumns = `
   c.name_status,
   c.email,
   c.pending_email,
+  c.name_edit_used,
+  c.email_edit_used,
+  c.grade_card_name,
   c.batch_label,
   c.regulation,
   c.sgpa_1_1,
@@ -85,17 +88,35 @@ export async function getStudentCgpa(studentId) {
   return rows[0] ? cgpaRowToApi(rows[0], academicSummaryFromJoinedRow(rows[0])) : null;
 }
 
-export async function setStudentName(studentId, name) {
+export async function setStudentName(studentId, name, gradeCardName = null) {
   const normalized = studentId.trim().toUpperCase();
   const rows = await d1Query('SELECT student_id, name_status FROM student_cgpa WHERE student_id = ? LIMIT 1', [normalized]);
   if (!rows.length) return { success: false, error: 'No student record found for this roll number.' };
-  
-  // Prevent overwriting an already approved name
+
   if (rows[0].name_status === 'approved') {
-    return { success: false, error: 'Your name has already been verified and approved. You cannot change it again.' };
+    return { success: false, error: 'Your name has already been verified and approved. Use the edit option to request a name correction.' };
   }
 
-  await d1Query('UPDATE student_cgpa SET name = ?, name_status = NULL WHERE student_id = ?', [name.trim(), normalized]);
+  const finalName = (gradeCardName || name).trim();
+  if (gradeCardName) {
+    await d1Query('UPDATE student_cgpa SET name = ?, grade_card_name = ?, name_status = NULL WHERE student_id = ?', [finalName, gradeCardName.trim(), normalized]);
+  } else {
+    await d1Query('UPDATE student_cgpa SET name = ?, name_status = NULL WHERE student_id = ?', [finalName, normalized]);
+  }
+  clearD1QueryCache();
+  return { success: true };
+}
+
+export async function setStudentNameEdit(studentId, newName) {
+  const normalized = studentId.trim().toUpperCase();
+  const rows = await d1Query('SELECT student_id, name, name_edit_used FROM student_cgpa WHERE student_id = ? LIMIT 1', [normalized], { noCache: true });
+  if (!rows.length) return { success: false, error: 'No student record found for this roll number.' };
+
+  if (rows[0].name_edit_used) {
+    return { success: false, error: 'You have already used your one-time name edit. Contact an administrator for further changes.' };
+  }
+
+  await d1Query('UPDATE student_cgpa SET name = ?, grade_card_name = ?, name_status = NULL, name_edit_used = 1 WHERE student_id = ?', [newName.trim(), newName.trim(), normalized]);
   clearD1QueryCache();
   return { success: true };
 }
@@ -103,13 +124,15 @@ export async function setStudentName(studentId, name) {
 export async function setStudentEmail(studentId, email) {
   const normalized = studentId.trim().toUpperCase();
   const cleanEmail = email.trim().toLowerCase();
-  const rows = await d1Query('SELECT student_id, email FROM student_cgpa WHERE student_id = ? LIMIT 1', [normalized], { noCache: true });
+  const rows = await d1Query('SELECT student_id, email, email_edit_used FROM student_cgpa WHERE student_id = ? LIMIT 1', [normalized], { noCache: true });
   if (!rows.length) return null;
 
   const currentEmail = (rows[0].email || '').trim();
   if (currentEmail && currentEmail !== cleanEmail) {
-    // Changing an existing email requires admin approval.
-    await d1Query('UPDATE student_cgpa SET pending_email = ? WHERE student_id = ?', [cleanEmail, normalized]);
+    if (rows[0].email_edit_used) {
+      return { status: 'blocked', error: 'You have already changed your email once. Contact an administrator for further changes.' };
+    }
+    await d1Query('UPDATE student_cgpa SET pending_email = ?, email_edit_used = 1 WHERE student_id = ?', [cleanEmail, normalized]);
     clearD1QueryCache();
     return { status: 'pending', email: currentEmail, pendingEmail: cleanEmail };
   }
@@ -274,7 +297,9 @@ export function cgpaRowToApi(row, academicSummary = null) {
     Name: row.name || '',
     NameStatus: row.name_status || 'pending',
     Email: row.email || '',
-    PendingEmail: row.pending_email || ''
+    PendingEmail: row.pending_email || '',
+    NameEditUsed: row.name_edit_used ? 1 : 0,
+    EmailEditUsed: row.email_edit_used ? 1 : 0
   };
   for (const [dbColumn, apiColumn] of Object.entries(semesterDbToApi)) {
     result[apiColumn] = numberToText(row[dbColumn]);

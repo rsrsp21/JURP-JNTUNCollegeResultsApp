@@ -3667,6 +3667,101 @@ section > .page-container > .download-row {
   margin-bottom: 12px;
 }
 
+/* Image cropper modal */
+.cropper-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: var(--overlay);
+}
+
+.cropper-dialog {
+  width: min(560px, 100%);
+  max-height: 92vh;
+  overflow-y: auto;
+  background: var(--white);
+  border: 1px solid var(--hairline);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 18px 50px var(--shadow-soft);
+}
+
+.cropper-heading {
+  font-family: var(--font-serif);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.cropper-hint {
+  margin: 6px 0 12px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.cropper-stage {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--hairline);
+  touch-action: none;
+  user-select: none;
+}
+
+.cropper-stage img {
+  display: block;
+  max-width: 100%;
+  max-height: 56vh;
+  pointer-events: none;
+}
+
+.cropper-box {
+  position: absolute;
+  border: 2px solid var(--ink);
+  box-shadow: 0 0 0 9999px var(--overlay);
+  cursor: move;
+  touch-action: none;
+}
+
+.cropper-handle {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: var(--ink);
+  border: 2px solid var(--paper);
+  border-radius: 50%;
+  touch-action: none;
+}
+
+.cropper-handle.nw { top: -9px; left: -9px; cursor: nwse-resize; }
+.cropper-handle.ne { top: -9px; right: -9px; cursor: nesw-resize; }
+.cropper-handle.sw { bottom: -9px; left: -9px; cursor: nesw-resize; }
+.cropper-handle.se { bottom: -9px; right: -9px; cursor: nwse-resize; }
+
+.cropper-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.id-upload-preview-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.id-upload-preview-row .id-upload-preview {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
 .id-upload-preview img {
   max-width: 100%;
   max-height: 180px;

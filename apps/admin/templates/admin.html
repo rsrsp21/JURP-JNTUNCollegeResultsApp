@@ -955,7 +955,7 @@
                 <!-- Tab 7: Student ID Images -->
                 <div class="tab-pane" id="pane-id-images">
                     <h3>Student ID Images</h3>
-                    <p class="text-muted mb-4">Cropped ID uploads students used to verify their names (stored in R2 under <code>idsImages/</code>). Rejecting an image deletes it and clears that student's name on the portal.</p>
+                    <p class="text-muted mb-4">Student ID cards and grade cards uploaded for name verification. ID images are in <code>idsImages/</code>, grade cards in <code>gradecardImages/</code>. Rejecting deletes the images and clears the student's name.</p>
                     <div class="d-flex align-items-center gap-2 mb-3">
                         <span id="id-images-count" class="csv-meta">Loading images...</span>
                         <button id="id-images-refresh-btn" class="button btn-sm" type="button">
@@ -1887,33 +1887,81 @@
         }
 
         function renderIdImages(images) {
-            idImagesCount.textContent = `${images.length} image${images.length === 1 ? '' : 's'}`;
+            idImagesCount.textContent = `${images.length} student${images.length === 1 ? '' : 's'}`;
             if (!images.length) {
                 idImagesGrid.innerHTML = '<div class="text-muted">No student ID images uploaded yet.</div>';
                 return;
             }
             idImagesGrid.innerHTML = '';
-            images.forEach(image => {
+            images.forEach(entry => {
                 const card = document.createElement('div');
                 card.className = 'id-image-card';
 
-                const img = document.createElement('img');
-                img.loading = 'lazy';
-                img.alt = `ID upload for ${image.roll_number || image.name}`;
-                img.src = `/api/admin/id-image?path=${encodeURIComponent(image.path)}`;
+                // Images row - show both ID card and grade card side by side
+                const imagesRow = document.createElement('div');
+                imagesRow.style.cssText = 'display: flex; gap: 0.5rem; margin-bottom: 0.5rem;';
+
+                if (entry.id_image) {
+                    const idImgWrap = document.createElement('div');
+                    idImgWrap.style.cssText = 'flex: 1; min-width: 0;';
+                    const idLabel = document.createElement('div');
+                    idLabel.style.cssText = 'font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); margin-bottom: 0.25rem;';
+                    idLabel.textContent = 'ID Card';
+                    const idImg = document.createElement('img');
+                    idImg.loading = 'lazy';
+                    idImg.alt = `ID card for ${entry.roll_number}`;
+                    idImg.src = `/api/admin/id-image?path=${encodeURIComponent(entry.id_image.path)}`;
+                    idImg.style.cssText = 'width: 100%; border-radius: 0.5rem; cursor: pointer;';
+                    idImg.addEventListener('click', () => window.open(idImg.src, '_blank'));
+                    idImgWrap.appendChild(idLabel);
+                    idImgWrap.appendChild(idImg);
+                    imagesRow.appendChild(idImgWrap);
+                }
+
+                if (entry.grade_card_image) {
+                    const gcImgWrap = document.createElement('div');
+                    gcImgWrap.style.cssText = 'flex: 1; min-width: 0;';
+                    const gcLabel = document.createElement('div');
+                    gcLabel.style.cssText = 'font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); margin-bottom: 0.25rem;';
+                    gcLabel.textContent = 'Grade Card';
+                    const gcImg = document.createElement('img');
+                    gcImg.loading = 'lazy';
+                    gcImg.alt = `Grade card for ${entry.roll_number}`;
+                    gcImg.src = `/api/admin/id-image?path=${encodeURIComponent(entry.grade_card_image.path)}`;
+                    gcImg.style.cssText = 'width: 100%; border-radius: 0.5rem; cursor: pointer;';
+                    gcImg.addEventListener('click', () => window.open(gcImg.src, '_blank'));
+                    gcImgWrap.appendChild(gcLabel);
+                    gcImgWrap.appendChild(gcImg);
+                    imagesRow.appendChild(gcImgWrap);
+                }
+
+                if (!entry.id_image && !entry.grade_card_image) {
+                    const noImg = document.createElement('div');
+                    noImg.className = 'text-muted';
+                    noImg.textContent = 'No images uploaded';
+                    imagesRow.appendChild(noImg);
+                }
+
+                card.appendChild(imagesRow);
 
                 const meta = document.createElement('div');
                 meta.className = 'id-image-meta';
-                meta.innerHTML = `<span class="id-image-roll">${image.roll_number || 'Unknown roll'}</span><br>${image.name} · ${(image.size / 1024).toFixed(1)} KB`;
+                let metaHtml = `<span class="id-image-roll">${entry.roll_number}</span>`;
+                if (entry.db_name) metaHtml += `<br>ID name: <strong>${entry.db_name}</strong>`;
+                if (entry.grade_card_name) metaHtml += `<br>Grade card name: <strong style="color: var(--accent-color);">${entry.grade_card_name}</strong>`;
+                meta.innerHTML = metaHtml;
+                card.appendChild(meta);
 
                 const nameLabel = document.createElement('label');
                 nameLabel.className = 'id-image-name-label';
-                nameLabel.textContent = 'Extracted name (editable)';
+                nameLabel.textContent = 'Final name (editable)';
                 const nameInput = document.createElement('input');
                 nameInput.type = 'text';
                 nameInput.className = 'form-control id-image-name-input';
-                nameInput.value = image.db_name || '';
+                nameInput.value = entry.grade_card_name || entry.db_name || '';
                 nameInput.placeholder = 'Student name';
+                card.appendChild(nameLabel);
+                card.appendChild(nameInput);
 
                 const actions = document.createElement('div');
                 actions.className = 'id-image-actions';
@@ -1925,10 +1973,11 @@
                     approveBtn.disabled = true;
                     approveBtn.textContent = 'Approving...';
                     try {
+                        const imgPath = entry.id_image ? entry.id_image.path : (entry.grade_card_image ? entry.grade_card_image.path : '');
                         const response = await fetch('/api/admin/approve-id-image', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ path: image.path, name: nameInput.value })
+                            body: JSON.stringify({ path: imgPath, name: nameInput.value })
                         });
                         const data = await response.json();
                         if (!response.ok) throw new Error(data.error || 'Approve failed');
@@ -1945,14 +1994,15 @@
                 rejectBtn.className = 'id-image-reject-btn';
                 rejectBtn.innerHTML = '<i class="fas fa-times-circle"></i> Reject';
                 rejectBtn.addEventListener('click', async () => {
-                    if (!confirm(`Reject this ID image and clear the portal name for ${image.roll_number || 'this student'}?`)) return;
+                    if (!confirm(`Reject images and clear the portal name for ${entry.roll_number}?`)) return;
                     rejectBtn.disabled = true;
                     rejectBtn.textContent = 'Rejecting...';
                     try {
+                        const imgPath = entry.id_image ? entry.id_image.path : (entry.grade_card_image ? entry.grade_card_image.path : '');
                         const response = await fetch('/api/admin/reject-id-image', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ path: image.path })
+                            body: JSON.stringify({ path: imgPath })
                         });
                         const data = await response.json();
                         if (!response.ok) throw new Error(data.error || 'Reject failed');
@@ -1967,10 +2017,6 @@
 
                 actions.appendChild(approveBtn);
                 actions.appendChild(rejectBtn);
-                card.appendChild(img);
-                card.appendChild(meta);
-                card.appendChild(nameLabel);
-                card.appendChild(nameInput);
                 card.appendChild(actions);
                 idImagesGrid.appendChild(card);
             });

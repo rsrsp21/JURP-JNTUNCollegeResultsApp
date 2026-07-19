@@ -161,20 +161,29 @@ export default function SemesterResultsPage() {
               </motion.div>
 
               <div className="profile-actions">
-                {!cgpaData.Name ? (
-                  <IdNameUpload
+                <IdNameUpload
                     studentId={payload.studentId}
-                    onVerified={(name) => {
-                      const next = { ...payload, cgpaData: { ...payload.cgpaData, Name: name } };
+                    currentName={cgpaData.Name || ''}
+                    nameEditUsed={Boolean(cgpaData.NameEditUsed)}
+                    onVerified={(name, data) => {
+                      const next = {
+                        ...payload,
+                        cgpaData: {
+                          ...payload.cgpaData,
+                          Name: name,
+                          NameStatus: 'pending',
+                          NameEditUsed: data?.mode === 'edit' ? 1 : payload.cgpaData.NameEditUsed
+                        }
+                      };
                       setPayload(next);
                       writeSemesterResultsCache(payload.studentId, next);
                     }}
                   />
-                ) : null}
                 <EmailSubscribe
                   studentId={payload.studentId}
                   currentEmail={cgpaData.Email || ''}
                   pendingEmail={cgpaData.PendingEmail || ''}
+                  changeUsed={Boolean(cgpaData.EmailEditUsed)}
                   onSaved={(result) => {
                     const next = {
                       ...payload,
