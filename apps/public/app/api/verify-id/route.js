@@ -132,9 +132,9 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Could not read a valid name from the image.' }, { status: 422 });
   }
 
-  const updated = await setStudentName(studentId, extractedName);
-  if (!updated) {
-    return NextResponse.json({ error: 'No student record found for this roll number.' }, { status: 404 });
+  const result = await setStudentName(studentId, extractedName);
+  if (!result.success) {
+    return NextResponse.json({ error: result.error }, { status: 422 });
   }
 
   // Archive the verified crop in R2 so admins can audit/reject it later.
