@@ -57,6 +57,7 @@ app.secret_key = os.getenv('FLASK_SECRET_KEY', 'jntun_results_secret_key')
 @app.context_processor
 def inject_template_vars():
     return {
+ 
         'main_portal_url': 'https://jurp.vercel.app'
     }
 
@@ -1130,6 +1131,7 @@ def admin_resolve_email_request():
 
 # --- Student ID Image Review ---
 ID_IMAGES_PREFIX = 'idsImages'
+GRADE_CARD_IMAGES_PREFIX = 'gradecardImages'
 ID_IMAGE_ROLL_PATTERN = re.compile(r'^([0-9]{2}[0-9A-Z]{3}A[0-9A-Z]{4})\.(jpg|jpeg|png|webp)$', re.IGNORECASE)
 
 @app.route('/api/admin/id-images', methods=['GET'])
@@ -1141,28 +1143,71 @@ def admin_list_id_images():
         return jsonify({'error': 'Cloudflare R2 is not configured'}), 500
 
     try:
-        images = []
+        # Gather ID card images
+        id_images_by_roll = {}
         for item in list_r2_keys_under(ID_IMAGES_PREFIX):
             if not item['name'].lower().endswith(('.jpg', '.jpeg', '.png', '.webp')):
                 continue
             match = ID_IMAGE_ROLL_PATTERN.match(item['name'])
-            images.append({**item, 'roll_number': match.group(1).upper() if match else None})
+            if match:
+                roll = match.group(1).upper()
+                id_images_by_roll[roll] = item
 
-        rolls = [image['roll_number'] for image in images if image['roll_number']]
+        # Gather grade card images
+        gc_images_by_roll = {}
+        for item in list_r2_keys_under(GRADE_CARD_IMAGES_PREFIX):
+            if not item['name'].lower().endswith(('.jpg', '.jpeg', '.png', '.webp')):
+                continue
+            match = ID_IMAGE_ROLL_PATTERN.match(item['name'])
+            if match:
+                roll = match.group(1).upper()
+                gc_images_by_roll[roll] = item
+
+        all_rolls = sorted(set(list(id_images_by_roll.keys()) + list(gc_images_by_roll.keys())))
+
         names_by_roll = {}
-        if rolls:
-            placeholders = ','.join('?' * len(rolls))
+        if all_rolls:
+            placeholders = ','.join('?' * len(all_rolls))
             for row in d1_storage.query(
-                f'SELECT student_id, name, name_status FROM student_cgpa WHERE student_id IN ({placeholders})', rolls
+                f'SELECT student_id, name, name_status, grade_card_name FROM student_cgpa WHERE student_id IN ({placeholders})', all_rolls
             ):
-                names_by_roll[row['student_id']] = {'name': row.get('name') or '', 'status': row.get('name_status') or 'pending'}
+                names_by_roll[row['student_id']] = {
+                    'name': row.get('name') or '',
+                    'status': row.get('name_status') or 'pending',
+                    'grade_card_name': row.get('grade_card_name') or ''
+                }
 
-        for image in images:
-            record = names_by_roll.get(image['roll_number'], {'name': '', 'status': 'pending'})
-            image['db_name'] = record['name']
-            image['status'] = record['status']
+        images = []
+        for roll in all_rolls:
+            id_img = id_images_by_roll.get(roll)
+            gc_img = gc_images_by_roll.get(roll)
+            record = names_by_roll.get(roll, {'name': '', 'status': 'pending', 'grade_card_name': ''})
 
-        pending = [image for image in images if image['status'] != 'approved']
+            entry = {
+                'roll_number': roll,
+                'db_name': record['name'],
+                'grade_card_name': record['grade_card_name'],
+                'status': record['status'],
+                'id_image': None,
+                'grade_card_image': None
+            }
+
+            if id_img:
+                entry['id_image'] = {
+                    'path': id_img['path'],
+                    'name': id_img['name'],
+                    'size': id_img.get('size', 0)
+                }
+            if gc_img:
+                entry['grade_card_image'] = {
+                    'path': gc_img['path'],
+                    'name': gc_img['name'],
+                    'size': gc_img.get('size', 0)
+                }
+
+            images.append(entry)
+
+        pending = [img for img in images if img['status'] != 'approved']
         approved = d1_storage.query(
             "SELECT student_id, name FROM student_cgpa WHERE name_status = 'approved' AND name IS NOT NULL ORDER BY student_id"
         )
@@ -1178,7 +1223,7 @@ def admin_approve_id_image():
     data = request.get_json(silent=True) or {}
     requested_path = data.get('path', '')
     name = ' '.join(str(data.get('name', '')).upper().split())
-    if not requested_path.startswith(ID_IMAGES_PREFIX + '/'):
+    if not (requested_path.startswith(ID_IMAGES_PREFIX + '/') or requested_path.startswith(GRADE_CARD_IMAGES_PREFIX + '/')):
         return jsonify({'error': 'Invalid image path'}), 400
     if not re.fullmatch(r"[A-Z][A-Z .]{1,58}[A-Z.]", name):
         return jsonify({'error': 'Enter a valid name (letters, spaces, and dots only)'}), 400
@@ -1206,7 +1251,7 @@ def admin_get_id_image():
         return jsonify({'error': 'Unauthorized'}), 401
 
     requested_path = request.args.get('path', '')
-    if not requested_path.startswith(ID_IMAGES_PREFIX + '/'):
+    if not (requested_path.startswith(ID_IMAGES_PREFIX + '/') or requested_path.startswith(GRADE_CARD_IMAGES_PREFIX + '/')):
         return jsonify({'error': 'Invalid image path'}), 400
 
     try:
@@ -1224,7 +1269,7 @@ def admin_reject_id_image():
 
     data = request.get_json(silent=True) or {}
     requested_path = data.get('path', '')
-    if not requested_path.startswith(ID_IMAGES_PREFIX + '/'):
+    if not (requested_path.startswith(ID_IMAGES_PREFIX + '/') or requested_path.startswith(GRADE_CARD_IMAGES_PREFIX + '/')):
         return jsonify({'error': 'Invalid image path'}), 400
 
     filename = requested_path.rsplit('/', 1)[-1]
@@ -1234,13 +1279,19 @@ def admin_reject_id_image():
     roll_number = match.group(1).upper()
 
     try:
-        d1_storage.execute("UPDATE student_cgpa SET name = NULL, name_status = 'rejected' WHERE student_id = ?", [roll_number])
+        d1_storage.execute("UPDATE student_cgpa SET name = NULL, name_status = 'rejected', grade_card_name = NULL WHERE student_id = ?", [roll_number])
         portal_db.clear_runtime_cache()
-        delete_r2_key(requested_path)
+        # Delete both ID and grade card images if they exist
+        for prefix in [ID_IMAGES_PREFIX, GRADE_CARD_IMAGES_PREFIX]:
+            for ext in ['jpg', 'jpeg', 'png', 'webp']:
+                try:
+                    delete_r2_key(f'{prefix}/{roll_number}.{ext}')
+                except Exception:
+                    pass
         return jsonify({
             'success': True,
             'roll_number': roll_number,
-            'message': f'Rejected ID image and cleared the name for {roll_number}.'
+            'message': f'Rejected and cleared all images and name for {roll_number}.'
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500

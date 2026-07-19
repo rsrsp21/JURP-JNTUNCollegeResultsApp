@@ -155,20 +155,26 @@ export default function CgpaPage() {
               </motion.div>
 
               <div className="profile-actions">
-                {!student.Name ? (
-                  <IdNameUpload
-                    studentId={student.ID}
-                    onVerified={(name) => {
-                      const next = { ...student, Name: name };
-                      setStudent(next);
-                      writeCgpaCache(student.ID, next);
-                    }}
-                  />
-                ) : null}
+                <IdNameUpload
+                  studentId={student.ID}
+                  currentName={student.Name || ''}
+                  nameEditUsed={Boolean(student.NameEditUsed)}
+                  onVerified={(name, data) => {
+                    const next = {
+                      ...student,
+                      Name: name,
+                      NameStatus: 'pending',
+                      NameEditUsed: data?.mode === 'edit' ? 1 : student.NameEditUsed
+                    };
+                    setStudent(next);
+                    writeCgpaCache(student.ID, next);
+                  }}
+                />
                 <EmailSubscribe
                   studentId={student.ID}
                   currentEmail={student.Email || ''}
                   pendingEmail={student.PendingEmail || ''}
+                  changeUsed={Boolean(student.EmailEditUsed)}
                   onSaved={(result) => {
                     const next = { ...student, Email: result.email, PendingEmail: result.pendingEmail || '' };
                     setStudent(next);

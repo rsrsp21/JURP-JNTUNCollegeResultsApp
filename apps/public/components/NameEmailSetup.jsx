@@ -72,16 +72,24 @@ export default function NameEmailSetup() {
           </div>
 
           <div className="profile-actions">
-            {!student.Name ? (
-              <IdNameUpload
-                studentId={student.ID}
-                onVerified={(name) => setStudent({ ...student, Name: name })}
-              />
-            ) : null}
+            <IdNameUpload
+              studentId={student.ID}
+              currentName={student.Name || ''}
+              nameEditUsed={Boolean(student.NameEditUsed)}
+              onVerified={(name, data) =>
+                setStudent({
+                  ...student,
+                  Name: name,
+                  NameStatus: 'pending',
+                  NameEditUsed: data?.mode === 'edit' ? 1 : student.NameEditUsed
+                })
+              }
+            />
             <EmailSubscribe
               studentId={student.ID}
               currentEmail={student.Email || ''}
               pendingEmail={student.PendingEmail || ''}
+              changeUsed={Boolean(student.EmailEditUsed)}
               onSaved={(result) => setStudent({ ...student, Email: result.email, PendingEmail: result.pendingEmail || '' })}
             />
           </div>

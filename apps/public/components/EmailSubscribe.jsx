@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import UiIcon from '@/components/UiIcon';
 
-export default function EmailSubscribe({ studentId, currentEmail = '', pendingEmail = '', onSaved }) {
+export default function EmailSubscribe({ studentId, currentEmail = '', pendingEmail = '', changeUsed = false, onSaved }) {
   const [editing, setEditing] = useState(false);
   const [email, setEmail] = useState(currentEmail);
   const [saving, setSaving] = useState(false);
@@ -46,7 +46,7 @@ export default function EmailSubscribe({ studentId, currentEmail = '', pendingEm
             <span className="pending-tag">Change to {pendingEmail} pending approval</span>
           </span>
         ) : null}
-        {!pendingEmail ? (
+        {!pendingEmail && !(currentEmail && changeUsed) ? (
           <button
             className={`subtle-button ${currentEmail ? '' : 'glow-attract'}`}
             type="button"
@@ -69,7 +69,7 @@ export default function EmailSubscribe({ studentId, currentEmail = '', pendingEm
     <form className="email-subscribe editing" onSubmit={save}>
       <span className="email-subscribe-hint">
         {currentEmail
-          ? 'Changing your email needs admin approval. Your current email stays active until then.'
+          ? 'Changing your email needs admin approval and can be done only once. Your current email stays active until then.'
           : 'Get result updates through email.'}
       </span>
       <input

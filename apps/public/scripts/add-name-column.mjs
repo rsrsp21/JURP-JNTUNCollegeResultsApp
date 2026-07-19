@@ -34,11 +34,20 @@ async function run(sql) {
 
 const columns = await run(`PRAGMA table_info(student_cgpa)`);
 const existing = new Set((columns?.[0]?.results || []).map((c) => c.name));
-for (const column of ['name', 'email', 'name_status', 'pending_email']) {
+const columnDefs = {
+  name: 'TEXT',
+  email: 'TEXT',
+  name_status: 'TEXT',
+  pending_email: 'TEXT',
+  grade_card_name: 'TEXT',
+  name_edit_used: 'INTEGER DEFAULT 0',
+  email_edit_used: 'INTEGER DEFAULT 0'
+};
+for (const [column, type] of Object.entries(columnDefs)) {
   if (existing.has(column)) {
     console.log(`Column "${column}" already exists on student_cgpa. Nothing to do.`);
   } else {
-    await run(`ALTER TABLE student_cgpa ADD COLUMN ${column} TEXT`);
+    await run(`ALTER TABLE student_cgpa ADD COLUMN ${column} ${type}`);
     console.log(`Added "${column}" column to student_cgpa.`);
   }
 }

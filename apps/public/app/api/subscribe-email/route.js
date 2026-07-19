@@ -28,6 +28,9 @@ export async function POST(request) {
   if (!result) {
     return NextResponse.json({ error: 'No student record found for this roll number.' }, { status: 404 });
   }
+  if (result.status === 'blocked') {
+    return NextResponse.json({ error: result.error }, { status: 403 });
+  }
 
   return NextResponse.json(result);
 }
