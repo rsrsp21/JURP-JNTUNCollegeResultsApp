@@ -273,6 +273,43 @@ def upload_changed_files_to_prefix(local_folder, prefix, previous_hashes=None, a
     return uploaded
 
 
+def list_keys_under(prefix):
+    client = _client()
+    prefix = normalize_key(prefix.strip('/')) or ''
+    list_prefix = f"{prefix}/" if prefix else ''
+    items = []
+
+    paginator = client.get_paginator('list_objects_v2')
+    for page in paginator.paginate(Bucket=_bucket(), Prefix=list_prefix):
+        for item in page.get('Contents', []):
+            key = item.get('Key', '')
+            if not key or key.endswith('/'):
+                continue
+
+            modified = item.get('LastModified')
+            if isinstance(modified, datetime):
+                modified = modified.timestamp()
+
+            items.append({
+                'path': key,
+                'name': PurePosixPath(key).name,
+                'size': item.get('Size', 0),
+                'modified': modified
+            })
+
+    items.sort(key=lambda item: item['path'].lower())
+    return items
+
+
+def read_bytes_key(path):
+    key = normalize_key(path)
+    if not key:
+        raise FileNotFoundError('File key not found')
+
+    response = _client().get_object(Bucket=_bucket(), Key=key)
+    return key, response['Body'].read(), response.get('ContentType') or 'application/octet-stream'
+
+
 def delete_key(path):
     key = normalize_key(path)
     if not key:

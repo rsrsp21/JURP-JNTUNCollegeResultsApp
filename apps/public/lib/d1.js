@@ -58,16 +58,20 @@ function writeCachedQuery(key, rows) {
   cache.set(key, { createdAt: Date.now(), rows });
 }
 
+export function clearD1QueryCache() {
+  queryCache().clear();
+}
+
 export function isD1Configured() {
   return Boolean(accountId() && databaseId() && apiToken());
 }
 
-export async function d1Query(sql, params = []) {
+export async function d1Query(sql, params = [], { noCache = false } = {}) {
   if (!isD1Configured()) {
     throw new Error('Cloudflare D1 is not configured.');
   }
 
-  const canCache = /^\s*select\b/i.test(sql);
+  const canCache = !noCache && /^\s*select\b/i.test(sql);
   const key = canCache ? cacheKey(sql, params) : null;
   const cachedRows = key ? readCachedQuery(key) : null;
   if (cachedRows) return cachedRows;

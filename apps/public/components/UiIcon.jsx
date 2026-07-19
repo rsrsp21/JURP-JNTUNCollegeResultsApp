@@ -23,6 +23,21 @@ function iconPath(name) {
           <path d="M8 18h.01" />
         </>
       );
+    case 'mail':
+      return (
+        <>
+          <rect x="3" y="5" width="18" height="14" rx="2" />
+          <path d="m3 7 9 6 9-6" />
+        </>
+      );
+    case 'upload':
+      return (
+        <>
+          <path d="M12 15V4" />
+          <path d="m8 8 4-4 4 4" />
+          <path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3" />
+        </>
+      );
     case 'graduationCap':
       return (
         <>

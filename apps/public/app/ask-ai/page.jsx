@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -15,9 +16,17 @@ const suggestions = [
   { type: 'roll', icon: 'userSearch', label: 'Ask by roll number' },
   { type: 'compare', icon: 'compare', label: 'Compare students' },
   { type: 'send', icon: 'sparkles', message: 'How can I improve my academic performance?', label: 'Improve performance' },
+  { type: 'send', icon: 'user', message: 'How do I add my name and email for result updates?', label: 'Add name & email' },
   { type: 'send', icon: 'download', message: 'How do I download my result PDF?', label: 'Download help' },
   { type: 'send', icon: 'bell', message: 'What results were recently released?', label: 'Latest results' }
 ];
+
+function isNameEmailQuestion(message = '') {
+  const text = message.toLowerCase();
+  const mentionsFeature = /\b(name|email|id card|idcard)\b/.test(text);
+  const mentionsIntent = /\b(add|verify|verified|upload|change|update|updates|register|set|fix|approve|approval|remove|how)\b/.test(text);
+  return mentionsFeature && mentionsIntent;
+}
 
 export default function AskAiPage() {
   const {
@@ -66,7 +75,14 @@ export default function AskAiPage() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Results AI is unavailable.');
       if (data.studentId) setActiveStudentId(data.studentId);
-      setMessages((current) => [...current, { role: 'assistant', text: data.answer || 'I could not prepare an answer.' }]);
+      setMessages((current) => [
+        ...current,
+        {
+          role: 'assistant',
+          text: data.answer || 'I could not prepare an answer.',
+          action: isNameEmailQuestion(message) ? 'name-email' : null
+        }
+      ]);
     } catch (err) {
       setError(err.message || 'Results AI is unavailable.');
     } finally {
@@ -196,6 +212,12 @@ export default function AskAiPage() {
                         ) : (
                           <p>{message.text}</p>
                         )}
+                        {message.action === 'name-email' ? (
+                          <Link href="/#name-email-setup" className="ink-button chat-action-button">
+                            <UiIcon name="user" />
+                            Add name &amp; email
+                          </Link>
+                        ) : null}
                       </div>
                     </div>
                   </motion.div>

@@ -8,7 +8,7 @@ import {
 import { envValue } from './env';
 
 const rollPattern = /(?<![A-Z0-9])\d{5}A[A-Z0-9]{4}(?![A-Z0-9])/gi;
-const academicKeywords = new Set('result results semester sem sgpa cgpa grade grades credit credits backlog backlogs fail failed supply supplementary performance subject subjects download pdf toppers topper rank branch batch regulation improve best weak attention honors minor roll number marks academic history portal compare comparison vs versus notification notifications released feature features'.split(' '));
+const academicKeywords = new Set('result results semester sem sgpa cgpa grade grades credit credits backlog backlogs fail failed supply supplementary performance subject subjects download pdf toppers topper rank branch batch regulation improve best weak attention honors minor roll number marks academic history portal compare comparison vs versus notification notifications released feature features name email id card upload verify verified approval approved pending updates'.split(' '));
 const greetings = new Set(['hi', 'hello', 'hey', 'help']);
 
 export function extractAllRollNumbers(text = '') {
@@ -26,7 +26,7 @@ export function isRelevantAcademicMessage(message = '') {
 export function needsStudentResultContext(message = '') {
   const words = new Set((message.toLowerCase().match(/[a-zA-Z]+/g) || []));
   const studentWords = new Set('cgpa sgpa grade grades credit credits backlog backlogs fail failed supply performance subject subjects semester sem best weak attention improve honors minor compare comparison vs versus'.split(' '));
-  const generalWords = new Set('toppers topper download pdf portal help how where notification notifications released feature features'.split(' '));
+  const generalWords = new Set('toppers topper download pdf portal help how where notification notifications released feature features name email id card upload verify approval approved updates'.split(' '));
   const hasGeneral = [...words].some((word) => generalWords.has(word));
   const hasStudent = [...words].some((word) => studentWords.has(word));
   if (hasGeneral && !hasStudent) return false;
@@ -54,6 +54,8 @@ export async function buildStudentContext(studentId, question) {
     portal: { currentNotification },
     student: {
       rollNumber: studentId,
+      name: cgpaData.Name || null,
+      nameStatus: cgpaData.Name ? (cgpaData.NameStatus === 'approved' ? 'approved' : 'pending admin approval') : null,
       batch: cgpaData.Batch || null,
       regulation: cgpaData.Regulation || null,
       cgpa: cgpaData.CGPA || null,
@@ -62,7 +64,7 @@ export async function buildStudentContext(studentId, question) {
       academicSummary: cgpaData.academicSummary || null
     },
     semesterSgpaAndCredits: Object.fromEntries(
-      Object.entries(cgpaData).filter(([key]) => !['ID', 'Batch', 'Regulation', 'Supplementary Appearances', 'academicSummary'].includes(key))
+      Object.entries(cgpaData).filter(([key]) => !['ID', 'Name', 'NameStatus', 'Email', 'Batch', 'Regulation', 'Supplementary Appearances', 'academicSummary'].includes(key))
     ),
     retrievedSemesters: semesterRecords,
     derivedSignals: {
@@ -96,7 +98,7 @@ export async function buildMultiStudentContext(studentIds, question) {
         supplementaryAppearances: cgpaData['Supplementary Appearances'] || null,
         academicSummary: cgpaData.academicSummary || null,
         semesterSgpaAndCredits: Object.fromEntries(
-          Object.entries(cgpaData).filter(([key]) => !['ID', 'Batch', 'Regulation', 'Supplementary Appearances', 'academicSummary'].includes(key))
+          Object.entries(cgpaData).filter(([key]) => !['ID', 'Name', 'NameStatus', 'Email', 'Batch', 'Regulation', 'Supplementary Appearances', 'academicSummary'].includes(key))
         ),
         retrievedSemesters: semesterRecords,
         derivedSignals: {
@@ -131,7 +133,13 @@ export async function buildGeneralContext(question) {
         { name: 'Semester-wise Results', path: '/semester_results', purpose: 'View semester grades, SGPA, credits, and download PDFs' },
         { name: 'Toppers', path: '/toppers', purpose: 'View branch-wise and overall toppers' }
       ],
-      chatScope: 'Only answer questions about results, CGPA, SGPA, credits, backlogs, toppers, downloads, and portal navigation.',
+      chatScope: 'Only answer questions about results, CGPA, SGPA, credits, backlogs, toppers, downloads, portal navigation, and the name/email verification feature.',
+      nameEmailFeature: {
+        summary:
+          'Students can verify their name by uploading a photo of their college ID card (with the mobile number cropped out for privacy) on the Home, CGPA, or Semester Results pages. Gemini AI extracts the name and roll number; the name then appears beside their roll number across the portal with a "Pending approval" tag until an admin approves it. Students can also add their email address to receive result updates through email.',
+        howTo:
+          'On the home page use the "Add name & email" button (or the section below the hero), or search your roll number on the CGPA / Semester Results pages and use the "Add your name (upload ID card)" and "Add email" buttons.'
+      },
       currentNotification: await latestNotificationText()
     }
   };
@@ -205,7 +213,10 @@ export async function callGemini(question, context, history = [], maxTokens = 20
   const model = getGeminiModel();
   const systemInstruction = `
 You are "Results AI" for JNTUK UCEN.
-Only answer questions about academic results, grades, CGPA, SGPA, credits, backlogs, toppers, downloads, portal navigation, and academic performance.
+Only answer questions about academic results, grades, CGPA, SGPA, credits, backlogs, toppers, downloads, portal navigation, academic performance, and the portal's name/email verification feature.
+When the retrieved student has a verified name, address them by name naturally (e.g. in greetings or summaries); if the name status is pending, you may mention it awaits admin approval.
+Students can verify their name by uploading their college ID card (mobile number cropped out) and add an email for result updates — explain this flow if asked how to add or fix a name or email.
+NEVER reveal, guess, or discuss any student's email address; if asked, say emails are private and can be managed by that student on the portal.
 Use the retrieved context as the source of truth. Do not invent roll numbers, grades, notifications, or rankings.
 When presenting semester rows, subjects, or comparisons, use clear Markdown tables.
 Return valid GitHub Flavored Markdown.

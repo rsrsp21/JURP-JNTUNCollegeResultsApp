@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { d1Query } from './d1';
+import { clearD1QueryCache, d1Query } from './d1';
 
 export const batchConfig = {
   '2021': { batchLabel: '2021-25', regulation: 'R20', prefixes: ['21031A', '22035A'] },
@@ -31,6 +31,10 @@ const semesterDbToApi = {
 
 const cgpaSelectColumns = `
   c.student_id,
+  c.name,
+  c.name_status,
+  c.email,
+  c.pending_email,
   c.batch_label,
   c.regulation,
   c.sgpa_1_1,
@@ -75,9 +79,38 @@ export async function getStudentCgpa(studentId) {
     WHERE c.student_id = ?
     LIMIT 1
     `,
-    [studentId.trim().toUpperCase()]
+    [studentId.trim().toUpperCase()],
+    { noCache: true }
   );
   return rows[0] ? cgpaRowToApi(rows[0], academicSummaryFromJoinedRow(rows[0])) : null;
+}
+
+export async function setStudentName(studentId, name) {
+  const normalized = studentId.trim().toUpperCase();
+  const rows = await d1Query('SELECT student_id FROM student_cgpa WHERE student_id = ? LIMIT 1', [normalized]);
+  if (!rows.length) return false;
+  await d1Query('UPDATE student_cgpa SET name = ?, name_status = NULL WHERE student_id = ?', [name.trim(), normalized]);
+  clearD1QueryCache();
+  return true;
+}
+
+export async function setStudentEmail(studentId, email) {
+  const normalized = studentId.trim().toUpperCase();
+  const cleanEmail = email.trim().toLowerCase();
+  const rows = await d1Query('SELECT student_id, email FROM student_cgpa WHERE student_id = ? LIMIT 1', [normalized], { noCache: true });
+  if (!rows.length) return null;
+
+  const currentEmail = (rows[0].email || '').trim();
+  if (currentEmail && currentEmail !== cleanEmail) {
+    // Changing an existing email requires admin approval.
+    await d1Query('UPDATE student_cgpa SET pending_email = ? WHERE student_id = ?', [cleanEmail, normalized]);
+    clearD1QueryCache();
+    return { status: 'pending', email: currentEmail, pendingEmail: cleanEmail };
+  }
+
+  await d1Query('UPDATE student_cgpa SET email = ?, pending_email = NULL WHERE student_id = ?', [cleanEmail, normalized]);
+  clearD1QueryCache();
+  return { status: 'saved', email: cleanEmail, pendingEmail: '' };
 }
 
 export async function getStudentResults(studentId) {
@@ -170,10 +203,11 @@ export async function getBatchSemesterCsv(batchYear, semesterNumber) {
 export async function getToppersForYear(batchYear) {
   const rows = await d1Query(
     `
-    SELECT category, roll_number, cgpa
-    FROM toppers
-    WHERE batch_year = ?
-    ORDER BY category, rank_order
+    SELECT t.category, t.roll_number, t.cgpa, c.name, c.name_status
+    FROM toppers t
+    LEFT JOIN student_cgpa c ON c.student_id = t.roll_number
+    WHERE t.batch_year = ?
+    ORDER BY t.category, t.rank_order
     `,
     [String(batchYear)]
   );
@@ -182,7 +216,12 @@ export async function getToppersForYear(batchYear) {
   for (const row of rows) {
     const category = String(row.category || '').toLowerCase();
     if (!result[category]) continue;
-    result[category].push({ roll_number: row.roll_number || '', cgpa: numberOrZero(row.cgpa) });
+    result[category].push({
+      roll_number: row.roll_number || '',
+      name: row.name || '',
+      name_status: row.name_status || 'pending',
+      cgpa: numberOrZero(row.cgpa)
+    });
   }
   return result;
 }
@@ -224,7 +263,13 @@ export async function latestNotificationText() {
 }
 
 export function cgpaRowToApi(row, academicSummary = null) {
-  const result = { ID: row.student_id || '' };
+  const result = {
+    ID: row.student_id || '',
+    Name: row.name || '',
+    NameStatus: row.name_status || 'pending',
+    Email: row.email || '',
+    PendingEmail: row.pending_email || ''
+  };
   for (const [dbColumn, apiColumn] of Object.entries(semesterDbToApi)) {
     result[apiColumn] = numberToText(row[dbColumn]);
   }

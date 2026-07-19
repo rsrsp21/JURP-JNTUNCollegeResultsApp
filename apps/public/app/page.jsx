@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import NameEmailSetup from '@/components/NameEmailSetup';
 
 const quickLinks = [
   { href: '/cgpa', icon: 'graduationCap', code: 'CG', label: 'CGPA', desc: 'Overall score, percentage, credits, and SGPA trend.', action: 'Check' },
@@ -13,6 +14,8 @@ const quickLinks = [
 
 const whatsappGroupUrl = 'https://chat.whatsapp.com/Flaf1SsPaL4DDhMRKIghlS';
 let notificationsMemoryCache = null;
+// Module-level flag: survives client-side route switches, resets on full page reload.
+let namePromoShown = false;
 
 const features = [
   { icon: 'bookOpen', title: 'Detailed Results', points: ['Semester-wise performance breakdown', 'Subject-wise grades and marks'] },
@@ -56,6 +59,21 @@ export default function HomePage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [allNotifications, setAllNotifications] = useState([]);
   const [loadingAll, setLoadingAll] = useState(false);
+  const [showNamePromo, setShowNamePromo] = useState(false);
+
+  useEffect(() => {
+    if (namePromoShown) return;
+    const timeoutId = window.setTimeout(() => {
+      namePromoShown = true;
+      setShowNamePromo(true);
+    }, 900);
+    return () => window.clearTimeout(timeoutId);
+  }, []);
+
+  function goToNameEmailSetup() {
+    setShowNamePromo(false);
+    document.getElementById('name-email-setup')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 
   function openAllNotifications() {
     setIsModalOpen(true);
@@ -152,6 +170,10 @@ export default function HomePage() {
                   <Icon name="whatsapp" />
                   Join
                 </a>
+                <button type="button" className="outline-button glow-attract hero-name-email-button" onClick={goToNameEmailSetup}>
+                  <Icon name="user" />
+                  Add name &amp; email
+                </button>
               </div>
             </motion.div>
 
@@ -234,6 +256,12 @@ export default function HomePage() {
         </div>
       </section>
 
+      <section className="section" id="name-email-setup">
+        <div className="page-container section-pad">
+          <NameEmailSetup />
+        </div>
+      </section>
+
       <section className="section">
         <div className="page-container section-pad">
           <div className="section-heading-row">
@@ -267,6 +295,49 @@ export default function HomePage() {
       </section>
 
       
+      <AnimatePresence>
+        {showNamePromo && (
+          <motion.div
+            className="modal-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setShowNamePromo(false);
+            }}
+          >
+            <motion.div
+              className="modal-content name-promo-modal"
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            >
+              <div className="modal-header">
+                <h3 className="modal-title"><Icon name="user" /> New: Name &amp; email updates</h3>
+                <button className="modal-close" onClick={() => setShowNamePromo(false)} aria-label="Close modal">
+                  <Icon name="x" />
+                </button>
+              </div>
+              <div className="modal-body name-promo-body">
+                <p>
+                  You can now <strong>verify your name</strong> with your college ID card and it will appear alongside
+                  your roll number across the portal — and add your <strong>email</strong> to get result updates.
+                </p>
+                <div className="download-row name-promo-actions">
+                  <button className="ink-button glow-attract" type="button" onClick={goToNameEmailSetup}>
+                    Add name &amp; email
+                  </button>
+                  <button className="subtle-button" type="button" onClick={() => setShowNamePromo(false)}>
+                    Maybe later
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <AnimatePresence>
         {isModalOpen && (
           <motion.div
@@ -535,6 +606,13 @@ function iconPath(name) {
         <>
           <circle cx="12" cy="12" r="8" />
           <path d="M12 8v5l3 2" />
+        </>
+      );
+    case 'user':
+      return (
+        <>
+          <circle cx="12" cy="8" r="4" />
+          <path d="M5 20a7 7 0 0 1 14 0" />
         </>
       );
     case 'zap':
