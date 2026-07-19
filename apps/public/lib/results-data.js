@@ -87,11 +87,17 @@ export async function getStudentCgpa(studentId) {
 
 export async function setStudentName(studentId, name) {
   const normalized = studentId.trim().toUpperCase();
-  const rows = await d1Query('SELECT student_id FROM student_cgpa WHERE student_id = ? LIMIT 1', [normalized]);
-  if (!rows.length) return false;
+  const rows = await d1Query('SELECT student_id, name_status FROM student_cgpa WHERE student_id = ? LIMIT 1', [normalized]);
+  if (!rows.length) return { success: false, error: 'No student record found for this roll number.' };
+  
+  // Prevent overwriting an already approved name
+  if (rows[0].name_status === 'approved') {
+    return { success: false, error: 'Your name has already been verified and approved. You cannot change it again.' };
+  }
+
   await d1Query('UPDATE student_cgpa SET name = ?, name_status = NULL WHERE student_id = ?', [name.trim(), normalized]);
   clearD1QueryCache();
-  return true;
+  return { success: true };
 }
 
 export async function setStudentEmail(studentId, email) {
