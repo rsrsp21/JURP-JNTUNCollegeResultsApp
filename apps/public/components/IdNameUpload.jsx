@@ -123,7 +123,7 @@ export default function IdNameUpload({ studentId, onVerified }) {
             ) : null}
 
             {status === 'verifying' ? (
-              <div className="status-message">Checking your ID with AI — reading Name and Roll No…</div>
+              <div className="status-message">Verifying your ID — reading Name and Roll No…</div>
             ) : null}
             {status === 'error' && message ? <div className="error-message">{message}</div> : null}
           </motion.div>
