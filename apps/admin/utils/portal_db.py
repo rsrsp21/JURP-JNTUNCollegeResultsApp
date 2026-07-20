@@ -509,25 +509,31 @@ def toggle_notification(index):
     return list_notifications()
 
 
-def list_honors_minor_eligibility(batch_year=None):
-    if batch_year:
-        rows = d1_storage.query(
-            """
-            SELECT student_id, batch_year, degree_type, eligibility_status, remarks, updated_at
-            FROM honors_minor_eligibility
-            WHERE batch_year = ?
-            ORDER BY batch_year, degree_type, student_id
-            """,
-            [str(batch_year)]
-        )
-    else:
-        rows = d1_storage.query(
-            """
-            SELECT student_id, batch_year, degree_type, eligibility_status, remarks, updated_at
-            FROM honors_minor_eligibility
-            ORDER BY batch_year, degree_type, student_id
-            """
-        )
+def list_honors_minor_eligibility(batch_year=None, _schema_retry=False):
+    try:
+        if batch_year:
+            rows = d1_storage.query(
+                """
+                SELECT student_id, batch_year, degree_type, eligibility_status, remarks, updated_at
+                FROM honors_minor_eligibility
+                WHERE batch_year = ?
+                ORDER BY batch_year, degree_type, student_id
+                """,
+                [str(batch_year)]
+            )
+        else:
+            rows = d1_storage.query(
+                """
+                SELECT student_id, batch_year, degree_type, eligibility_status, remarks, updated_at
+                FROM honors_minor_eligibility
+                ORDER BY batch_year, degree_type, student_id
+                """
+            )
+    except RuntimeError as exc:
+        if not _schema_retry and _is_missing_table_error(exc, 'honors_minor_eligibility'):
+            apply_schema()
+            return list_honors_minor_eligibility(batch_year, _schema_retry=True)
+        raise
     return [
         {
             'studentId': row.get('student_id') or '',
@@ -567,19 +573,36 @@ def upsert_honors_minor_eligibility_bulk(student_ids, degree_type, eligibility_s
         })
         updated.append(student_id)
 
-    _bulk_upsert(
-        'honors_minor_eligibility',
-        ['student_id', 'batch_year', 'degree_type', 'eligibility_status', 'remarks', 'sync_token'],
-        rows,
-        ['student_id'],
-    )
+    try:
+        _bulk_upsert(
+            'honors_minor_eligibility',
+            ['student_id', 'batch_year', 'degree_type', 'eligibility_status', 'remarks', 'sync_token'],
+            rows,
+            ['student_id'],
+        )
+    except RuntimeError as exc:
+        if not _is_missing_table_error(exc, 'honors_minor_eligibility'):
+            raise
+        apply_schema()
+        _bulk_upsert(
+            'honors_minor_eligibility',
+            ['student_id', 'batch_year', 'degree_type', 'eligibility_status', 'remarks', 'sync_token'],
+            rows,
+            ['student_id'],
+        )
     clear_runtime_cache()
     return {'updated': updated, 'skipped': skipped}
 
 
-def delete_honors_minor_eligibility(student_id):
+def delete_honors_minor_eligibility(student_id, _schema_retry=False):
     student_id = (student_id or '').strip().upper()
-    d1_storage.execute('DELETE FROM honors_minor_eligibility WHERE student_id = ?', [student_id])
+    try:
+        d1_storage.execute('DELETE FROM honors_minor_eligibility WHERE student_id = ?', [student_id])
+    except RuntimeError as exc:
+        if not _schema_retry and _is_missing_table_error(exc, 'honors_minor_eligibility'):
+            apply_schema()
+            return delete_honors_minor_eligibility(student_id, _schema_retry=True)
+        raise
     clear_runtime_cache()
 
 
@@ -1245,6 +1268,10 @@ def _academic_summary_db_row_to_api(row):
 
 def _is_missing_academic_summary_table_error(exc):
     return 'student_academic_summary' in str(exc) and 'no such table' in str(exc).lower()
+
+
+def _is_missing_table_error(exc, table_name):
+    return table_name in str(exc) and 'no such table' in str(exc).lower()
 
 
 def _semester_summaries_from_cgpa_record(cgpa_record, honors_credits=None):
