@@ -990,7 +990,7 @@
 
                 <!-- Tab 8: Emails -->
                 <div class="tab-pane" id="pane-emails">
-                    <h3>Email Change Requests</h3>
+                    <h3>Emails</h3>
                     <p class="text-muted mb-4">Roll numbers that have requested an email change. Approve to apply the new email, or reject to keep the current one.</p>
                     <div id="email-requests-status" style="font-style: italic; color: #4db6ac; font-weight: 500;"></div>
                     <div id="email-requests-grid" class="id-images-grid">
@@ -1000,6 +1000,22 @@
                         <button id="email-requests-prev-btn" class="button btn-sm" type="button" disabled><i class="fas fa-chevron-left"></i> Prev</button>
                         <span id="email-requests-page-info" class="db-meta"></span>
                         <button id="email-requests-next-btn" class="button btn-sm" type="button" disabled>Next <i class="fas fa-chevron-right"></i></button>
+                    </div>
+
+                    <h5 class="mt-4 mb-2" style="color: var(--text-primary);"><i class="fas fa-envelope-open-text"></i> Existing emails</h5>
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <input type="text" id="emails-search" class="form-control" placeholder="Search roll number, name, or email..." style="max-width: 320px;">
+                    </div>
+                    <div class="db-table-wrap" style="max-height: 320px;">
+                        <table class="db-table" id="emails-table">
+                            <thead><tr><th>#</th><th>Roll Number</th><th>Name</th><th>Email</th></tr></thead>
+                            <tbody><tr><td colspan="4" class="text-center text-muted py-3">No emails on file yet.</td></tr></tbody>
+                        </table>
+                    </div>
+                    <div class="db-pagination">
+                        <button id="emails-prev-btn" class="button btn-sm" type="button" disabled><i class="fas fa-chevron-left"></i> Prev</button>
+                        <span id="emails-page-info" class="db-meta"></span>
+                        <button id="emails-next-btn" class="button btn-sm" type="button" disabled>Next <i class="fas fa-chevron-right"></i></button>
                     </div>
                 </div>
 
@@ -2172,6 +2188,7 @@
             if (!emailRequestsLoaded) {
                 emailRequestsLoaded = true;
                 loadEmailRequests();
+                loadEmailsList();
             }
         });
 
@@ -2230,6 +2247,58 @@
         document.getElementById('id-images-refresh-btn').addEventListener('click', () => {
             loadIdImages();
             loadApprovedNames();
+        });
+
+        // --- Existing Emails (paginated) ---
+        const emailsState = { page: 1, perPage: 25, search: '' };
+        const emailsPrevBtn = document.getElementById('emails-prev-btn');
+        const emailsNextBtn = document.getElementById('emails-next-btn');
+        const emailsPageInfo = document.getElementById('emails-page-info');
+        const emailsSearch = document.getElementById('emails-search');
+
+        async function loadEmailsList() {
+            const tbody = document.querySelector('#emails-table tbody');
+            try {
+                const params = new URLSearchParams({
+                    page: emailsState.page,
+                    per_page: emailsState.perPage,
+                    search: emailsState.search
+                });
+                const response = await fetch(`/api/admin/emails?${params}`);
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Failed to load emails');
+
+                emailsPrevBtn.disabled = data.page <= 1;
+                emailsNextBtn.disabled = data.page >= data.pages;
+                const start = data.total === 0 ? 0 : (data.page - 1) * data.per_page + 1;
+                const end = Math.min(data.total, data.page * data.per_page);
+                emailsPageInfo.textContent = `${start}-${end} of ${data.total}`;
+
+                renderEmailsList(data.rows || [], start);
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center text-muted py-3">${err.message}</td></tr>`;
+            }
+        }
+
+        function renderEmailsList(rows, startIndex = 1) {
+            const tbody = document.querySelector('#emails-table tbody');
+            if (!rows.length) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3">No emails on file yet.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = rows.map((row, index) =>
+                `<tr><td class="text-muted">${startIndex + index}</td><td style="font-family: monospace;">${row.student_id}</td><td>${row.name || '—'}</td><td>${row.email}</td></tr>`
+            ).join('');
+        }
+
+        emailsPrevBtn.addEventListener('click', () => { emailsState.page -= 1; loadEmailsList(); });
+        emailsNextBtn.addEventListener('click', () => { emailsState.page += 1; loadEmailsList(); });
+        emailsSearch.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                emailsState.search = emailsSearch.value.trim();
+                emailsState.page = 1;
+                loadEmailsList();
+            }
         });
 
         // --- Database Browser ---
