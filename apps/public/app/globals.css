@@ -1816,32 +1816,26 @@ section > .page-container > .download-row {
   color: var(--danger);
 }
 
-.eligibility-badge {
-  display: inline-block;
-  padding: 4px 10px;
-  border-radius: 999px;
-  border: 1px solid transparent;
-  font-size: 0.8rem;
-  font-weight: 600;
-  white-space: nowrap;
+.status-value {
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
-.eligibility-badge.eligible {
+.status-value.eligible {
   color: var(--success);
-  border-color: var(--success-ring);
-  background: var(--success-ring);
 }
 
-.eligibility-badge.not-eligible {
+.status-value.not-eligible {
   color: var(--danger);
-  border-color: var(--danger-border);
-  background: rgba(180, 35, 24, 0.08);
 }
 
-.eligibility-badge.unknown {
+.status-value.unknown {
   color: var(--warning);
-  border-color: var(--hairline);
-  background: var(--soft);
+}
+
+.semester-summary-value.status-value,
+.semester-sgpa.status-value {
+  font-size: 22px;
 }
 
 .tabs-row {

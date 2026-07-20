@@ -8,6 +8,7 @@ export async function downloadCgpaPdf(student) {
   await import('jspdf-autotable');
   const doc = new jsPDF();
   const summary = student.academicSummary || {};
+  const hasName = Boolean(student.Name && String(student.Name).trim());
 
   addHeader(doc, 'Student Academic Record');
   await addLogo(doc);
@@ -15,35 +16,43 @@ export async function downloadCgpaPdf(student) {
   doc.setFontSize(12);
   doc.text('Student Information', 20, 50);
   doc.setFont('helvetica', 'bold');
-  doc.text('Roll Number:', 20, 60);
-  doc.text('Branch:', 20, 70);
-  doc.text('Batch:', 20, 80);
-  doc.text('Regulation:', 20, 90);
+  let y = 60;
+  if (hasName) {
+    doc.text('Name:', 20, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(value(student.Name), 60, y);
+    doc.setFont('helvetica', 'bold');
+    y += 10;
+  }
+  doc.text('Roll Number:', 20, y);
+  doc.text('Branch:', 20, y + 10);
+  doc.text('Batch:', 20, y + 20);
+  doc.text('Regulation:', 20, y + 30);
 
   doc.setFont('helvetica', 'normal');
-  doc.text(value(student.ID, 'Unknown'), 60, 60);
-  doc.text(branchFromRoll(student.ID), 60, 70);
-  doc.text(batchDisplay(student.Batch), 60, 80);
-  doc.text(value(student.Regulation), 60, 90);
+  doc.text(value(student.ID, 'Unknown'), 60, y);
+  doc.text(branchFromRoll(student.ID), 60, y + 10);
+  doc.text(batchDisplay(student.Batch), 60, y + 20);
+  doc.text(value(student.Regulation), 60, y + 30);
 
   doc.setFont('helvetica', 'bold');
-  doc.text('Academic Performance', 20, 110);
-  doc.text('CGPA:', 20, 120);
-  doc.text('Percentage:', 20, 130);
-  doc.text('Division:', 20, 140);
-  doc.text('Total Credits:', 20, 150);
+  doc.text('Academic Performance', 20, y + 50);
+  doc.text('CGPA:', 20, y + 60);
+  doc.text('Percentage:', 20, y + 70);
+  doc.text('Division:', 20, y + 80);
+  doc.text('Total Credits:', 20, y + 90);
 
   doc.setFont('helvetica', 'normal');
-  doc.text(value(student.CGPA), 60, 120);
-  doc.text(value(summary.percentage), 60, 130);
-  doc.text(value(summary.division), 60, 140);
-  doc.text(value(student['Total Credits']), 60, 150);
+  doc.text(value(student.CGPA), 60, y + 60);
+  doc.text(value(summary.percentage), 60, y + 70);
+  doc.text(value(summary.division), 60, y + 80);
+  doc.text(value(student['Total Credits']), 60, y + 90);
 
   doc.setFont('helvetica', 'bold');
-  doc.text('Semester-wise Performance', 20, 170);
+  doc.text('Semester-wise Performance', 20, y + 110);
 
   doc.autoTable({
-    startY: 180,
+    startY: y + 120,
     head: [['Semester', 'SGPA', 'Credits']],
     body: semesterRows(student).map((item) => [item.label, value(item.sgpa), value(item.credits)]),
     theme: 'grid',
@@ -69,6 +78,7 @@ export async function downloadSemesterPdf({ studentId, cgpaData, semester, summa
   await import('jspdf-autotable');
   const doc = new jsPDF();
   const semesterLabel = semesterLabelFor(semester);
+  const hasName = Boolean(cgpaData?.Name && String(cgpaData.Name).trim());
 
   await addLogo(doc);
   addHeader(doc, 'Semester Results');
@@ -76,32 +86,40 @@ export async function downloadSemesterPdf({ studentId, cgpaData, semester, summa
   doc.setFontSize(12);
   doc.text('Student Information', 20, 50);
   doc.setFont('helvetica', 'bold');
-  doc.text('Roll Number:', 20, 60);
-  doc.text('Branch:', 20, 70);
-  doc.text('Batch:', 20, 80);
-  doc.text('Regulation:', 20, 90);
-  doc.text('Year & Semester:', 20, 100);
+  let y = 60;
+  if (hasName) {
+    doc.text('Name:', 20, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(value(cgpaData.Name), 80, y);
+    doc.setFont('helvetica', 'bold');
+    y += 10;
+  }
+  doc.text('Roll Number:', 20, y);
+  doc.text('Branch:', 20, y + 10);
+  doc.text('Batch:', 20, y + 20);
+  doc.text('Regulation:', 20, y + 30);
+  doc.text('Year & Semester:', 20, y + 40);
 
   doc.setFont('helvetica', 'normal');
-  doc.text(value(studentId), 80, 60);
-  doc.text(branchFromRoll(studentId), 80, 70);
-  doc.text(batchDisplay(cgpaData?.Batch), 80, 80);
-  doc.text(value(cgpaData?.Regulation), 80, 90);
-  doc.text(semesterLabel, 80, 100);
+  doc.text(value(studentId), 80, y);
+  doc.text(branchFromRoll(studentId), 80, y + 10);
+  doc.text(batchDisplay(cgpaData?.Batch), 80, y + 20);
+  doc.text(value(cgpaData?.Regulation), 80, y + 30);
+  doc.text(semesterLabel, 80, y + 40);
 
   doc.setFont('helvetica', 'bold');
-  doc.text('Academic Performance', 20, 120);
-  doc.text('SGPA:', 20, 130);
-  doc.text('Credits:', 20, 140);
+  doc.text('Academic Performance', 20, y + 60);
+  doc.text('SGPA:', 20, y + 70);
+  doc.text('Credits:', 20, y + 80);
   doc.setFont('helvetica', 'normal');
-  doc.text(value(summary?.sgpa), 80, 130);
-  doc.text(value(summary?.credits), 80, 140);
+  doc.text(value(summary?.sgpa), 80, y + 70);
+  doc.text(value(summary?.credits), 80, y + 80);
 
   doc.setFont('helvetica', 'bold');
-  doc.text('Subject-wise Results', 20, 160);
+  doc.text('Subject-wise Results', 20, y + 100);
 
   doc.autoTable({
-    startY: 170,
+    startY: y + 110,
     head: [['Subject Code', 'Subject Name', 'Grade', 'Credits']],
     body: (rows || []).map(subjectRow),
     theme: 'grid',
@@ -133,6 +151,7 @@ export async function downloadAllSemestersPdf({ studentId, cgpaData, semesterDat
   const { jsPDF } = await import('jspdf');
   await import('jspdf-autotable');
   const doc = new jsPDF({ margin: { top: 20, bottom: 20 } });
+  const hasName = Boolean(cgpaData?.Name && String(cgpaData.Name).trim());
 
   await addLogo(doc);
   addHeader(doc, 'Complete Academic Record');
@@ -140,26 +159,34 @@ export async function downloadAllSemestersPdf({ studentId, cgpaData, semesterDat
   doc.setFontSize(12);
   doc.text('Student Information', 20, 50);
   doc.setFont('helvetica', 'bold');
-  doc.text('Roll Number:', 20, 60);
-  doc.text('Branch:', 20, 70);
-  doc.text('Batch:', 20, 80);
-  doc.text('Regulation:', 20, 90);
-  doc.text('CGPA:', 20, 100);
-  doc.text('Total Credits Earned*:', 20, 110);
+  let y = 60;
+  if (hasName) {
+    doc.text('Name:', 20, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(value(cgpaData.Name), 80, y);
+    doc.setFont('helvetica', 'bold');
+    y += 10;
+  }
+  doc.text('Roll Number:', 20, y);
+  doc.text('Branch:', 20, y + 10);
+  doc.text('Batch:', 20, y + 20);
+  doc.text('Regulation:', 20, y + 30);
+  doc.text('CGPA:', 20, y + 40);
+  doc.text('Total Credits Earned*:', 20, y + 50);
 
   doc.setFont('helvetica', 'normal');
-  doc.text(value(studentId), 80, 60);
-  doc.text(branchFromRoll(studentId), 80, 70);
-  doc.text(batchDisplay(cgpaData?.Batch), 80, 80);
-  doc.text(value(cgpaData?.Regulation), 80, 90);
-  doc.text(value(cgpaData?.CGPA), 80, 100);
-  doc.text(value(cgpaData?.['Total Credits']), 80, 110);
+  doc.text(value(studentId), 80, y);
+  doc.text(branchFromRoll(studentId), 80, y + 10);
+  doc.text(batchDisplay(cgpaData?.Batch), 80, y + 20);
+  doc.text(value(cgpaData?.Regulation), 80, y + 30);
+  doc.text(value(cgpaData?.CGPA), 80, y + 40);
+  doc.text(value(cgpaData?.['Total Credits']), 80, y + 50);
 
   doc.setFont('helvetica', 'italic');
   doc.setFontSize(10);
-  doc.text('* Honors/Minor credits excluded', 20, 120);
+  doc.text('* Honors/Minor credits excluded', 20, y + 60);
 
-  let currentY = 130;
+  let currentY = y + 70;
   for (let year = 1; year <= 4; year += 1) {
     if (currentY > doc.internal.pageSize.height - 100) {
       doc.addPage();

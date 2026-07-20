@@ -49,3 +49,19 @@ export function classForGrade(grade = '') {
   if (value === 'B' || value === 'C') return 'grade-good';
   return 'grade-neutral';
 }
+
+export function honorsMinorStatusLabel(status) {
+  const labels = { ELIGIBLE: 'Eligible', NOT_ELIGIBLE: 'Not Eligible', UNKNOWN: 'Unknown' };
+  return labels[status] || 'Unknown';
+}
+
+export function honorsMinorStatusClass(status) {
+  const classes = { ELIGIBLE: 'eligible', NOT_ELIGIBLE: 'not-eligible', UNKNOWN: 'unknown' };
+  return classes[status] || 'unknown';
+}
+
+export function honorsMinorDegreeLabel(degreeType) {
+  if (degreeType === 'HONOR') return 'Honor';
+  if (degreeType === 'MINOR') return 'Minor';
+  return 'Honors/Minor';
+}

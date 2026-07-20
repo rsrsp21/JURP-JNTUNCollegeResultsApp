@@ -8,7 +8,16 @@ import RollSearch from '@/components/RollSearch';
 import IdNameUpload from '@/components/IdNameUpload';
 import EmailSubscribe from '@/components/EmailSubscribe';
 import UiIcon from '@/components/UiIcon';
-import { batchDisplay, branchFromRoll, displayValue, isValidRollNumber, normalizeRollNumber, semesters } from '@/lib/client-utils';
+import {
+  batchDisplay,
+  branchFromRoll,
+  displayValue,
+  honorsMinorStatusClass,
+  honorsMinorStatusLabel,
+  isValidRollNumber,
+  normalizeRollNumber,
+  semesters
+} from '@/lib/client-utils';
 import { downloadAllSemestersPdf, downloadSemesterPdf } from '@/lib/pdf';
 import { useApp } from '@/components/AppContext';
 
@@ -240,7 +249,9 @@ export default function SemesterResultsPage() {
                           <span className="meta-label">Sem</span>
                           <span className="accordion-label">{semester.label}</span>
                           <span className="accordion-summary">
-                            {displayValue(semester.summary.sgpa)} SGPA
+                            {semester.number === 9 && payload.honorsMinorStatus
+                              ? honorsMinorStatusLabel(payload.honorsMinorStatus.status)
+                              : `${displayValue(semester.summary.sgpa)} SGPA`}
                           </span>
                           <span className="accordion-chevron">
                             <UiIcon name={open ? 'chevronUp' : 'chevronDown'} />
@@ -257,17 +268,22 @@ export default function SemesterResultsPage() {
                           >
                             <div className="semester-summary-strip">
                               <div>
-                                <div className="data-block-label">SGPA</div>
-                                <div className="semester-summary-value">{displayValue(semester.summary.sgpa)}</div>
+                                <div className="data-block-label">
+                                  {semester.number === 9 && payload.honorsMinorStatus ? 'Eligibility' : 'SGPA'}
+                                </div>
+                                <div
+                                  className={
+                                    semester.number === 9 && payload.honorsMinorStatus
+                                      ? `semester-summary-value status-value ${honorsMinorStatusClass(payload.honorsMinorStatus.status)}`
+                                      : 'semester-summary-value'
+                                  }
+                                >
+                                  {semester.number === 9 && payload.honorsMinorStatus
+                                    ? honorsMinorStatusLabel(payload.honorsMinorStatus.status)
+                                    : displayValue(semester.summary.sgpa)}
+                                </div>
                               </div>
-                              <div>
-                                {semester.number === 9 && payload.honorsMinorStatus ? (
-                                  <>
-                                    <div className="data-block-label">Eligibility</div>
-                                    <EligibilityBadge status={payload.honorsMinorStatus} />
-                                  </>
-                                ) : null}
-                              </div>
+                              <div />
                               <div>
                                 <div className="data-block-label">Credits</div>
                                 <div className="mini-meta-value">{displayValue(semester.summary.credits)}</div>
@@ -358,16 +374,4 @@ function Meta({ label, value }) {
 function gradeClass(grade = '') {
   const value = String(grade).trim().toUpperCase();
   return value === 'F' || value === 'AB' || value === 'ABSENT' ? 'fail' : '';
-}
-
-function EligibilityBadge({ status }) {
-  const { degreeType, status: state } = status;
-  const label = { ELIGIBLE: 'Eligible', NOT_ELIGIBLE: 'Not Eligible', UNKNOWN: 'Unknown' }[state] || 'Unknown';
-  const className = { ELIGIBLE: 'eligible', NOT_ELIGIBLE: 'not-eligible', UNKNOWN: 'unknown' }[state] || 'unknown';
-  return (
-    <span className={`eligibility-badge ${className}`}>
-      {degreeType ? `${degreeType === 'HONOR' ? 'Honor' : 'Minor'} · ` : ''}
-      {label}
-    </span>
-  );
 }
