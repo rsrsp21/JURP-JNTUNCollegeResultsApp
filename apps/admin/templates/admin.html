@@ -770,8 +770,14 @@
                         <button class="tab-btn" data-pane="pane-id-images">
                             <i class="fas fa-id-card"></i> ID Images
                         </button>
+                        <button class="tab-btn" data-pane="pane-emails">
+                            <i class="fas fa-envelope"></i> Emails
+                        </button>
                         <button class="tab-btn" data-pane="pane-database">
                             <i class="fas fa-database"></i> Database
+                        </button>
+                        <button class="tab-btn" data-pane="pane-honors-minor">
+                            <i class="fas fa-user-graduate"></i> Honors/Minor Eligibility
                         </button>
                     </aside>
 
@@ -965,21 +971,39 @@
                     <div id="id-images-status" style="font-style: italic; color: #4db6ac; font-weight: 500;"></div>
                     <div id="id-images-grid" class="id-images-grid"></div>
 
-                    <h5 class="mt-4 mb-2" style="color: var(--text-primary);"><i class="fas fa-envelope"></i> Email change requests</h5>
-                    <div id="email-requests-grid" class="id-images-grid">
-                        <div class="text-muted">No email change requests.</div>
-                    </div>
-
                     <h5 class="mt-4 mb-2" style="color: var(--text-primary);"><i class="fas fa-check-circle"></i> Approved names</h5>
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <input type="text" id="approved-names-search" class="form-control" placeholder="Search roll number or name..." style="max-width: 260px;">
+                    </div>
                     <div class="db-table-wrap" style="max-height: 320px;">
                         <table class="db-table" id="approved-names-table">
                             <thead><tr><th>#</th><th>Roll Number</th><th>Name</th></tr></thead>
                             <tbody><tr><td colspan="3" class="text-center text-muted py-3">No approved names yet.</td></tr></tbody>
                         </table>
                     </div>
+                    <div class="db-pagination">
+                        <button id="approved-names-prev-btn" class="button btn-sm" type="button" disabled><i class="fas fa-chevron-left"></i> Prev</button>
+                        <span id="approved-names-page-info" class="db-meta"></span>
+                        <button id="approved-names-next-btn" class="button btn-sm" type="button" disabled>Next <i class="fas fa-chevron-right"></i></button>
+                    </div>
                 </div>
 
-                <!-- Tab 8: Database Browser -->
+                <!-- Tab 8: Emails -->
+                <div class="tab-pane" id="pane-emails">
+                    <h3>Email Change Requests</h3>
+                    <p class="text-muted mb-4">Roll numbers that have requested an email change. Approve to apply the new email, or reject to keep the current one.</p>
+                    <div id="email-requests-status" style="font-style: italic; color: #4db6ac; font-weight: 500;"></div>
+                    <div id="email-requests-grid" class="id-images-grid">
+                        <div class="text-muted">No email change requests.</div>
+                    </div>
+                    <div class="db-pagination">
+                        <button id="email-requests-prev-btn" class="button btn-sm" type="button" disabled><i class="fas fa-chevron-left"></i> Prev</button>
+                        <span id="email-requests-page-info" class="db-meta"></span>
+                        <button id="email-requests-next-btn" class="button btn-sm" type="button" disabled>Next <i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+
+                <!-- Tab 9: Database Browser -->
                 <div class="tab-pane" id="pane-database">
                     <h3>Database Browser</h3>
                     <p class="text-muted mb-4">Browse every table in the portal D1 database — search across all columns, filter by a specific column, sort by clicking headers, and page through rows.</p>
@@ -1026,6 +1050,48 @@
                         <button id="db-prev-btn" class="button btn-sm" type="button" disabled><i class="fas fa-chevron-left"></i> Prev</button>
                         <span id="db-page-info" class="db-meta"></span>
                         <button id="db-next-btn" class="button btn-sm" type="button" disabled>Next <i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+
+                <!-- Tab 9: Honors/Minor Eligibility -->
+                <div class="tab-pane" id="pane-honors-minor">
+                    <h3>Honors/Minor Eligibility</h3>
+                    <p class="text-muted mb-4">Paste the Eligible and Not Eligible roll number lists from the college's Honors/Minor sheet, comma-separated. Students with Honors/Minor (semester 9) coursework and no entry here show as "Unknown" on the public site.</p>
+
+                    <form id="honors-minor-form" class="mb-4">
+                        <div class="form-group">
+                            <label for="honors-minor-degree-type">Degree Type</label>
+                            <select id="honors-minor-degree-type" class="form-control" required>
+                                <option value="HONOR">Honor</option>
+                                <option value="MINOR">Minor</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="honors-minor-prefix">Common Roll Number Prefix (optional)</label>
+                            <input type="text" id="honors-minor-prefix" class="form-control" placeholder="e.g., 21031A05 &mdash; lets you paste short suffixes below instead of full roll numbers">
+                        </div>
+                        <div class="form-group">
+                            <label for="honors-minor-eligible">Eligible Roll Numbers (comma-separated)</label>
+                            <textarea id="honors-minor-eligible" class="form-control" rows="3" placeholder="e.g. 21031A0502, 503, 7, 516, 22, 32, 33, 34, 41, 46, 52, 54, 61"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="honors-minor-not-eligible">Not Eligible Roll Numbers (comma-separated)</label>
+                            <textarea id="honors-minor-not-eligible" class="form-control" rows="3" placeholder="e.g. 23, 35, 31"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="honors-minor-remarks">Remarks (optional)</label>
+                            <input type="text" id="honors-minor-remarks" class="form-control" placeholder="e.g., Sem 9 Honors eligibility list">
+                        </div>
+                        <button type="submit" class="button w-100" id="honors-minor-btn">
+                            <i class="fas fa-plus"></i> Save Eligibility Lists
+                        </button>
+                    </form>
+
+                    <div id="honors-minor-status-line" style="margin-top: 1rem; font-style: italic; color: #4db6ac; font-weight: 500;"></div>
+
+                    <h5 class="mt-4 mb-3" style="color: var(--text-primary);"><i class="fas fa-list"></i> Current Records</h5>
+                    <div id="admin-honors-minor-list" class="admin-card" style="max-height: 400px; overflow-y: auto; padding: 0.5rem;">
+                        <div class="text-center py-3 text-muted"><i class="fas fa-spinner fa-spin"></i> Loading eligibility records...</div>
                     </div>
                 </div>
 
@@ -1879,7 +1945,6 @@
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.error || 'Failed to load ID images');
                 renderIdImages(data.images || []);
-                renderApprovedNames(data.approved || []);
             } catch (err) {
                 idImagesCount.textContent = 'Failed to load';
                 idImagesGrid.innerHTML = `<div class="text-muted">${err.message}</div>`;
@@ -2022,12 +2087,28 @@
             });
         }
 
+        // --- Email Change Requests (paginated) ---
+        const emailRequestsState = { page: 1, perPage: 25 };
+        const emailRequestsStatus = document.getElementById('email-requests-status');
+        const emailRequestsPrevBtn = document.getElementById('email-requests-prev-btn');
+        const emailRequestsNextBtn = document.getElementById('email-requests-next-btn');
+        const emailRequestsPageInfo = document.getElementById('email-requests-page-info');
+        let emailRequestsLoaded = false;
+
         async function loadEmailRequests() {
             const grid = document.getElementById('email-requests-grid');
             try {
-                const response = await fetch('/api/admin/email-requests');
+                const params = new URLSearchParams({ page: emailRequestsState.page, per_page: emailRequestsState.perPage });
+                const response = await fetch(`/api/admin/email-requests?${params}`);
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.error || 'Failed to load email requests');
+
+                emailRequestsPrevBtn.disabled = data.page <= 1;
+                emailRequestsNextBtn.disabled = data.page >= data.pages;
+                const start = data.total === 0 ? 0 : (data.page - 1) * data.per_page + 1;
+                const end = Math.min(data.total, data.page * data.per_page);
+                emailRequestsPageInfo.textContent = `${start}-${end} of ${data.total}`;
+
                 if (!data.requests.length) {
                     grid.innerHTML = '<div class="text-muted">No email change requests.</div>';
                     return;
@@ -2062,11 +2143,11 @@
                             });
                             const result = await response.json();
                             if (!response.ok) throw new Error(result.error || 'Failed');
-                            idImagesStatus.textContent = result.message;
+                            emailRequestsStatus.textContent = result.message;
                             loadEmailRequests();
                         } catch (err) {
                             btn.disabled = false;
-                            idImagesStatus.textContent = `Error: ${err.message}`;
+                            emailRequestsStatus.textContent = `Error: ${err.message}`;
                         }
                     }
 
@@ -2084,20 +2165,71 @@
             }
         }
 
-        function renderApprovedNames(rows) {
+        emailRequestsPrevBtn.addEventListener('click', () => { emailRequestsState.page -= 1; loadEmailRequests(); });
+        emailRequestsNextBtn.addEventListener('click', () => { emailRequestsState.page += 1; loadEmailRequests(); });
+
+        document.querySelector('.tab-btn[data-pane="pane-emails"]').addEventListener('click', () => {
+            if (!emailRequestsLoaded) {
+                emailRequestsLoaded = true;
+                loadEmailRequests();
+            }
+        });
+
+        // --- Approved Names (paginated) ---
+        const approvedNamesState = { page: 1, perPage: 25, search: '' };
+        const approvedNamesPrevBtn = document.getElementById('approved-names-prev-btn');
+        const approvedNamesNextBtn = document.getElementById('approved-names-next-btn');
+        const approvedNamesPageInfo = document.getElementById('approved-names-page-info');
+        const approvedNamesSearch = document.getElementById('approved-names-search');
+
+        async function loadApprovedNames() {
+            const tbody = document.querySelector('#approved-names-table tbody');
+            try {
+                const params = new URLSearchParams({
+                    page: approvedNamesState.page,
+                    per_page: approvedNamesState.perPage,
+                    search: approvedNamesState.search
+                });
+                const response = await fetch(`/api/admin/approved-names?${params}`);
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Failed to load approved names');
+
+                approvedNamesPrevBtn.disabled = data.page <= 1;
+                approvedNamesNextBtn.disabled = data.page >= data.pages;
+                const start = data.total === 0 ? 0 : (data.page - 1) * data.per_page + 1;
+                const end = Math.min(data.total, data.page * data.per_page);
+                approvedNamesPageInfo.textContent = `${start}-${end} of ${data.total}`;
+
+                renderApprovedNames(data.rows || [], start);
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="3" class="text-center text-muted py-3">${err.message}</td></tr>`;
+            }
+        }
+
+        function renderApprovedNames(rows, startIndex = 1) {
             const tbody = document.querySelector('#approved-names-table tbody');
             if (!rows.length) {
                 tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted py-3">No approved names yet.</td></tr>';
                 return;
             }
             tbody.innerHTML = rows.map((row, index) =>
-                `<tr><td class="text-muted">${index + 1}</td><td style="font-family: monospace;">${row.student_id}</td><td>${row.name}</td></tr>`
+                `<tr><td class="text-muted">${startIndex + index}</td><td style="font-family: monospace;">${row.student_id}</td><td>${row.name}</td></tr>`
             ).join('');
         }
 
+        approvedNamesPrevBtn.addEventListener('click', () => { approvedNamesState.page -= 1; loadApprovedNames(); });
+        approvedNamesNextBtn.addEventListener('click', () => { approvedNamesState.page += 1; loadApprovedNames(); });
+        approvedNamesSearch.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                approvedNamesState.search = approvedNamesSearch.value.trim();
+                approvedNamesState.page = 1;
+                loadApprovedNames();
+            }
+        });
+
         document.getElementById('id-images-refresh-btn').addEventListener('click', () => {
             loadIdImages();
-            loadEmailRequests();
+            loadApprovedNames();
         });
 
         // --- Database Browser ---
@@ -2253,9 +2385,134 @@
             if (!idImagesLoaded) {
                 idImagesLoaded = true;
                 loadIdImages();
-                loadEmailRequests();
+                loadApprovedNames();
             }
         });
+
+        // --- Honors/Minor Eligibility Management Script ---
+        const honorsMinorForm = document.getElementById('honors-minor-form');
+        const honorsMinorList = document.getElementById('admin-honors-minor-list');
+        const honorsMinorStatusLine = document.getElementById('honors-minor-status-line');
+
+        async function fetchHonorsMinorEligibility() {
+            try {
+                const res = await fetch('/api/admin/honors-minor-eligibility');
+                const data = await res.json();
+                if (res.ok) {
+                    renderHonorsMinorEligibility(data.records);
+                } else {
+                    honorsMinorList.innerHTML = `<div class="text-danger py-3 text-center"><i class="fas fa-exclamation-triangle"></i> Error loading records: ${data.error}</div>`;
+                }
+            } catch (err) {
+                honorsMinorList.innerHTML = `<div class="text-danger py-3 text-center"><i class="fas fa-exclamation-triangle"></i> Error loading records: ${err.message}</div>`;
+            }
+        }
+
+        function renderHonorsMinorEligibility(records) {
+            if (!records || records.length === 0) {
+                honorsMinorList.innerHTML = '<div class="text-center py-3 text-muted">No eligibility records found.</div>';
+                return;
+            }
+
+            honorsMinorList.innerHTML = '';
+            records.forEach((item) => {
+                const div = document.createElement('div');
+                div.className = 'd-flex justify-content-between align-items-center mb-2 p-2 border-bottom';
+                div.style.borderColor = 'rgba(255,255,255,0.05)';
+
+                const statusColor = item.eligibilityStatus === 'ELIGIBLE' ? '#4db6ac' : '#ff8a7a';
+
+                div.innerHTML = `
+                    <div style="flex-grow: 1; margin-right: 15px;">
+                        <span style="font-weight: 500; color: var(--text-primary);">${item.studentId}</span>
+                        <div class="text-muted small mt-1 d-flex align-items-center gap-3">
+                            <span>Batch ${item.batchYear}</span>
+                            <span>${item.degreeType}</span>
+                            <span style="color: ${statusColor}; font-weight: 500;">${item.eligibilityStatus.replace('_', ' ')}</span>
+                            ${item.remarks ? `<span>${item.remarks}</span>` : ''}
+                        </div>
+                    </div>
+                    <button class="button btn-sm btn-danger delete-honors-minor-btn" data-id="${item.studentId}" style="padding: 4px 8px; font-size: 12px; background: #d32f2f;">
+                        <i class="fas fa-trash-alt"></i> Delete
+                    </button>
+                `;
+
+                honorsMinorList.appendChild(div);
+            });
+
+            document.querySelectorAll('.delete-honors-minor-btn').forEach((btn) => {
+                btn.addEventListener('click', async function () {
+                    const id = this.getAttribute('data-id');
+                    if (confirm(`Remove eligibility record for ${id}?`)) {
+                        honorsMinorStatusLine.textContent = 'Deleting...';
+                        honorsMinorStatusLine.style.color = '#4db6ac';
+                        try {
+                            const res = await fetch(`/api/admin/honors-minor-eligibility/${id}`, { method: 'DELETE' });
+                            const result = await res.json();
+                            if (res.ok) {
+                                honorsMinorStatusLine.textContent = `Removed ${id}.`;
+                                honorsMinorStatusLine.style.color = 'var(--success-color)';
+                                renderHonorsMinorEligibility(result.records);
+                            } else {
+                                honorsMinorStatusLine.textContent = `Error: ${result.error}`;
+                                honorsMinorStatusLine.style.color = 'var(--danger-color)';
+                            }
+                        } catch (err) {
+                            honorsMinorStatusLine.textContent = `Connection error: ${err.message}`;
+                            honorsMinorStatusLine.style.color = 'var(--danger-color)';
+                        }
+                    }
+                });
+            });
+        }
+
+        honorsMinorForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const degreeType = document.getElementById('honors-minor-degree-type').value;
+            const prefix = document.getElementById('honors-minor-prefix').value;
+            const eligibleInput = document.getElementById('honors-minor-eligible');
+            const notEligibleInput = document.getElementById('honors-minor-not-eligible');
+            const remarksInput = document.getElementById('honors-minor-remarks');
+
+            honorsMinorStatusLine.textContent = 'Saving eligibility lists...';
+            honorsMinorStatusLine.style.color = '#4db6ac';
+
+            try {
+                const res = await fetch('/api/admin/honors-minor-eligibility', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        degreeType,
+                        prefix,
+                        eligibleIds: eligibleInput.value,
+                        notEligibleIds: notEligibleInput.value,
+                        remarks: remarksInput.value
+                    })
+                });
+
+                const result = await res.json();
+
+                if (res.ok) {
+                    const skippedNote = result.skipped && result.skipped.length
+                        ? ` Skipped (unrecognized batch): ${result.skipped.join(', ')}.`
+                        : '';
+                    honorsMinorStatusLine.textContent = `Saved ${result.updated.length} record(s).${skippedNote}`;
+                    honorsMinorStatusLine.style.color = skippedNote ? 'var(--danger-color)' : 'var(--success-color)';
+                    eligibleInput.value = '';
+                    notEligibleInput.value = '';
+                    remarksInput.value = '';
+                    renderHonorsMinorEligibility(result.records);
+                } else {
+                    honorsMinorStatusLine.textContent = `Error: ${result.error}`;
+                    honorsMinorStatusLine.style.color = 'var(--danger-color)';
+                }
+            } catch (err) {
+                honorsMinorStatusLine.textContent = `Connection error: ${err.message}`;
+                honorsMinorStatusLine.style.color = 'var(--danger-color)';
+            }
+        });
+
+        document.querySelector('.tab-btn[data-pane="pane-honors-minor"]').addEventListener('click', fetchHonorsMinorEligibility);
     </script>
 </body>
 </html>

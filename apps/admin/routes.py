@@ -1091,10 +1091,31 @@ def admin_email_requests():
         return jsonify({'error': 'Unauthorized'}), 401
 
     try:
-        rows = d1_storage.query(
-            'SELECT student_id, name, email, pending_email FROM student_cgpa WHERE pending_email IS NOT NULL ORDER BY student_id'
+        page = max(1, int(request.args.get('page', 1) or 1))
+        per_page = min(100, max(10, int(request.args.get('per_page', 25) or 25)))
+        offset = (page - 1) * per_page
+
+        total_rows = d1_storage.query(
+            'SELECT COUNT(*) AS c FROM student_cgpa WHERE pending_email IS NOT NULL'
         )
-        return jsonify({'success': True, 'requests': rows})
+        total = total_rows[0]['c'] if total_rows else 0
+        rows = d1_storage.query(
+            """
+            SELECT student_id, name, email, pending_email FROM student_cgpa
+            WHERE pending_email IS NOT NULL
+            ORDER BY student_id
+            LIMIT ? OFFSET ?
+            """,
+            [per_page, offset]
+        )
+        return jsonify({
+            'success': True,
+            'requests': rows,
+            'total': total,
+            'page': page,
+            'per_page': per_page,
+            'pages': max(1, (total + per_page - 1) // per_page)
+        })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -1208,10 +1229,51 @@ def admin_list_id_images():
             images.append(entry)
 
         pending = [img for img in images if img['status'] != 'approved']
-        approved = d1_storage.query(
-            "SELECT student_id, name FROM student_cgpa WHERE name_status = 'approved' AND name IS NOT NULL ORDER BY student_id"
+        return jsonify({'success': True, 'images': pending})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/admin/approved-names', methods=['GET'])
+def admin_approved_names():
+    if not session.get('logged_in'):
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    try:
+        page = max(1, int(request.args.get('page', 1) or 1))
+        per_page = min(100, max(10, int(request.args.get('per_page', 25) or 25)))
+        search = (request.args.get('search') or '').strip()
+        offset = (page - 1) * per_page
+
+        where_sql = ''
+        params = []
+        if search:
+            where_sql = ' AND (student_id LIKE ? OR name LIKE ?)'
+            like = f'%{search}%'
+            params.extend([like, like])
+
+        total_rows = d1_storage.query(
+            f"SELECT COUNT(*) AS c FROM student_cgpa WHERE name_status = 'approved' AND name IS NOT NULL{where_sql}",
+            params
         )
-        return jsonify({'success': True, 'images': pending, 'approved': approved})
+        total = total_rows[0]['c'] if total_rows else 0
+        rows = d1_storage.query(
+            f"""
+            SELECT student_id, name FROM student_cgpa
+            WHERE name_status = 'approved' AND name IS NOT NULL{where_sql}
+            ORDER BY student_id
+            LIMIT ? OFFSET ?
+            """,
+            params + [per_page, offset]
+        )
+
+        return jsonify({
+            'success': True,
+            'rows': rows,
+            'total': total,
+            'page': page,
+            'per_page': per_page,
+            'pages': max(1, (total + per_page - 1) // per_page)
+        })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -1342,15 +1404,99 @@ def admin_delete_notification(index):
 def admin_toggle_blinking(index):
     if not session.get('logged_in'):
         return jsonify({'error': 'Unauthorized'}), 401
-        
+
     try:
         notifications = portal_db.toggle_notification(index)
         if notifications is not None:
             return jsonify({'success': True, 'notifications': notifications})
-                
+
         return jsonify({'error': 'Notification not found'}), 404
     except Exception as e:
         print(f"Error toggling blinking: {e}")
+        return jsonify({'error': str(e)}), 500
+
+# --- Honors/Minor Eligibility ---
+def _expand_roll_number_token(token, prefix=''):
+    """Expand a shorthand roll number entry (e.g. "7", "22") against a common prefix."""
+    token = (token or '').strip().upper()
+    if not token:
+        return ''
+    if re.match(r'^[0-9]{2}[0-9A-Z]{3}A[0-9A-Z]{4}$', token):
+        return token
+    if not prefix:
+        return token
+    suffix = re.sub(r'[^0-9A-Z]', '', token)
+    if suffix.isdigit() and len(suffix) < 2:
+        suffix = suffix.zfill(2)
+    return f'{prefix}{suffix}'
+
+
+def _parse_roll_number_list(raw, prefix):
+    tokens = [token for token in re.split(r'[,\s]+', (raw or '').strip()) if token]
+    return [_expand_roll_number_token(token, prefix) for token in tokens]
+
+
+@app.route('/api/admin/honors-minor-eligibility', methods=['GET'])
+def admin_list_honors_minor_eligibility():
+    if not session.get('logged_in'):
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    try:
+        batch = request.args.get('batch', '').strip() or None
+        records = portal_db.list_honors_minor_eligibility(batch)
+        return jsonify({'success': True, 'records': records})
+    except Exception as e:
+        print(f"Error listing honors/minor eligibility: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/admin/honors-minor-eligibility', methods=['POST'])
+def admin_add_honors_minor_eligibility():
+    if not session.get('logged_in'):
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    data = request.get_json() or {}
+    degree_type = (data.get('degreeType') or '').strip().upper()
+    prefix = (data.get('prefix') or '').strip().upper()
+    remarks = data.get('remarks') or ''
+
+    if degree_type not in ('HONOR', 'MINOR'):
+        return jsonify({'error': 'degreeType must be HONOR or MINOR'}), 400
+
+    eligible_ids = _parse_roll_number_list(data.get('eligibleIds'), prefix)
+    not_eligible_ids = _parse_roll_number_list(data.get('notEligibleIds'), prefix)
+
+    if not eligible_ids and not not_eligible_ids:
+        return jsonify({'error': 'Provide at least one roll number in the Eligible or Not Eligible list'}), 400
+
+    try:
+        eligible_result = portal_db.upsert_honors_minor_eligibility_bulk(
+            eligible_ids, degree_type, 'ELIGIBLE', remarks
+        )
+        not_eligible_result = portal_db.upsert_honors_minor_eligibility_bulk(
+            not_eligible_ids, degree_type, 'NOT_ELIGIBLE', remarks
+        )
+        records = portal_db.list_honors_minor_eligibility()
+        return jsonify({
+            'success': True,
+            'records': records,
+            'updated': eligible_result['updated'] + not_eligible_result['updated'],
+            'skipped': eligible_result['skipped'] + not_eligible_result['skipped'],
+        })
+    except Exception as e:
+        print(f"Error saving honors/minor eligibility: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/admin/honors-minor-eligibility/<student_id>', methods=['DELETE'])
+def admin_delete_honors_minor_eligibility(student_id):
+    if not session.get('logged_in'):
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    try:
+        portal_db.delete_honors_minor_eligibility(student_id)
+        records = portal_db.list_honors_minor_eligibility()
+        return jsonify({'success': True, 'records': records})
+    except Exception as e:
+        print(f"Error deleting honors/minor eligibility: {e}")
         return jsonify({'error': str(e)}), 500
 
 # --- Static File and Main Route (Catch-all) ---

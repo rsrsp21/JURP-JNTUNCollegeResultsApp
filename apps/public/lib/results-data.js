@@ -74,18 +74,61 @@ export function batchYearFromStudentId(studentId = '') {
 }
 
 export async function getStudentCgpa(studentId) {
-  const rows = await d1Query(
-    `
-    SELECT ${cgpaSelectColumns}
-    FROM student_cgpa c
-    LEFT JOIN student_academic_summary s ON s.student_id = c.student_id
-    WHERE c.student_id = ?
-    LIMIT 1
-    `,
-    [studentId.trim().toUpperCase()],
-    { noCache: true }
-  );
-  return rows[0] ? cgpaRowToApi(rows[0], academicSummaryFromJoinedRow(rows[0])) : null;
+  const normalized = studentId.trim().toUpperCase();
+  const [rows, honorsMinorStatus] = await Promise.all([
+    d1Query(
+      `
+      SELECT ${cgpaSelectColumns}
+      FROM student_cgpa c
+      LEFT JOIN student_academic_summary s ON s.student_id = c.student_id
+      WHERE c.student_id = ?
+      LIMIT 1
+      `,
+      [normalized],
+      { noCache: true }
+    ),
+    getHonorsMinorStatus(normalized)
+  ]);
+  if (!rows[0]) return null;
+  const cgpaData = cgpaRowToApi(rows[0], academicSummaryFromJoinedRow(rows[0]));
+  cgpaData.honorsMinorStatus = honorsMinorStatus;
+  return cgpaData;
+}
+
+export async function getHonorsMinorStatus(studentId) {
+  const normalized = studentId.trim().toUpperCase();
+  const [eligibilityRows, sem9Rows] = await Promise.all([
+    d1Query(
+      `
+      SELECT degree_type, eligibility_status, remarks
+      FROM honors_minor_eligibility
+      WHERE student_id = ?
+      LIMIT 1
+      `,
+      [normalized]
+    ),
+    d1Query(
+      `
+      SELECT 1
+      FROM semester_results
+      WHERE student_id = ? AND semester_number = 9
+      LIMIT 1
+      `,
+      [normalized]
+    )
+  ]);
+
+  if (eligibilityRows[0]) {
+    return {
+      degreeType: eligibilityRows[0].degree_type || null,
+      status: eligibilityRows[0].eligibility_status || 'UNKNOWN',
+      remarks: eligibilityRows[0].remarks || ''
+    };
+  }
+  if (sem9Rows.length) {
+    return { degreeType: null, status: 'UNKNOWN', remarks: '' };
+  }
+  return null;
 }
 
 export async function setStudentName(studentId, name, gradeCardName = null) {
@@ -161,6 +204,7 @@ export async function getStudentResults(studentId) {
   return {
     studentId: normalized,
     cgpaData,
+    honorsMinorStatus: cgpaData?.honorsMinorStatus ?? (await getHonorsMinorStatus(normalized)),
     semesterData: Object.fromEntries(
       Object.entries(grouped).map(([semester, rows]) => [semester, rows.map(semesterRowToApi)])
     ),

@@ -69,6 +69,16 @@ CREATE TABLE IF NOT EXISTS toppers (
   UNIQUE(batch_year, category, rank_order)
 );
 
+CREATE TABLE IF NOT EXISTS honors_minor_eligibility (
+  student_id TEXT PRIMARY KEY,
+  batch_year TEXT NOT NULL,
+  degree_type TEXT NOT NULL,
+  eligibility_status TEXT NOT NULL,
+  remarks TEXT,
+  sync_token TEXT,
+  updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS notifications (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   text TEXT NOT NULL,
@@ -93,6 +103,9 @@ ON semester_results(batch_year, semester_number, row_order);
 
 CREATE INDEX IF NOT EXISTS idx_toppers_batch_category
 ON toppers(batch_year, category, rank_order);
+
+CREATE INDEX IF NOT EXISTS idx_honors_minor_eligibility_batch
+ON honors_minor_eligibility(batch_year, degree_type);
 
 CREATE INDEX IF NOT EXISTS idx_notifications_order
 ON notifications(sort_order, id);

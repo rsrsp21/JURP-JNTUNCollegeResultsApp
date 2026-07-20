@@ -193,6 +193,13 @@ export default function CgpaPage() {
                 <Stat label="Percentage" value={displayValue(summary.percentage)} />
                 <Stat label="Total Credits" value={displayValue(student['Total Credits'])} />
                 <Stat label="Supplementary" value={summary.supplementaryCount > 0 ? String(summary.supplementaryCount) : 'None'} />
+                {student.honorsMinorStatus ? (
+                  <Stat
+                    label="Honors/Minor"
+                    value={honorsMinorStatusLabel(student.honorsMinorStatus.status)}
+                    note={student.honorsMinorStatus.degreeType === 'HONOR' ? 'Honor' : student.honorsMinorStatus.degreeType === 'MINOR' ? 'Minor' : ''}
+                  />
+                ) : null}
               </motion.div>
 
               <motion.div
@@ -263,6 +270,11 @@ function readCgpaCache(rollNumber) {
 
 function writeCgpaCache(rollNumber, data) {
   cgpaMemoryCache.set(rollNumber, data);
+}
+
+function honorsMinorStatusLabel(status) {
+  const labels = { ELIGIBLE: 'Eligible', NOT_ELIGIBLE: 'Not Eligible', UNKNOWN: 'Unknown' };
+  return labels[status] || 'Unknown';
 }
 
 function fullSemesterLabel(key) {
