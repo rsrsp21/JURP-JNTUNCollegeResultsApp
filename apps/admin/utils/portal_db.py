@@ -509,6 +509,80 @@ def toggle_notification(index):
     return list_notifications()
 
 
+def list_honors_minor_eligibility(batch_year=None):
+    if batch_year:
+        rows = d1_storage.query(
+            """
+            SELECT student_id, batch_year, degree_type, eligibility_status, remarks, updated_at
+            FROM honors_minor_eligibility
+            WHERE batch_year = ?
+            ORDER BY batch_year, degree_type, student_id
+            """,
+            [str(batch_year)]
+        )
+    else:
+        rows = d1_storage.query(
+            """
+            SELECT student_id, batch_year, degree_type, eligibility_status, remarks, updated_at
+            FROM honors_minor_eligibility
+            ORDER BY batch_year, degree_type, student_id
+            """
+        )
+    return [
+        {
+            'studentId': row.get('student_id') or '',
+            'batchYear': row.get('batch_year') or '',
+            'degreeType': row.get('degree_type') or '',
+            'eligibilityStatus': row.get('eligibility_status') or '',
+            'remarks': row.get('remarks') or '',
+            'updatedAt': row.get('updated_at') or '',
+        }
+        for row in rows
+    ]
+
+
+def upsert_honors_minor_eligibility_bulk(student_ids, degree_type, eligibility_status, remarks=''):
+    degree_type = (degree_type or '').strip().upper()
+    eligibility_status = (eligibility_status or '').strip().upper()
+    remarks = (remarks or '').strip()
+
+    updated = []
+    skipped = []
+    rows = []
+    for student_id in student_ids:
+        student_id = (student_id or '').strip().upper()
+        if not student_id:
+            continue
+        batch_year = batch_year_from_student_id(student_id)
+        if not batch_year:
+            skipped.append(student_id)
+            continue
+        rows.append({
+            'student_id': student_id,
+            'batch_year': batch_year,
+            'degree_type': degree_type,
+            'eligibility_status': eligibility_status,
+            'remarks': remarks,
+            'sync_token': _sync_token(student_id, degree_type, eligibility_status),
+        })
+        updated.append(student_id)
+
+    _bulk_upsert(
+        'honors_minor_eligibility',
+        ['student_id', 'batch_year', 'degree_type', 'eligibility_status', 'remarks', 'sync_token'],
+        rows,
+        ['student_id'],
+    )
+    clear_runtime_cache()
+    return {'updated': updated, 'skipped': skipped}
+
+
+def delete_honors_minor_eligibility(student_id):
+    student_id = (student_id or '').strip().upper()
+    d1_storage.execute('DELETE FROM honors_minor_eligibility WHERE student_id = ?', [student_id])
+    clear_runtime_cache()
+
+
 def replace_cgpa_from_dataframe(batch_year, dataframe):
     batch_year = str(batch_year)
     sync_token = _sync_token('cgpa', batch_year)

@@ -260,7 +260,14 @@ export default function SemesterResultsPage() {
                                 <div className="data-block-label">SGPA</div>
                                 <div className="semester-summary-value">{displayValue(semester.summary.sgpa)}</div>
                               </div>
-                              <div />
+                              <div>
+                                {semester.number === 9 && payload.honorsMinorStatus ? (
+                                  <>
+                                    <div className="data-block-label">Eligibility</div>
+                                    <EligibilityBadge status={payload.honorsMinorStatus} />
+                                  </>
+                                ) : null}
+                              </div>
                               <div>
                                 <div className="data-block-label">Credits</div>
                                 <div className="mini-meta-value">{displayValue(semester.summary.credits)}</div>
@@ -351,4 +358,16 @@ function Meta({ label, value }) {
 function gradeClass(grade = '') {
   const value = String(grade).trim().toUpperCase();
   return value === 'F' || value === 'AB' || value === 'ABSENT' ? 'fail' : '';
+}
+
+function EligibilityBadge({ status }) {
+  const { degreeType, status: state } = status;
+  const label = { ELIGIBLE: 'Eligible', NOT_ELIGIBLE: 'Not Eligible', UNKNOWN: 'Unknown' }[state] || 'Unknown';
+  const className = { ELIGIBLE: 'eligible', NOT_ELIGIBLE: 'not-eligible', UNKNOWN: 'unknown' }[state] || 'unknown';
+  return (
+    <span className={`eligibility-badge ${className}`}>
+      {degreeType ? `${degreeType === 'HONOR' ? 'Honor' : 'Minor'} · ` : ''}
+      {label}
+    </span>
+  );
 }

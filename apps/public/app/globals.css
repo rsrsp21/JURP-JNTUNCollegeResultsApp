@@ -1816,6 +1816,34 @@ section > .page-container > .download-row {
   color: var(--danger);
 }
 
+.eligibility-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.eligibility-badge.eligible {
+  color: var(--success);
+  border-color: var(--success-ring);
+  background: var(--success-ring);
+}
+
+.eligibility-badge.not-eligible {
+  color: var(--danger);
+  border-color: var(--danger-border);
+  background: rgba(180, 35, 24, 0.08);
+}
+
+.eligibility-badge.unknown {
+  color: var(--warning);
+  border-color: var(--hairline);
+  background: var(--soft);
+}
+
 .tabs-row {
   display: flex;
   flex-wrap: wrap;
