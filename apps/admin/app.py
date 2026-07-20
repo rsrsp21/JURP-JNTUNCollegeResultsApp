@@ -39,6 +39,10 @@ def create_app():
     app.add_url_rule('/api/admin/approve-id-image', methods=['POST'], view_func=routes.admin_approve_id_image)
     app.add_url_rule('/api/admin/email-requests', methods=['GET'], view_func=routes.admin_email_requests)
     app.add_url_rule('/api/admin/email-request', methods=['POST'], view_func=routes.admin_resolve_email_request)
+    app.add_url_rule('/api/admin/approved-names', methods=['GET'], view_func=routes.admin_approved_names)
+    app.add_url_rule('/api/admin/honors-minor-eligibility', methods=['GET'], view_func=routes.admin_list_honors_minor_eligibility)
+    app.add_url_rule('/api/admin/honors-minor-eligibility', methods=['POST'], view_func=routes.admin_add_honors_minor_eligibility)
+    app.add_url_rule('/api/admin/honors-minor-eligibility/<student_id>', methods=['DELETE'], view_func=routes.admin_delete_honors_minor_eligibility)
 
     app.add_url_rule('/images/<path:filename>', endpoint='public_images', view_func=_serve_public_image)
     app.add_url_rule('/cgpa', endpoint='public_cgpa_redirect', view_func=lambda: redirect(_public_url('/cgpa')))
