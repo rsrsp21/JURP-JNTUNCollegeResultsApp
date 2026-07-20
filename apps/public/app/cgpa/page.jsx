@@ -9,7 +9,17 @@ import IdNameUpload from '@/components/IdNameUpload';
 import EmailSubscribe from '@/components/EmailSubscribe';
 import SgpaChart from '@/components/SgpaChart';
 import UiIcon from '@/components/UiIcon';
-import { batchDisplay, branchFromRoll, displayValue, isValidRollNumber, normalizeRollNumber, semesters } from '@/lib/client-utils';
+import {
+  batchDisplay,
+  branchFromRoll,
+  displayValue,
+  honorsMinorDegreeLabel,
+  honorsMinorStatusClass,
+  honorsMinorStatusLabel,
+  isValidRollNumber,
+  normalizeRollNumber,
+  semesters
+} from '@/lib/client-utils';
 import { downloadCgpaPdf } from '@/lib/pdf';
 import { useApp } from '@/components/AppContext';
 
@@ -193,13 +203,6 @@ export default function CgpaPage() {
                 <Stat label="Percentage" value={displayValue(summary.percentage)} />
                 <Stat label="Total Credits" value={displayValue(student['Total Credits'])} />
                 <Stat label="Supplementary" value={summary.supplementaryCount > 0 ? String(summary.supplementaryCount) : 'None'} />
-                {student.honorsMinorStatus ? (
-                  <Stat
-                    label="Honors/Minor"
-                    value={honorsMinorStatusLabel(student.honorsMinorStatus.status)}
-                    note={student.honorsMinorStatus.degreeType === 'HONOR' ? 'Honor' : student.honorsMinorStatus.degreeType === 'MINOR' ? 'Minor' : ''}
-                  />
-                ) : null}
               </motion.div>
 
               <motion.div
@@ -217,7 +220,7 @@ export default function CgpaPage() {
 
               <div className="semester-breakdown">
                 <h2 className="section-title"><UiIcon name="fileText" /> Semester breakdown</h2>
-                {semesterRows.length ? (
+                {semesterRows.length || student.honorsMinorStatus ? (
                   <div className="semester-list mt-32">
                     {semesterRows.map((row, index) => (
                       <motion.div
@@ -233,6 +236,22 @@ export default function CgpaPage() {
                         <div className="semester-credits">{displayValue(row.credits)} cr</div>
                       </motion.div>
                     ))}
+                    {student.honorsMinorStatus ? (
+                      <motion.div
+                        className="semester-breakdown-row"
+                        key="honors-minor"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: semesterRows.length * 0.035, duration: 0.22 }}
+                        whileHover={{ x: 3 }}
+                      >
+                        <div className="semester-name">{honorsMinorDegreeLabel(student.honorsMinorStatus.degreeType)}</div>
+                        <div className={`semester-sgpa status-value ${honorsMinorStatusClass(student.honorsMinorStatus.status)}`}>
+                          {honorsMinorStatusLabel(student.honorsMinorStatus.status)}
+                        </div>
+                        <div className="semester-credits">{displayValue(student.honorsMinorStatus.credits)} cr</div>
+                      </motion.div>
+                    ) : null}
                   </div>
                 ) : (
                   <div className="empty-state">No semester data available for chart.</div>
@@ -270,11 +289,6 @@ function readCgpaCache(rollNumber) {
 
 function writeCgpaCache(rollNumber, data) {
   cgpaMemoryCache.set(rollNumber, data);
-}
-
-function honorsMinorStatusLabel(status) {
-  const labels = { ELIGIBLE: 'Eligible', NOT_ELIGIBLE: 'Not Eligible', UNKNOWN: 'Unknown' };
-  return labels[status] || 'Unknown';
 }
 
 function fullSemesterLabel(key) {

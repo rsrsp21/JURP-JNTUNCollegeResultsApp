@@ -112,10 +112,9 @@ export async function getHonorsMinorStatus(studentId) {
       ),
       d1Query(
         `
-        SELECT 1
+        SELECT credits
         FROM semester_results
         WHERE student_id = ? AND semester_number = 9
-        LIMIT 1
         `,
         [normalized]
       )
@@ -125,15 +124,18 @@ export async function getHonorsMinorStatus(studentId) {
     throw err;
   }
 
+  const credits = honorsCreditsFromRows({ 9: sem9Rows });
+
   if (eligibilityRows[0]) {
     return {
       degreeType: eligibilityRows[0].degree_type || null,
       status: eligibilityRows[0].eligibility_status || 'UNKNOWN',
-      remarks: eligibilityRows[0].remarks || ''
+      remarks: eligibilityRows[0].remarks || '',
+      credits
     };
   }
   if (sem9Rows.length) {
-    return { degreeType: null, status: 'UNKNOWN', remarks: '' };
+    return { degreeType: null, status: 'UNKNOWN', remarks: '', credits };
   }
   return null;
 }
