@@ -1277,6 +1277,50 @@ def admin_approved_names():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/admin/emails', methods=['GET'])
+def admin_emails():
+    if not session.get('logged_in'):
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    try:
+        page = max(1, int(request.args.get('page', 1) or 1))
+        per_page = min(100, max(10, int(request.args.get('per_page', 25) or 25)))
+        search = (request.args.get('search') or '').strip()
+        offset = (page - 1) * per_page
+
+        where_sql = ''
+        params = []
+        if search:
+            where_sql = ' AND (student_id LIKE ? OR name LIKE ? OR email LIKE ?)'
+            like = f'%{search}%'
+            params.extend([like, like, like])
+
+        total_rows = d1_storage.query(
+            f"SELECT COUNT(*) AS c FROM student_cgpa WHERE email IS NOT NULL AND email != ''{where_sql}",
+            params
+        )
+        total = total_rows[0]['c'] if total_rows else 0
+        rows = d1_storage.query(
+            f"""
+            SELECT student_id, name, email FROM student_cgpa
+            WHERE email IS NOT NULL AND email != ''{where_sql}
+            ORDER BY student_id
+            LIMIT ? OFFSET ?
+            """,
+            params + [per_page, offset]
+        )
+
+        return jsonify({
+            'success': True,
+            'rows': rows,
+            'total': total,
+            'page': page,
+            'per_page': per_page,
+            'pages': max(1, (total + per_page - 1) // per_page)
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/admin/approve-id-image', methods=['POST'])
 def admin_approve_id_image():
     if not session.get('logged_in'):
