@@ -97,26 +97,33 @@ export async function getStudentCgpa(studentId) {
 
 export async function getHonorsMinorStatus(studentId) {
   const normalized = studentId.trim().toUpperCase();
-  const [eligibilityRows, sem9Rows] = await Promise.all([
-    d1Query(
-      `
-      SELECT degree_type, eligibility_status, remarks
-      FROM honors_minor_eligibility
-      WHERE student_id = ?
-      LIMIT 1
-      `,
-      [normalized]
-    ),
-    d1Query(
-      `
-      SELECT 1
-      FROM semester_results
-      WHERE student_id = ? AND semester_number = 9
-      LIMIT 1
-      `,
-      [normalized]
-    )
-  ]);
+  let eligibilityRows;
+  let sem9Rows;
+  try {
+    [eligibilityRows, sem9Rows] = await Promise.all([
+      d1Query(
+        `
+        SELECT degree_type, eligibility_status, remarks
+        FROM honors_minor_eligibility
+        WHERE student_id = ?
+        LIMIT 1
+        `,
+        [normalized]
+      ),
+      d1Query(
+        `
+        SELECT 1
+        FROM semester_results
+        WHERE student_id = ? AND semester_number = 9
+        LIMIT 1
+        `,
+        [normalized]
+      )
+    ]);
+  } catch (err) {
+    if (/no such table/i.test(err.message || '')) return null;
+    throw err;
+  }
 
   if (eligibilityRows[0]) {
     return {
