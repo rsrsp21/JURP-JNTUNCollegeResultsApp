@@ -158,8 +158,10 @@ function namesCompatible(a, b) {
   return exactMatches >= 1;
 }
 
+// Throws on failure — callers must archive images before writing a verified
+// name to the DB, so a failed upload never leaves an orphaned "pending" name
+// with no image for admin to review (see incident: name saved, image missing).
 async function archiveImage(prefix, studentId, image) {
-  if (!isR2Configured()) return null;
   const mimeType = String(image.mimeType).toLowerCase();
   const extension = mimeType === 'image/png' ? 'png' : mimeType === 'image/webp' ? 'webp' : 'jpg';
   try {
@@ -170,7 +172,7 @@ async function archiveImage(prefix, studentId, image) {
     );
   } catch (error) {
     console.error(`Failed to archive image to R2 (${prefix}):`, error);
-    return null;
+    throw Object.assign(new Error('Could not save your image. Please try again.'), { status: 502 });
   }
 }
 
@@ -240,6 +242,9 @@ export async function POST(request) {
   if (!apiKey) {
     return NextResponse.json({ error: 'Verification is not configured on the server.' }, { status: 503 });
   }
+  if (!isR2Configured()) {
+    return NextResponse.json({ error: 'Image storage is not configured on the server.' }, { status: 503 });
+  }
 
   try {
     if (mode === 'edit') {
@@ -268,10 +273,11 @@ export async function POST(request) {
         );
       }
 
+      const archivedKey = await archiveImage('gradecardImages', studentId, gradeCardImage);
+
       const result = await setStudentNameEdit(studentId, gradeCardName);
       if (!result.success) return NextResponse.json({ error: result.error }, { status: 422 });
 
-      const archivedKey = await archiveImage('gradecardImages', studentId, gradeCardImage);
       return NextResponse.json({ name: gradeCardName, rollNumber: studentId, mode: 'edit', archivedKey });
     }
 
@@ -316,16 +322,16 @@ export async function POST(request) {
       }
     }
 
-    // Grade card carries the fuller official name, so it wins when provided.
-    const result = await setStudentName(studentId, idName, gradeCardName);
-    if (!result.success) {
-      return NextResponse.json({ error: result.error }, { status: 422 });
-    }
-
     const archivedKey = await archiveImage('idsImages', studentId, idImage);
     let gradeCardKey = null;
     if (gradeCardImage) {
       gradeCardKey = await archiveImage('gradecardImages', studentId, gradeCardImage);
+    }
+
+    // Grade card carries the fuller official name, so it wins when provided.
+    const result = await setStudentName(studentId, idName, gradeCardName);
+    if (!result.success) {
+      return NextResponse.json({ error: result.error }, { status: 422 });
     }
 
     return NextResponse.json({
