@@ -512,9 +512,7 @@ def extract_tables_from_pdf(pdf_source, required_columns=None, model="new"):
     """Extracts tables from a JNTU results PDF and returns a cleaned DataFrame using the coordinate alignment model."""
     with _open_pdf(pdf_source) as pdf:
         total_pages = len(pdf.pages)
-    
-    with _open_pdf(pdf_source) as pdf2:
-        df, page_stats = _extract_new_model_from_text(pdf2)
+        df, page_stats = _extract_new_model_from_text(pdf)
     method_name = "new_model_parser"
     
     if df.empty:

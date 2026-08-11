@@ -157,8 +157,10 @@ The generated import files are written to `apps/admin/d1_import/`.
 A typical production command is:
 
 ```powershell
-gunicorn app:app
+gunicorn app:app --timeout 120
 ```
+
+Gunicorn's default worker timeout is 30 seconds, which is not enough for the PDF-to-CSV converter on large multi-page result PDFs (pdfplumber parses every page's text geometry). Without `--timeout`, the worker is killed mid-request on large PDFs and the browser gets a truncated/non-JSON response (shows up as a "JSON error" in the admin UI) instead of the app's own error message. Set this explicitly in whatever field the host uses to configure the start command (e.g. Render's "Start Command"), since editing this README alone does not change the deployed process.
 
 Set all secrets in the hosting provider, not in committed files. The app listens on port `5001` when started with `python run.py`; production hosts often provide their own port through the process manager. The current live admin deployment is `https://jntunresultsadmin.onrender.com`.
 
