@@ -16,6 +16,7 @@ const whatsappGroupUrl = 'https://chat.whatsapp.com/Flaf1SsPaL4DDhMRKIghlS';
 let notificationsMemoryCache = null;
 // Module-level flag: survives client-side route switches, resets on full page reload.
 let namePromoShown = false;
+const NAME_PROMO_STORAGE_KEY = 'jurp_name_promo_seen';
 
 const features = [
   { icon: 'bookOpen', title: 'Detailed Results', points: ['Semester-wise performance breakdown', 'Subject-wise grades and marks'] },
@@ -63,7 +64,7 @@ export default function HomePage() {
   const [showNamePromo, setShowNamePromo] = useState(false);
 
   useEffect(() => {
-    if (namePromoShown) return;
+    if (namePromoShown || hasSeenNamePromo()) return;
     const timeoutId = window.setTimeout(() => {
       namePromoShown = true;
       setShowNamePromo(true);
@@ -71,8 +72,13 @@ export default function HomePage() {
     return () => window.clearTimeout(timeoutId);
   }, []);
 
-  function goToNameEmailSetup() {
+  function dismissNamePromo() {
+    markNamePromoSeen();
     setShowNamePromo(false);
+  }
+
+  function goToNameEmailSetup() {
+    dismissNamePromo();
     document.getElementById('name-email-setup')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
@@ -304,7 +310,7 @@ export default function HomePage() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={(e) => {
-              if (e.target === e.currentTarget) setShowNamePromo(false);
+              if (e.target === e.currentTarget) dismissNamePromo();
             }}
           >
             <motion.div
@@ -316,7 +322,7 @@ export default function HomePage() {
             >
               <div className="modal-header">
                 <h3 className="modal-title"><Icon name="user" /> New: Name &amp; email updates</h3>
-                <button className="modal-close" onClick={() => setShowNamePromo(false)} aria-label="Close modal">
+                <button className="modal-close" onClick={dismissNamePromo} aria-label="Close modal">
                   <Icon name="x" />
                 </button>
               </div>
@@ -329,7 +335,7 @@ export default function HomePage() {
                   <button className="ink-button glow-attract" type="button" onClick={goToNameEmailSetup}>
                     Add name &amp; email
                   </button>
-                  <button className="subtle-button" type="button" onClick={() => setShowNamePromo(false)}>
+                  <button className="subtle-button" type="button" onClick={dismissNamePromo}>
                     Maybe later
                   </button>
                 </div>
@@ -426,6 +432,22 @@ function readNotificationsCache() {
 
 function writeNotificationsCache(items) {
   notificationsMemoryCache = items;
+}
+
+function hasSeenNamePromo() {
+  try {
+    return window.localStorage.getItem(NAME_PROMO_STORAGE_KEY) === 'true';
+  } catch (error) {
+    return false;
+  }
+}
+
+function markNamePromoSeen() {
+  try {
+    window.localStorage.setItem(NAME_PROMO_STORAGE_KEY, 'true');
+  } catch (error) {
+    // Ignore storage errors (private browsing, disabled storage, etc.)
+  }
 }
 
 function isNewNotification(item) {
