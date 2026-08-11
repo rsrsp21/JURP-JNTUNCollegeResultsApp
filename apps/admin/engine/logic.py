@@ -62,8 +62,8 @@ def calculate_sgpa_summary(file_path, batch, semester, base_path):
 
     df = pd.read_csv(file_path)
     
-    # Filter out non-calculative grades
-    df = df[(df['Grade'] != 'COMPLE') & (df['Grade'] != 'NOT CO')]
+    # Filter out non-calculative grades ('CM' is the new-model equivalent of 'COMPLE')
+    df = df[~df['Grade'].isin(['COMPLE', 'NOT CO', 'CM'])]
     
     # Mapping
     grade_mapping = get_grade_mapping(batch)
