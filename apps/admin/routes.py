@@ -1277,6 +1277,82 @@ def admin_approved_names():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+def _orphaned_name_rows():
+    """Rows in student_cgpa with a saved name but no matching R2 ID image."""
+    rolls_with_image = set()
+    for item in list_r2_keys_under(ID_IMAGES_PREFIX):
+        match = ID_IMAGE_ROLL_PATTERN.match(item['name'])
+        if match:
+            rolls_with_image.add(match.group(1).upper())
+
+    named_rows = d1_storage.query(
+        "SELECT student_id, name, name_status FROM student_cgpa WHERE name IS NOT NULL AND name != ''"
+    )
+    orphaned = [
+        row for row in named_rows
+        if str(row.get('student_id') or '').upper() not in rolls_with_image
+    ]
+    orphaned.sort(key=lambda r: str(r.get('student_id') or ''))
+    return orphaned
+
+@app.route('/api/admin/orphaned-names', methods=['GET'])
+def admin_orphaned_names():
+    if not session.get('logged_in'):
+        return jsonify({'error': 'Unauthorized'}), 401
+    if not is_r2_configured():
+        return jsonify({'error': 'Cloudflare R2 is not configured'}), 500
+
+    try:
+        rows = _orphaned_name_rows()
+        return jsonify({'success': True, 'rows': rows, 'count': len(rows)})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/admin/clear-orphaned-names', methods=['POST'])
+def admin_clear_orphaned_names():
+    if not session.get('logged_in'):
+        return jsonify({'error': 'Unauthorized'}), 401
+    if not is_r2_configured():
+        return jsonify({'error': 'Cloudflare R2 is not configured'}), 500
+
+    data = request.get_json(silent=True) or {}
+    requested = data.get('roll_numbers')
+
+    try:
+        current_orphans = {row['student_id'] for row in _orphaned_name_rows()}
+
+        if requested is None:
+            roll_numbers = sorted(current_orphans)
+        else:
+            if not isinstance(requested, list):
+                return jsonify({'error': 'roll_numbers must be a list'}), 400
+            requested_set = {str(r).strip().upper() for r in requested if str(r).strip()}
+            # Re-check against the freshest R2 listing so a stale client-side list
+            # (e.g. an image finished uploading in the meantime) can never wipe a
+            # name that now has a matching image.
+            roll_numbers = sorted(requested_set & current_orphans)
+
+        if not roll_numbers:
+            return jsonify({'success': True, 'cleared': [], 'message': 'Nothing to clear.'})
+
+        placeholders = ','.join('?' * len(roll_numbers))
+        d1_storage.execute(
+            f"""
+            UPDATE student_cgpa
+            SET name = NULL, name_status = NULL, grade_card_name = NULL
+            WHERE student_id IN ({placeholders})
+            """,
+            roll_numbers
+        )
+        portal_db.clear_runtime_cache()
+        return jsonify({
+            'success': True,
+            'cleared': roll_numbers,
+            'message': f"Cleared {len(roll_numbers)} orphaned name{'s' if len(roll_numbers) != 1 else ''}."
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/admin/emails', methods=['GET'])
 def admin_emails():
     if not session.get('logged_in'):

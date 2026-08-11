@@ -986,6 +986,25 @@
                         <span id="approved-names-page-info" class="db-meta"></span>
                         <button id="approved-names-next-btn" class="button btn-sm" type="button" disabled>Next <i class="fas fa-chevron-right"></i></button>
                     </div>
+
+                    <h5 class="mt-4 mb-2" style="color: var(--text-primary);"><i class="fas fa-triangle-exclamation"></i> Orphaned names (no R2 image)</h5>
+                    <p class="text-muted small mb-2">A name got saved to the database but its ID/grade-card image never made it into R2 (failed upload, deleted object, etc.). These will never show up above and can never be approved as-is. Clearing resets the name so the student can re-verify.</p>
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span id="orphaned-names-count" class="csv-meta">Loading...</span>
+                        <button id="orphaned-names-refresh-btn" class="button btn-sm" type="button">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                        <button id="orphaned-names-clear-all-btn" class="button btn-sm" type="button" style="background: var(--danger-color); border-color: var(--danger-color);" disabled>
+                            <i class="fas fa-broom"></i> Clear all
+                        </button>
+                    </div>
+                    <div id="orphaned-names-status" style="font-style: italic; color: #4db6ac; font-weight: 500;"></div>
+                    <div class="db-table-wrap" style="max-height: 320px;">
+                        <table class="db-table" id="orphaned-names-table">
+                            <thead><tr><th>#</th><th>Roll Number</th><th>Saved Name</th><th></th></tr></thead>
+                            <tbody><tr><td colspan="4" class="text-center text-muted py-3">Loading...</td></tr></tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <!-- Tab 8: Emails -->
@@ -2247,7 +2266,80 @@
         document.getElementById('id-images-refresh-btn').addEventListener('click', () => {
             loadIdImages();
             loadApprovedNames();
+            loadOrphanedNames();
         });
+
+        // --- Orphaned Names (name saved, no matching R2 image) ---
+        const orphanedNamesCount = document.getElementById('orphaned-names-count');
+        const orphanedNamesStatus = document.getElementById('orphaned-names-status');
+        const orphanedNamesRefreshBtn = document.getElementById('orphaned-names-refresh-btn');
+        const orphanedNamesClearAllBtn = document.getElementById('orphaned-names-clear-all-btn');
+        let orphanedNamesRows = [];
+
+        async function loadOrphanedNames() {
+            const tbody = document.querySelector('#orphaned-names-table tbody');
+            orphanedNamesCount.textContent = 'Loading...';
+            orphanedNamesClearAllBtn.disabled = true;
+            try {
+                const response = await fetch('/api/admin/orphaned-names');
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Failed to load orphaned names');
+                orphanedNamesRows = data.rows || [];
+                orphanedNamesCount.textContent = `${orphanedNamesRows.length} row${orphanedNamesRows.length === 1 ? '' : 's'}`;
+                orphanedNamesClearAllBtn.disabled = orphanedNamesRows.length === 0;
+                renderOrphanedNames();
+            } catch (err) {
+                orphanedNamesCount.textContent = 'Failed to load';
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center text-muted py-3">${err.message}</td></tr>`;
+            }
+        }
+
+        function renderOrphanedNames() {
+            const tbody = document.querySelector('#orphaned-names-table tbody');
+            if (!orphanedNamesRows.length) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3">No orphaned names. Every saved name has a matching R2 image.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = '';
+            orphanedNamesRows.forEach((row, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td class="text-muted">${index + 1}</td><td style="font-family: monospace;">${row.student_id}</td><td>${row.name || ''}</td>`;
+                const actionCell = document.createElement('td');
+                const clearBtn = document.createElement('button');
+                clearBtn.className = 'button btn-sm';
+                clearBtn.style.cssText = 'background: var(--danger-color); border-color: var(--danger-color);';
+                clearBtn.innerHTML = '<i class="fas fa-eraser"></i> Clear';
+                clearBtn.addEventListener('click', () => clearOrphanedNames([row.student_id], clearBtn));
+                actionCell.appendChild(clearBtn);
+                tr.appendChild(actionCell);
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function clearOrphanedNames(rollNumbers, triggerBtn) {
+            const isAll = rollNumbers === null;
+            const label = isAll ? `all ${orphanedNamesRows.length} orphaned name(s)` : rollNumbers.join(', ');
+            if (!confirm(`Clear ${label}? The affected student(s) will need to re-verify their name.`)) return;
+
+            if (triggerBtn) { triggerBtn.disabled = true; }
+            try {
+                const response = await fetch('/api/admin/clear-orphaned-names', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ roll_numbers: rollNumbers })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Clear failed');
+                orphanedNamesStatus.textContent = data.message;
+                loadOrphanedNames();
+            } catch (err) {
+                if (triggerBtn) { triggerBtn.disabled = false; }
+                orphanedNamesStatus.textContent = `Error: ${err.message}`;
+            }
+        }
+
+        orphanedNamesRefreshBtn.addEventListener('click', loadOrphanedNames);
+        orphanedNamesClearAllBtn.addEventListener('click', () => clearOrphanedNames(null, orphanedNamesClearAllBtn));
 
         // --- Existing Emails (paginated) ---
         const emailsState = { page: 1, perPage: 25, search: '' };
@@ -2455,6 +2547,7 @@
                 idImagesLoaded = true;
                 loadIdImages();
                 loadApprovedNames();
+                loadOrphanedNames();
             }
         });
 

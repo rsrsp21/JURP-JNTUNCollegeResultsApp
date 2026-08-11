@@ -40,6 +40,8 @@ def create_app():
     app.add_url_rule('/api/admin/email-requests', methods=['GET'], view_func=routes.admin_email_requests)
     app.add_url_rule('/api/admin/email-request', methods=['POST'], view_func=routes.admin_resolve_email_request)
     app.add_url_rule('/api/admin/approved-names', methods=['GET'], view_func=routes.admin_approved_names)
+    app.add_url_rule('/api/admin/orphaned-names', methods=['GET'], view_func=routes.admin_orphaned_names)
+    app.add_url_rule('/api/admin/clear-orphaned-names', methods=['POST'], view_func=routes.admin_clear_orphaned_names)
     app.add_url_rule('/api/admin/emails', methods=['GET'], view_func=routes.admin_emails)
     app.add_url_rule('/api/admin/honors-minor-eligibility', methods=['GET'], view_func=routes.admin_list_honors_minor_eligibility)
     app.add_url_rule('/api/admin/honors-minor-eligibility', methods=['POST'], view_func=routes.admin_add_honors_minor_eligibility)
