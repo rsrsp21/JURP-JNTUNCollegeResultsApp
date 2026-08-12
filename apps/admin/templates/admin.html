@@ -1961,6 +1961,9 @@
                             statusMsg += ` Email not sent: ${email.skipped_reason}.`;
                         } else {
                             statusMsg += ` Emailed ${email.sent}/${email.total} subscriber(s)${email.failed ? `, ${email.failed} failed` : ''}.`;
+                            if (email.failed && email.errors && email.errors.length) {
+                                statusMsg += ` First error: ${email.errors[0]}`;
+                            }
                         }
                     }
                     notificationStatus.textContent = statusMsg;
