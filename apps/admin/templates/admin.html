@@ -945,11 +945,15 @@
                             <input type="checkbox" id="notification-is-new" checked style="width: auto; margin-bottom: 0;">
                             <label for="notification-is-new" style="margin-bottom: 0; cursor: pointer;">Show "New!" blinking badge on the homepage</label>
                         </div>
+                        <div class="form-group d-flex align-items-center gap-2 mb-3">
+                            <input type="checkbox" id="notification-send-email" checked style="width: auto; margin-bottom: 0;">
+                            <label for="notification-send-email" style="margin-bottom: 0; cursor: pointer;">Also email everyone who added their email address</label>
+                        </div>
                         <button type="submit" class="button w-100" id="notification-btn">
                             <i class="fas fa-plus"></i> Add Notification (Push to Top)
                         </button>
                     </form>
-                    
+
                     <div id="notification-status" style="margin-top: 1rem; font-style: italic; color: #4db6ac; font-weight: 500;"></div>
                     
                     <h5 class="mt-4 mb-3" style="color: var(--text-primary);"><i class="fas fa-list"></i> Current Notifications</h5>
@@ -1928,10 +1932,11 @@
             const textInput = document.getElementById('notification-text');
             const dateInput = document.getElementById('notification-date');
             const isNewInput = document.getElementById('notification-is-new');
-            
+            const sendEmailInput = document.getElementById('notification-send-email');
+
             notificationStatus.textContent = 'Saving notification...';
             notificationStatus.style.color = '#4db6ac';
-            
+
             try {
                 const res = await fetch('/api/admin/add-notification', {
                     method: 'POST',
@@ -1941,14 +1946,24 @@
                     body: JSON.stringify({
                         text: textInput.value,
                         date: dateInput.value,
-                        is_new: isNewInput.checked
+                        is_new: isNewInput.checked,
+                        send_email: sendEmailInput.checked
                     })
                 });
-                
+
                 const result = await res.json();
-                
+
                 if (res.ok) {
-                    notificationStatus.textContent = 'Notification added successfully and pushed to top!';
+                    let statusMsg = 'Notification added successfully and pushed to top!';
+                    const email = result.email;
+                    if (email) {
+                        if (email.skipped_reason) {
+                            statusMsg += ` Email not sent: ${email.skipped_reason}.`;
+                        } else {
+                            statusMsg += ` Emailed ${email.sent}/${email.total} subscriber(s)${email.failed ? `, ${email.failed} failed` : ''}.`;
+                        }
+                    }
+                    notificationStatus.textContent = statusMsg;
                     notificationStatus.style.color = 'var(--success-color)';
                     textInput.value = '';
                     dateInput.value = '';

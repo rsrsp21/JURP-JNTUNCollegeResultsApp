@@ -30,6 +30,7 @@ from utils.r2_storage import (
 )
 from utils import portal_db
 from utils import d1_storage
+from utils import email_notify
 from engine.logic import (
     get_batch, save_processed_csv, apply_revaluation,
     merge_all_semesters, calculate_supple_appearances,
@@ -1500,10 +1501,19 @@ def admin_add_notification():
         
     try:
         notifications = portal_db.add_notification(text, date_str, is_new)
-        return jsonify({'success': True, 'notifications': notifications})
     except Exception as e:
         print(f"Error adding notification: {e}")
         return jsonify({'error': str(e)}), 500
+
+    email_result = None
+    if bool(data.get('send_email', True)):
+        try:
+            email_result = email_notify.send_notification_email(text, date_str)
+        except Exception as e:
+            # Best-effort: the notification itself already saved successfully.
+            email_result = {'sent': 0, 'failed': 0, 'total': 0, 'skipped_reason': str(e)}
+
+    return jsonify({'success': True, 'notifications': notifications, 'email': email_result})
 
 @app.route('/api/admin/delete-notification/<int:index>', methods=['DELETE'])
 def admin_delete_notification(index):
