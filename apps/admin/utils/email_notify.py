@@ -78,10 +78,13 @@ def send_notification_email(text, date_str=None):
                 sent += len(chunk)
             else:
                 failed += len(chunk)
-                errors.append(response.text[:200])
+                error_text = response.text[:200]
+                errors.append(error_text)
+                print(f"Resend batch send failed ({response.status_code}): {error_text}")
         except Exception as e:
             failed += len(chunk)
             errors.append(str(e))
+            print(f"Resend batch send raised an exception: {e}")
 
         if i + BATCH_SIZE < len(emails):
             time.sleep(1)  # basic pacing between batches
