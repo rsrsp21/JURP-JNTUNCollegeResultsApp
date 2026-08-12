@@ -644,14 +644,22 @@ def _extract_new_model_from_text(pdf):
     records = []
     page_stats = []
     current_id = None
-    # Name fragments accumulate independently of where the SubCode line lands
-    # (see below) rather than a single prefix-anchored pending_line string.
-    pending_subcode = None
-    pending_parts = []
-
+    pending_line = ""
+    
     id_line_pattern = re.compile(r'\b(\d{2}\d{3}[A-Za-z]\d{4})\b')
     subcode_start_pattern = re.compile(r'^\s*(?:\d+\s+)?([A-Za-z]?\d{5,7}[A-Za-z]{0,2})\b')
-
+    
+    subject_line_pattern = re.compile(
+        r'^\s*(?:\d+\s+)?'
+        r'([A-Za-z]?\d{5,7}[A-Za-z]{0,2})\s+'
+        r'(.*?)\s*'
+        r'(-?\d+|---)\s+'
+        r'([A-Za-z\-]+)\s+'
+        r'([A-Za-z0-9\+\-]+|ABSENT|COMPLE|NOT CO|No Change|--- No Change ---|---)\s+'
+        r'(\d+\.?\d*|---)\s*$',
+        re.IGNORECASE
+    )
+    
     combined_pattern = re.compile(
         r'^\s*(?:\d+\s+)?'                  # Optional SNo
         r'(\d{2}\d{3}[A-Za-z]\d{4})\s+'     # Htno (Roll Number)
@@ -662,25 +670,17 @@ def _extract_new_model_from_text(pdf):
         r'(\d+\.?\d*|---)\s*$',             # Credits
         re.IGNORECASE
     )
-
-    # Matches the trailing IM/Res/Grade/Credits tail of an already
-    # subcode-stripped, fully-joined name (see pending_parts below).
-    row_close_pattern = re.compile(
-        r'^(.*?)\s*'
-        r'(-?\d+|---)\s+'
-        r'([A-Za-z\-]+)\s+'
-        r'([A-Za-z0-9\+\-]+|ABSENT|COMPLE|NOT CO|No Change|--- No Change ---|---)\s+'
-        r'(\d+\.?\d*|---)\s*$',
-        re.IGNORECASE
-    )
-    row_close_fallback_pattern = re.compile(
-        r'^(.*?)\s+'
+    
+    subject_fallback_pattern = re.compile(
+        r'^\s*(?:\d+\s+)?'
+        r'([A-Za-z]?\d{5,7}[A-Za-z]{0,2})\s+'
+        r'(.*?)\s+'
         r'([A-Za-z0-9\+\-]+|ABSENT|COMPLE|NOT CO|No Change|--- No Change ---)\s+'
         r'(\d+\.?\d*|---)\s*$',
         re.IGNORECASE
     )
 
-
+    
     for page_num, page in enumerate(pdf.pages, 1):
         lines = _get_visual_lines(page)
         if not lines:
@@ -714,6 +714,17 @@ def _extract_new_model_from_text(pdf):
                 just_added_record = False
                 continue
             
+            if just_added_record:
+                id_match_temp = id_line_pattern.search(line)
+                is_new_subj_temp = subcode_start_pattern.search(line)
+                if not id_match_temp and not is_new_subj_temp:
+                    if records:
+                        records[-1]['Subject Name'] = (records[-1]['Subject Name'] + " " + line).strip()
+                    just_added_record = False
+                    continue
+                else:
+                    just_added_record = False
+            
             # Try to match a combined line first
             combined_match = combined_pattern.match(line)
             if combined_match:
@@ -730,89 +741,60 @@ def _extract_new_model_from_text(pdf):
                     'Credits': combined_match.group(6)
                 })
                 page_row_count += 1
-                pending_subcode = None
-                pending_parts = []
                 just_added_record = False
                 continue
-
+            
             id_match = id_line_pattern.search(line)
             if id_match:
                 current_id = id_match.group(1).upper()
                 line = id_line_pattern.sub("", line).strip()
-                pending_subcode = None
-                pending_parts = []
-                just_added_record = False
                 if not line:
+                    pending_line = ""
                     continue
-
-            # A tall wrapped-name cell can put the SNo/SubCode line anywhere
-            # among the name's wrapped lines (top-aligned, vertically
-            # centered, etc.), not necessarily first. So rather than assuming
-            # the SubCode always leads pending text, extract it whenever it
-            # appears and keep collecting name fragments in the order seen,
-            # independent of where the SubCode line landed.
-            was_just_added = just_added_record
-            just_added_record = False
-
-            subcode_match = subcode_start_pattern.match(line)
-            if subcode_match:
-                remainder = line[subcode_match.end():].strip()
-                pending_subcode = subcode_match.group(1).upper()
-                if remainder:
-                    pending_parts.append(remainder)
+            
+            is_new_subject = subcode_start_pattern.search(line)
+            if is_new_subject:
+                pending_line = line
             else:
-                active = pending_subcode is not None or bool(pending_parts)
-                if active:
-                    pending_parts.append(line)
-                elif was_just_added:
-                    # Likely the start of the NEXT row's wrapped name, whose
-                    # SNo/SubCode line hasn't appeared yet (see above) -
-                    # rather than a trailing continuation of the row we just
-                    # finished, which is what this used to assume.
-                    pending_parts = [line]
+                if pending_line:
+                    pending_line += " " + line
                 else:
-                    # Nothing in progress - likely header/footer noise that
-                    # slipped past the keyword filters above.
+                    # Ignore the line if there is no active subject line being reconstructed (it is likely a header/footer)
                     continue
-
-            if pending_subcode is None:
-                continue
-
-            candidate = " ".join(pending_parts).strip()
-
-            close_match = row_close_pattern.match(candidate)
-            if close_match:
+            
+            subj_match = subject_line_pattern.match(pending_line)
+            if subj_match:
+                if id_match and not current_id:
+                     current_id = id_match.group(1).upper()
                 if current_id:
                     records.append({
                         'ID': current_id,
-                        'Subject Code': pending_subcode,
-                        'Subject Name': close_match.group(1).strip(),
-                        'Internal Marks': close_match.group(2),
-                        'Result': close_match.group(3).upper(),
-                        'Grade': close_match.group(4).upper(),
-                        'Credits': close_match.group(5)
+                        'Subject Code': subj_match.group(1).upper(),
+                        'Subject Name': subj_match.group(2).strip(),
+                        'Internal Marks': subj_match.group(3),
+                        'Result': subj_match.group(4).upper(),
+                        'Grade': subj_match.group(5).upper(),
+                        'Credits': subj_match.group(6)
                     })
                     page_row_count += 1
-                pending_subcode = None
-                pending_parts = []
+                pending_line = ""
                 just_added_record = True
                 continue
-
-            fallback_close_match = row_close_fallback_pattern.match(candidate)
-            if fallback_close_match:
+            
+            fallback_match = subject_fallback_pattern.match(pending_line)
+            if fallback_match:
                 if current_id:
                     records.append({
                         'ID': current_id,
-                        'Subject Code': pending_subcode,
-                        'Subject Name': fallback_close_match.group(1).strip(),
+                        'Subject Code': fallback_match.group(1).upper(),
+                        'Subject Name': fallback_match.group(2).strip(),
                         'Internal Marks': '',
                         'Result': '',
-                        'Grade': fallback_close_match.group(2).upper(),
-                        'Credits': fallback_close_match.group(3)
+                        'Grade': fallback_match.group(3).upper(),
+                        'Credits': fallback_match.group(4)
                     })
                     page_row_count += 1
-                pending_subcode = None
-                pending_parts = []
+                pending_line = ""
                 just_added_record = True
                 continue
 
