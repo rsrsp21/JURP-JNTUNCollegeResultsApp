@@ -90,14 +90,10 @@ Copy `.env.example` to `.env` and fill in the values you need.
 | `GEMINI_API_KEY` | For AI | API key used by Ask AI endpoints. |
 | `GEMINI_MODEL` | Optional | Gemini model name. Defaults to `gemini-2.5-flash`. |
 | `PUBLIC_APP_URL` | Optional | Public portal base URL used for cross-links. |
-| `SMTP_HOST` | For notification emails | SMTP server host. Defaults to `smtp.gmail.com`. |
-| `SMTP_PORT` | Optional | SMTP port. Defaults to `465` (implicit TLS). Set to `587` to use STARTTLS instead (some hosts block one port but not the other). |
-| `SMTP_USE_SSL` | Optional | Force implicit TLS regardless of port. Auto-enabled when `SMTP_PORT=465`. |
-| `SMTP_USERNAME` | For notification emails | Mailbox address to authenticate and send as, e.g. a Gmail address. Without this (and `SMTP_PASSWORD`), adding a notification just skips the email step. |
-| `SMTP_PASSWORD` | For notification emails | An [app password](https://myaccount.google.com/apppasswords) for the account above (requires 2-Step Verification enabled) - not the regular account password. |
-| `SMTP_FROM_EMAIL` | Optional | From address if different from `SMTP_USERNAME`. |
-| `SMTP_FROM_NAME` | Optional | Display name on outgoing emails. Defaults to "JNTUK UCEN Results Portal". |
-| `SMTP_NOTIFICATION_SUBJECT` | Optional | Subject line for notification emails. Defaults to "JNTUK UCEN Results Portal - New Update". |
+| `BREVO_API_KEY` | For notification emails | API key from [brevo.com](https://app.brevo.com) (Settings -> SMTP & API -> API Keys). Without it (and `BREVO_FROM_EMAIL`), adding a notification just skips the email step. |
+| `BREVO_FROM_EMAIL` | For notification emails | Sender address verified in Brevo (Settings -> Senders & IP -> Senders - just click the confirmation link Brevo emails you, no domain/DNS needed). |
+| `BREVO_FROM_NAME` | Optional | Display name on outgoing emails. Defaults to "JNTUK UCEN Results Portal". |
+| `BREVO_NOTIFICATION_SUBJECT` | Optional | Subject line for notification emails. Defaults to "JNTUK UCEN Results Portal - New Update". |
 
 ## Main Routes
 
