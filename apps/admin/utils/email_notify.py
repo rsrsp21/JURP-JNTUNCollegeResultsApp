@@ -22,16 +22,52 @@ def _subscriber_emails():
 
 
 def _notification_html(text, date_str):
-    date_html = f'<p style="font-size:13px;color:#64748b;margin:4px 0 16px;">{date_str}</p>' if date_str else ''
+    portal_url = os.getenv('PUBLIC_APP_URL', 'https://jurp.vercel.app')
+    date_html = (
+        f'<p style="margin:0 0 20px;font-size:13px;color:#94a3b8;">{date_str}</p>'
+        if date_str else ''
+    )
+    # Table-based layout with inline styles throughout - div/flexbox layouts
+    # and <style> blocks are unreliable across Gmail/Outlook/etc, tables are
+    # the one thing every email client renders consistently.
     return f"""
-    <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 24px;">
-      <h2 style="color:#1e293b; margin-bottom: 4px;">New update on JNTUK UCEN Results Portal</h2>
-      {date_html}
-      <p style="font-size:15px; color:#334155; line-height:1.5;">{text}</p>
-      <p style="font-size:12px;color:#94a3b8; margin-top:24px;">
-        You're receiving this because you added your email on the results portal.
-      </p>
-    </div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f1f5f9;padding:32px 16px;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;">
+  <tr>
+    <td align="center">
+      <table role="presentation" width="480" cellpadding="0" cellspacing="0" style="max-width:480px;width:100%;background:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e2e8f0;">
+        <tr>
+          <td style="background:#4338ca;padding:28px 32px;">
+            <p style="margin:0;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#c7d2fe;font-weight:600;">JNTUK UCEN Results Portal</p>
+            <p style="margin:6px 0 0;font-size:20px;font-weight:700;color:#ffffff;">New Update Posted</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:28px 32px 8px;">
+            {date_html}
+            <p style="margin:0 0 24px;font-size:16px;line-height:1.6;color:#1e293b;">{text}</p>
+            <table role="presentation" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="border-radius:8px;background:#4338ca;">
+                  <a href="{portal_url}" target="_blank" style="display:inline-block;padding:12px 24px;font-size:14px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:8px;">
+                    Open Results Portal &rarr;
+                  </a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:24px 32px 28px;border-top:1px solid #f1f5f9;margin-top:24px;">
+            <p style="margin:20px 0 0;font-size:12px;line-height:1.5;color:#94a3b8;">
+              You're receiving this because you added your email on the JNTUK UCEN results portal.
+              <a href="{portal_url}" style="color:#94a3b8;">Visit the portal</a> anytime to check results, CGPA, and toppers.
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
     """
 
 
