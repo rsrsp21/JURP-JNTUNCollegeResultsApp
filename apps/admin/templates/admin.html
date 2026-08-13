@@ -773,6 +773,9 @@
                         <button class="tab-btn" data-pane="pane-emails">
                             <i class="fas fa-envelope"></i> Emails
                         </button>
+                        <button class="tab-btn" data-pane="pane-send-email">
+                            <i class="fas fa-paper-plane"></i> Send Email
+                        </button>
                         <button class="tab-btn" data-pane="pane-database">
                             <i class="fas fa-database"></i> Database
                         </button>
@@ -945,10 +948,6 @@
                             <input type="checkbox" id="notification-is-new" checked style="width: auto; margin-bottom: 0;">
                             <label for="notification-is-new" style="margin-bottom: 0; cursor: pointer;">Show "New!" blinking badge on the homepage</label>
                         </div>
-                        <div class="form-group d-flex align-items-center gap-2 mb-3">
-                            <input type="checkbox" id="notification-send-email" checked style="width: auto; margin-bottom: 0;">
-                            <label for="notification-send-email" style="margin-bottom: 0; cursor: pointer;">Also email everyone who added their email address</label>
-                        </div>
                         <button type="submit" class="button w-100" id="notification-btn">
                             <i class="fas fa-plus"></i> Add Notification (Push to Top)
                         </button>
@@ -1040,6 +1039,83 @@
                         <span id="emails-page-info" class="db-meta"></span>
                         <button id="emails-next-btn" class="button btn-sm" type="button" disabled>Next <i class="fas fa-chevron-right"></i></button>
                     </div>
+                </div>
+
+                <!-- Tab: Send Email -->
+                <div class="tab-pane" id="pane-send-email">
+                    <h3>Send Email</h3>
+                    <p class="text-muted mb-4">Send a one-off email to everyone who added their email address, or to a specific selection of them.</p>
+
+                    <form id="send-email-form">
+                        <div class="form-group">
+                            <label for="send-email-category">Email Type</label>
+                            <select id="send-email-category" class="form-control">
+                                <option value="notification">Notification / Result Update</option>
+                                <option value="feature">Feature Update</option>
+                                <option value="custom">Custom Message</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="send-email-notification-group" style="display: none;">
+                            <label for="send-email-notification-select">Base on an existing notification</label>
+                            <select id="send-email-notification-select" class="form-control">
+                                <option value="">Write a new message instead...</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="send-email-subject">Subject <span class="text-muted">(optional - a sensible default is used if left blank)</span></label>
+                            <input type="text" id="send-email-subject" class="form-control" placeholder="e.g., 3-2 Regular June-2026 Results Released!">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="send-email-message">Message</label>
+                            <textarea id="send-email-message" class="form-control" rows="5" placeholder="Write the email message..." required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="send-email-date">Date <span class="text-muted">(optional, shown under the heading)</span></label>
+                            <input type="text" id="send-email-date" class="form-control" placeholder="e.g., May 11, 2026">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Recipients</label>
+                            <div class="d-flex align-items-center gap-3 mb-2">
+                                <label class="d-flex align-items-center gap-2" style="margin-bottom: 0; cursor: pointer; font-weight: normal;">
+                                    <input type="radio" name="send-email-recipients-mode" id="send-email-recipients-all" value="all" checked style="width: auto;">
+                                    All subscribers
+                                </label>
+                                <label class="d-flex align-items-center gap-2" style="margin-bottom: 0; cursor: pointer; font-weight: normal;">
+                                    <input type="radio" name="send-email-recipients-mode" id="send-email-recipients-specific" value="specific" style="width: auto;">
+                                    Select specific recipients
+                                </label>
+                            </div>
+
+                            <div id="send-email-recipients-picker" style="display: none;">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <input type="text" id="send-email-recipients-search" class="form-control" placeholder="Search roll number, name, or email..." style="max-width: 320px;">
+                                    <span id="send-email-selected-count" class="csv-meta">0 selected</span>
+                                    <button type="button" id="send-email-clear-selection-btn" class="button btn-sm btn-secondary">Clear selection</button>
+                                </div>
+                                <div class="db-table-wrap" style="max-height: 280px;">
+                                    <table class="db-table" id="send-email-recipients-table">
+                                        <thead><tr><th style="width: 36px;"><input type="checkbox" id="send-email-select-page-checkbox"></th><th>Roll Number</th><th>Name</th><th>Email</th></tr></thead>
+                                        <tbody><tr><td colspan="4" class="text-center text-muted py-3">Loading...</td></tr></tbody>
+                                    </table>
+                                </div>
+                                <div class="db-pagination">
+                                    <button id="send-email-recipients-prev-btn" class="button btn-sm" type="button" disabled><i class="fas fa-chevron-left"></i> Prev</button>
+                                    <span id="send-email-recipients-page-info" class="db-meta"></span>
+                                    <button id="send-email-recipients-next-btn" class="button btn-sm" type="button" disabled>Next <i class="fas fa-chevron-right"></i></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="button w-100" id="send-email-btn">
+                            <i class="fas fa-paper-plane"></i> Send Email
+                        </button>
+                    </form>
+                    <div id="send-email-status" style="font-style: italic; color: #4db6ac; font-weight: 500; margin-top: 12px;"></div>
                 </div>
 
                 <!-- Tab 9: Database Browser -->
@@ -1932,7 +2008,6 @@
             const textInput = document.getElementById('notification-text');
             const dateInput = document.getElementById('notification-date');
             const isNewInput = document.getElementById('notification-is-new');
-            const sendEmailInput = document.getElementById('notification-send-email');
 
             notificationStatus.textContent = 'Saving notification...';
             notificationStatus.style.color = '#4db6ac';
@@ -1946,27 +2021,14 @@
                     body: JSON.stringify({
                         text: textInput.value,
                         date: dateInput.value,
-                        is_new: isNewInput.checked,
-                        send_email: sendEmailInput.checked
+                        is_new: isNewInput.checked
                     })
                 });
 
                 const result = await res.json();
 
                 if (res.ok) {
-                    let statusMsg = 'Notification added successfully and pushed to top!';
-                    const email = result.email;
-                    if (email) {
-                        if (email.skipped_reason) {
-                            statusMsg += ` Email not sent: ${email.skipped_reason}.`;
-                        } else {
-                            statusMsg += ` Emailed ${email.sent}/${email.total} subscriber(s)${email.failed ? `, ${email.failed} failed` : ''}.`;
-                            if (email.failed && email.errors && email.errors.length) {
-                                statusMsg += ` First error: ${email.errors[0]}`;
-                            }
-                        }
-                    }
-                    notificationStatus.textContent = statusMsg;
+                    notificationStatus.textContent = 'Notification added successfully and pushed to top!';
                     notificationStatus.style.color = 'var(--success-color)';
                     textInput.value = '';
                     dateInput.value = '';
@@ -2408,6 +2470,216 @@
                 emailsState.search = emailsSearch.value.trim();
                 emailsState.page = 1;
                 loadEmailsList();
+            }
+        });
+
+        // --- Send Email ---
+        const sendEmailForm = document.getElementById('send-email-form');
+        const sendEmailStatus = document.getElementById('send-email-status');
+        const sendEmailCategory = document.getElementById('send-email-category');
+        const sendEmailNotificationGroup = document.getElementById('send-email-notification-group');
+        const sendEmailNotificationSelect = document.getElementById('send-email-notification-select');
+        const sendEmailSubjectInput = document.getElementById('send-email-subject');
+        const sendEmailMessageInput = document.getElementById('send-email-message');
+        const sendEmailDateInput = document.getElementById('send-email-date');
+        const sendEmailRecipientsPicker = document.getElementById('send-email-recipients-picker');
+        const sendEmailRecipientsSearch = document.getElementById('send-email-recipients-search');
+        const sendEmailSelectedCount = document.getElementById('send-email-selected-count');
+        const sendEmailClearSelectionBtn = document.getElementById('send-email-clear-selection-btn');
+        const sendEmailSelectPageCheckbox = document.getElementById('send-email-select-page-checkbox');
+        const sendEmailRecipientsPrevBtn = document.getElementById('send-email-recipients-prev-btn');
+        const sendEmailRecipientsNextBtn = document.getElementById('send-email-recipients-next-btn');
+        const sendEmailRecipientsPageInfo = document.getElementById('send-email-recipients-page-info');
+
+        let sendEmailNotifications = [];
+        let sendEmailNotificationsLoaded = false;
+        const sendEmailRecipientsState = { page: 1, perPage: 25, search: '' };
+        let sendEmailRecipientsRows = []; // rows currently shown on this page
+        const sendEmailSelected = new Map(); // email -> {student_id, name, email}
+
+        function updateSendEmailSelectedCount() {
+            sendEmailSelectedCount.textContent = `${sendEmailSelected.size} selected`;
+        }
+
+        async function loadSendEmailNotifications() {
+            try {
+                const response = await fetch('/api/notifications');
+                const data = await response.json();
+                sendEmailNotifications = Array.isArray(data) ? data : [];
+                sendEmailNotificationSelect.innerHTML = '<option value="">Write a new message instead...</option>' +
+                    sendEmailNotifications.map((n, i) => `<option value="${i}">${(n.date ? n.date + ' — ' : '') + n.text}</option>`).join('');
+            } catch (err) {
+                sendEmailNotificationSelect.innerHTML = '<option value="">Could not load notifications</option>';
+            }
+        }
+
+        sendEmailCategory.addEventListener('change', () => {
+            sendEmailNotificationGroup.style.display = sendEmailCategory.value === 'notification' ? '' : 'none';
+        });
+
+        sendEmailNotificationSelect.addEventListener('change', () => {
+            const idx = sendEmailNotificationSelect.value;
+            if (idx === '') return;
+            const picked = sendEmailNotifications[parseInt(idx, 10)];
+            if (!picked) return;
+            sendEmailMessageInput.value = picked.text || '';
+            sendEmailDateInput.value = picked.date || '';
+        });
+
+        document.querySelectorAll('input[name="send-email-recipients-mode"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                const specific = document.getElementById('send-email-recipients-specific').checked;
+                sendEmailRecipientsPicker.style.display = specific ? '' : 'none';
+                if (specific && !sendEmailRecipientsRows.length) {
+                    loadSendEmailRecipients();
+                }
+            });
+        });
+
+        async function loadSendEmailRecipients() {
+            const tbody = document.querySelector('#send-email-recipients-table tbody');
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3">Loading...</td></tr>';
+            try {
+                const params = new URLSearchParams({
+                    page: sendEmailRecipientsState.page,
+                    per_page: sendEmailRecipientsState.perPage,
+                    search: sendEmailRecipientsState.search
+                });
+                const response = await fetch(`/api/admin/emails?${params}`);
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Failed to load emails');
+
+                sendEmailRecipientsPrevBtn.disabled = data.page <= 1;
+                sendEmailRecipientsNextBtn.disabled = data.page >= data.pages;
+                const start = data.total === 0 ? 0 : (data.page - 1) * data.per_page + 1;
+                const end = Math.min(data.total, data.page * data.per_page);
+                sendEmailRecipientsPageInfo.textContent = `${start}-${end} of ${data.total}`;
+
+                sendEmailRecipientsRows = data.rows || [];
+                renderSendEmailRecipients();
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center text-muted py-3">${err.message}</td></tr>`;
+            }
+        }
+
+        function renderSendEmailRecipients() {
+            const tbody = document.querySelector('#send-email-recipients-table tbody');
+            if (!sendEmailRecipientsRows.length) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3">No emails on file yet.</td></tr>';
+                sendEmailSelectPageCheckbox.checked = false;
+                return;
+            }
+            tbody.innerHTML = '';
+            sendEmailRecipientsRows.forEach(row => {
+                const tr = document.createElement('tr');
+                const checked = sendEmailSelected.has(row.email);
+                tr.innerHTML = `<td><input type="checkbox" class="send-email-row-checkbox" ${checked ? 'checked' : ''}></td>` +
+                    `<td style="font-family: monospace;">${row.student_id}</td><td>${row.name || '—'}</td><td>${row.email}</td>`;
+                const checkbox = tr.querySelector('.send-email-row-checkbox');
+                checkbox.addEventListener('change', () => {
+                    if (checkbox.checked) {
+                        sendEmailSelected.set(row.email, row);
+                    } else {
+                        sendEmailSelected.delete(row.email);
+                    }
+                    updateSendEmailSelectedCount();
+                    sendEmailSelectPageCheckbox.checked = sendEmailRecipientsRows.every(r => sendEmailSelected.has(r.email));
+                });
+                tbody.appendChild(tr);
+            });
+            sendEmailSelectPageCheckbox.checked = sendEmailRecipientsRows.every(r => sendEmailSelected.has(r.email));
+        }
+
+        sendEmailSelectPageCheckbox.addEventListener('change', () => {
+            sendEmailRecipientsRows.forEach(row => {
+                if (sendEmailSelectPageCheckbox.checked) {
+                    sendEmailSelected.set(row.email, row);
+                } else {
+                    sendEmailSelected.delete(row.email);
+                }
+            });
+            updateSendEmailSelectedCount();
+            renderSendEmailRecipients();
+        });
+
+        sendEmailClearSelectionBtn.addEventListener('click', () => {
+            sendEmailSelected.clear();
+            updateSendEmailSelectedCount();
+            renderSendEmailRecipients();
+        });
+
+        sendEmailRecipientsPrevBtn.addEventListener('click', () => { sendEmailRecipientsState.page -= 1; loadSendEmailRecipients(); });
+        sendEmailRecipientsNextBtn.addEventListener('click', () => { sendEmailRecipientsState.page += 1; loadSendEmailRecipients(); });
+        sendEmailRecipientsSearch.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                sendEmailRecipientsState.search = sendEmailRecipientsSearch.value.trim();
+                sendEmailRecipientsState.page = 1;
+                loadSendEmailRecipients();
+            }
+        });
+
+        sendEmailForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const specific = document.getElementById('send-email-recipients-specific').checked;
+            let recipients;
+            if (specific) {
+                if (!sendEmailSelected.size) {
+                    sendEmailStatus.textContent = 'Select at least one recipient, or switch to "All subscribers".';
+                    sendEmailStatus.style.color = 'var(--danger-color)';
+                    return;
+                }
+                recipients = Array.from(sendEmailSelected.keys());
+            } else {
+                recipients = 'all';
+            }
+
+            const payload = {
+                category: sendEmailCategory.value,
+                subject: sendEmailSubjectInput.value.trim(),
+                message: sendEmailMessageInput.value.trim(),
+                date: sendEmailDateInput.value.trim(),
+                recipients
+            };
+            if (sendEmailCategory.value === 'notification' && sendEmailNotificationSelect.value !== '') {
+                payload.notification_index = parseInt(sendEmailNotificationSelect.value, 10);
+            }
+
+            sendEmailStatus.textContent = 'Sending...';
+            sendEmailStatus.style.color = '#4db6ac';
+
+            try {
+                const res = await fetch('/api/admin/send-email', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await res.json();
+                if (!res.ok) throw new Error(result.error || 'Failed to send email');
+
+                const email = result.email;
+                let statusMsg;
+                if (email.skipped_reason) {
+                    statusMsg = `Not sent: ${email.skipped_reason}.`;
+                } else {
+                    statusMsg = `Emailed ${email.sent}/${email.total} recipient(s)${email.failed ? `, ${email.failed} failed` : ''}.`;
+                    if (email.failed && email.errors && email.errors.length) {
+                        statusMsg += ` First error: ${email.errors[0]}`;
+                    }
+                }
+                sendEmailStatus.textContent = statusMsg;
+                sendEmailStatus.style.color = email.sent ? 'var(--success-color)' : 'var(--danger-color)';
+            } catch (err) {
+                sendEmailStatus.textContent = `Error: ${err.message}`;
+                sendEmailStatus.style.color = 'var(--danger-color)';
+            }
+        });
+
+        document.querySelector('.tab-btn[data-pane="pane-send-email"]').addEventListener('click', () => {
+            sendEmailNotificationGroup.style.display = sendEmailCategory.value === 'notification' ? '' : 'none';
+            if (!sendEmailNotificationsLoaded) {
+                sendEmailNotificationsLoaded = true;
+                loadSendEmailNotifications();
             }
         });
 

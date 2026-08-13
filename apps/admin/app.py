@@ -29,6 +29,7 @@ def create_app():
     app.add_url_rule('/api/admin/csv-file', methods=['GET'], view_func=routes.admin_get_csv_file)
     app.add_url_rule('/api/admin/csv-file', methods=['PUT'], view_func=routes.admin_save_csv_file)
     app.add_url_rule('/api/admin/add-notification', methods=['POST'], view_func=routes.admin_add_notification)
+    app.add_url_rule('/api/admin/send-email', methods=['POST'], view_func=routes.admin_send_email)
     app.add_url_rule('/api/admin/delete-notification/<int:index>', methods=['DELETE'], view_func=routes.admin_delete_notification)
     app.add_url_rule('/api/admin/toggle-blinking/<int:index>', methods=['POST'], view_func=routes.admin_toggle_blinking)
     app.add_url_rule('/api/admin/db-tables', methods=['GET'], view_func=routes.admin_db_tables)
