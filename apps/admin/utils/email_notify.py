@@ -1,5 +1,7 @@
+import contextlib
 import os
 import smtplib
+import socket
 import time
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -9,6 +11,26 @@ from . import d1_storage
 
 
 SEND_INTERVAL_SECONDS = 0.4  # basic pacing between sends
+
+_original_getaddrinfo = socket.getaddrinfo
+
+
+@contextlib.contextmanager
+def _force_ipv4_dns():
+    """Some hosts (e.g. Render) have no IPv6 egress, so a hostname that
+    resolves to an IPv6 address first (smtp.gmail.com does) fails with
+    "Network is unreachable" before smtplib gets a chance to fall back to
+    IPv4. Force AF_INET-only resolution for the duration of the initial
+    connection so it never picks an unreachable address in the first place.
+    """
+    def ipv4_only(host, port, family=0, type=0, proto=0, flags=0):
+        return _original_getaddrinfo(host, port, socket.AF_INET, type, proto, flags)
+
+    socket.getaddrinfo = ipv4_only
+    try:
+        yield
+    finally:
+        socket.getaddrinfo = _original_getaddrinfo
 
 
 def is_smtp_configured():
@@ -66,7 +88,8 @@ def send_notification_email(text, date_str=None):
     html_body = _notification_html(text, date_str)
 
     try:
-        server = smtplib.SMTP(host, port, timeout=15)
+        with _force_ipv4_dns():
+            server = smtplib.SMTP(host, port, timeout=15)
         server.starttls()
         server.login(username, password)
     except Exception as e:
