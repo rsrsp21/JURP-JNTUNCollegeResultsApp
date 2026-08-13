@@ -1,17 +1,18 @@
 import os
+import smtplib
 import time
-
-import requests
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.utils import formataddr
 
 from . import d1_storage
 
 
-RESEND_SEND_URL = 'https://api.resend.com/emails'
-SEND_INTERVAL_SECONDS = 0.55  # stay under Resend's default 2 req/sec rate limit
+SEND_INTERVAL_SECONDS = 0.4  # basic pacing between sends
 
 
-def is_resend_configured():
-    return bool(os.getenv('RESEND_API_KEY')) and bool(os.getenv('RESEND_FROM_EMAIL'))
+def is_smtp_configured():
+    return bool(os.getenv('SMTP_USERNAME')) and bool(os.getenv('SMTP_PASSWORD'))
 
 
 def _subscriber_emails():
@@ -37,17 +38,15 @@ def _notification_html(text, date_str):
 
 def send_notification_email(text, date_str=None):
     """Best-effort broadcast of a notification to every student with a
-    stored email address, via Resend, one recipient per API call. Returns a
-    summary dict; never raises - callers should treat this as best-effort
-    and not let a failure block the notification itself from being saved.
+    stored email address, via SMTP (Gmail by default). Returns a summary
+    dict; never raises - callers should treat this as best-effort and not
+    let a failure block the notification itself from being saved.
 
-    Sends are one-at-a-time (not Resend's /emails/batch) on purpose: batch
-    validates every "to" address up front and fails the WHOLE batch on a
-    single bad one (e.g. a stray @example.com test address), which would
-    silently fail everyone else's delivery too.
+    Sends are one-at-a-time over a single authenticated connection, so one
+    bad address only fails that one recipient instead of the whole run.
     """
-    if not is_resend_configured():
-        return {'sent': 0, 'failed': 0, 'total': 0, 'skipped_reason': 'Resend is not configured'}
+    if not is_smtp_configured():
+        return {'sent': 0, 'failed': 0, 'total': 0, 'skipped_reason': 'SMTP is not configured'}
 
     try:
         emails = _subscriber_emails()
@@ -57,38 +56,46 @@ def send_notification_email(text, date_str=None):
     if not emails:
         return {'sent': 0, 'failed': 0, 'total': 0, 'skipped_reason': 'No subscribed emails found'}
 
-    api_key = os.getenv('RESEND_API_KEY')
-    from_addr = os.getenv('RESEND_FROM_EMAIL')
-    subject = os.getenv('RESEND_NOTIFICATION_SUBJECT', 'JNTUK UCEN Results Portal - New Update')
+    host = os.getenv('SMTP_HOST', 'smtp.gmail.com')
+    port = int(os.getenv('SMTP_PORT', '587'))
+    username = os.getenv('SMTP_USERNAME')
+    password = os.getenv('SMTP_PASSWORD')
+    from_email = os.getenv('SMTP_FROM_EMAIL', username)
+    from_name = os.getenv('SMTP_FROM_NAME', 'JNTUK UCEN Results Portal')
+    subject = os.getenv('SMTP_NOTIFICATION_SUBJECT', 'JNTUK UCEN Results Portal - New Update')
     html_body = _notification_html(text, date_str)
 
+    try:
+        server = smtplib.SMTP(host, port, timeout=15)
+        server.starttls()
+        server.login(username, password)
+    except Exception as e:
+        print(f"SMTP login failed: {e}")
+        return {'sent': 0, 'failed': 0, 'total': len(emails), 'skipped_reason': f'SMTP login failed: {e}'}
+
     sent, failed, errors = 0, 0, []
+    try:
+        for i, email in enumerate(emails):
+            msg = MIMEMultipart('alternative')
+            msg['Subject'] = subject
+            msg['From'] = formataddr((from_name, from_email))
+            msg['To'] = email
+            msg.attach(MIMEText(html_body, 'html'))
 
-    for i, email in enumerate(emails):
-        try:
-            response = requests.post(
-                RESEND_SEND_URL,
-                headers={
-                    'Authorization': f'Bearer {api_key}',
-                    'Content-Type': 'application/json',
-                },
-                json={'from': from_addr, 'to': [email], 'subject': subject, 'html': html_body},
-                timeout=15,
-            )
-            if response.ok:
+            try:
+                server.sendmail(from_email, [email], msg.as_string())
                 sent += 1
-            else:
+            except Exception as e:
                 failed += 1
-                error_text = f'{email}: {response.text[:200]}'
-                errors.append(error_text)
-                print(f"Resend send to {email} failed ({response.status_code}): {response.text[:200]}")
-        except Exception as e:
-            failed += 1
-            error_text = f'{email}: {e}'
-            errors.append(error_text)
-            print(f"Resend send to {email} raised an exception: {e}")
+                errors.append(f'{email}: {e}')
+                print(f"SMTP send to {email} failed: {e}")
 
-        if i + 1 < len(emails):
-            time.sleep(SEND_INTERVAL_SECONDS)
+            if i + 1 < len(emails):
+                time.sleep(SEND_INTERVAL_SECONDS)
+    finally:
+        try:
+            server.quit()
+        except Exception:
+            pass
 
     return {'sent': sent, 'failed': failed, 'total': len(emails), 'errors': errors[:5]}
