@@ -1501,19 +1501,63 @@ def admin_add_notification():
         
     try:
         notifications = portal_db.add_notification(text, date_str, is_new)
+        return jsonify({'success': True, 'notifications': notifications})
     except Exception as e:
         print(f"Error adding notification: {e}")
         return jsonify({'error': str(e)}), 500
 
-    email_result = None
-    if bool(data.get('send_email', True)):
-        try:
-            email_result = email_notify.send_notification_email(text, date_str)
-        except Exception as e:
-            # Best-effort: the notification itself already saved successfully.
-            email_result = {'sent': 0, 'failed': 0, 'total': 0, 'skipped_reason': str(e)}
+@app.route('/api/admin/send-email', methods=['POST'])
+def admin_send_email():
+    if not session.get('logged_in'):
+        return jsonify({'error': 'Unauthorized'}), 401
 
-    return jsonify({'success': True, 'notifications': notifications, 'email': email_result})
+    data = request.get_json(silent=True) or {}
+    category = (data.get('category') or 'custom').strip()
+    if category not in ('notification', 'feature', 'custom'):
+        category = 'custom'
+
+    subject = (data.get('subject') or '').strip()
+    message = (data.get('message') or '').strip()
+    date_str = (data.get('date') or '').strip()
+
+    if category == 'notification' and data.get('notification_index') is not None:
+        try:
+            idx = int(data['notification_index'])
+        except (TypeError, ValueError):
+            return jsonify({'error': 'Invalid notification_index'}), 400
+        notifications = portal_db.list_notifications()
+        if not (0 <= idx < len(notifications)):
+            return jsonify({'error': 'Notification not found'}), 404
+        picked = notifications[idx]
+        if not message:
+            message = picked.get('text', '')
+        if not date_str:
+            date_str = picked.get('date', '')
+
+    if not message:
+        return jsonify({'error': 'Message is required'}), 400
+    if not subject:
+        subject = email_notify.default_subject(category)
+
+    recipients = data.get('recipients')
+    try:
+        if recipients == 'all':
+            recipient_emails = email_notify.get_all_subscriber_emails()
+        elif isinstance(recipients, list):
+            recipient_emails = [str(e).strip() for e in recipients if str(e).strip()]
+        else:
+            return jsonify({'error': 'recipients must be "all" or a list of email addresses'}), 400
+    except Exception as e:
+        return jsonify({'error': f'Could not resolve recipients: {e}'}), 500
+
+    if not recipient_emails:
+        return jsonify({'error': 'No recipients to send to'}), 400
+
+    try:
+        result = email_notify.send_bulk_email(recipient_emails, subject, message, category, date_str)
+        return jsonify({'success': True, 'email': result})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/admin/delete-notification/<int:index>', methods=['DELETE'])
 def admin_delete_notification(index):
