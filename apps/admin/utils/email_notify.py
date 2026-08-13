@@ -2,6 +2,7 @@ import contextlib
 import os
 import smtplib
 import socket
+import ssl
 import time
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -79,7 +80,8 @@ def send_notification_email(text, date_str=None):
         return {'sent': 0, 'failed': 0, 'total': 0, 'skipped_reason': 'No subscribed emails found'}
 
     host = os.getenv('SMTP_HOST', 'smtp.gmail.com')
-    port = int(os.getenv('SMTP_PORT', '587'))
+    port = int(os.getenv('SMTP_PORT', '465'))
+    use_ssl = port == 465 or os.getenv('SMTP_USE_SSL', '').strip().lower() in ('1', 'true', 'yes')
     username = os.getenv('SMTP_USERNAME')
     password = os.getenv('SMTP_PASSWORD')
     from_email = os.getenv('SMTP_FROM_EMAIL', username)
@@ -89,8 +91,13 @@ def send_notification_email(text, date_str=None):
 
     try:
         with _force_ipv4_dns():
-            server = smtplib.SMTP(host, port, timeout=15)
-        server.starttls()
+            if use_ssl:
+                # Port 465: implicit TLS from the start of the connection.
+                server = smtplib.SMTP_SSL(host, port, timeout=15, context=ssl.create_default_context())
+            else:
+                # Port 587 (or other): plaintext connection, then upgrade via STARTTLS.
+                server = smtplib.SMTP(host, port, timeout=15)
+                server.starttls()
         server.login(username, password)
     except Exception as e:
         print(f"SMTP login failed: {e}")

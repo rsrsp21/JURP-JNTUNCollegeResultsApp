@@ -91,7 +91,8 @@ Copy `.env.example` to `.env` and fill in the values you need.
 | `GEMINI_MODEL` | Optional | Gemini model name. Defaults to `gemini-2.5-flash`. |
 | `PUBLIC_APP_URL` | Optional | Public portal base URL used for cross-links. |
 | `SMTP_HOST` | For notification emails | SMTP server host. Defaults to `smtp.gmail.com`. |
-| `SMTP_PORT` | Optional | SMTP port. Defaults to `587` (STARTTLS). |
+| `SMTP_PORT` | Optional | SMTP port. Defaults to `465` (implicit TLS). Set to `587` to use STARTTLS instead (some hosts block one port but not the other). |
+| `SMTP_USE_SSL` | Optional | Force implicit TLS regardless of port. Auto-enabled when `SMTP_PORT=465`. |
 | `SMTP_USERNAME` | For notification emails | Mailbox address to authenticate and send as, e.g. a Gmail address. Without this (and `SMTP_PASSWORD`), adding a notification just skips the email step. |
 | `SMTP_PASSWORD` | For notification emails | An [app password](https://myaccount.google.com/apppasswords) for the account above (requires 2-Step Verification enabled) - not the regular account password. |
 | `SMTP_FROM_EMAIL` | Optional | From address if different from `SMTP_USERNAME`. |
