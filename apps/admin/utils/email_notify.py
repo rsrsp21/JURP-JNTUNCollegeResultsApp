@@ -1,41 +1,17 @@
-import contextlib
 import os
-import smtplib
-import socket
-import ssl
 import time
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from email.utils import formataddr
+
+import requests
 
 from . import d1_storage
 
 
+BREVO_SEND_URL = 'https://api.brevo.com/v3/smtp/email'
 SEND_INTERVAL_SECONDS = 0.4  # basic pacing between sends
 
-_original_getaddrinfo = socket.getaddrinfo
 
-
-@contextlib.contextmanager
-def _force_ipv4_dns():
-    """Some hosts (e.g. Render) have no IPv6 egress, so a hostname that
-    resolves to an IPv6 address first (smtp.gmail.com does) fails with
-    "Network is unreachable" before smtplib gets a chance to fall back to
-    IPv4. Force AF_INET-only resolution for the duration of the initial
-    connection so it never picks an unreachable address in the first place.
-    """
-    def ipv4_only(host, port, family=0, type=0, proto=0, flags=0):
-        return _original_getaddrinfo(host, port, socket.AF_INET, type, proto, flags)
-
-    socket.getaddrinfo = ipv4_only
-    try:
-        yield
-    finally:
-        socket.getaddrinfo = _original_getaddrinfo
-
-
-def is_smtp_configured():
-    return bool(os.getenv('SMTP_USERNAME')) and bool(os.getenv('SMTP_PASSWORD'))
+def is_brevo_configured():
+    return bool(os.getenv('BREVO_API_KEY')) and bool(os.getenv('BREVO_FROM_EMAIL'))
 
 
 def _subscriber_emails():
@@ -61,15 +37,16 @@ def _notification_html(text, date_str):
 
 def send_notification_email(text, date_str=None):
     """Best-effort broadcast of a notification to every student with a
-    stored email address, via SMTP (Gmail by default). Returns a summary
-    dict; never raises - callers should treat this as best-effort and not
-    let a failure block the notification itself from being saved.
+    stored email address, via Brevo's transactional email API (HTTPS, not
+    SMTP - some hosts block outbound SMTP ports entirely). Returns a
+    summary dict; never raises - callers should treat this as best-effort
+    and not let a failure block the notification itself from being saved.
 
-    Sends are one-at-a-time over a single authenticated connection, so one
-    bad address only fails that one recipient instead of the whole run.
+    Sends are one-at-a-time so a single bad address only fails that one
+    recipient instead of the whole run.
     """
-    if not is_smtp_configured():
-        return {'sent': 0, 'failed': 0, 'total': 0, 'skipped_reason': 'SMTP is not configured'}
+    if not is_brevo_configured():
+        return {'sent': 0, 'failed': 0, 'total': 0, 'skipped_reason': 'Brevo is not configured'}
 
     try:
         emails = _subscriber_emails()
@@ -79,53 +56,45 @@ def send_notification_email(text, date_str=None):
     if not emails:
         return {'sent': 0, 'failed': 0, 'total': 0, 'skipped_reason': 'No subscribed emails found'}
 
-    host = os.getenv('SMTP_HOST', 'smtp.gmail.com')
-    port = int(os.getenv('SMTP_PORT', '465'))
-    use_ssl = port == 465 or os.getenv('SMTP_USE_SSL', '').strip().lower() in ('1', 'true', 'yes')
-    username = os.getenv('SMTP_USERNAME')
-    password = os.getenv('SMTP_PASSWORD')
-    from_email = os.getenv('SMTP_FROM_EMAIL', username)
-    from_name = os.getenv('SMTP_FROM_NAME', 'JNTUK UCEN Results Portal')
-    subject = os.getenv('SMTP_NOTIFICATION_SUBJECT', 'JNTUK UCEN Results Portal - New Update')
+    api_key = os.getenv('BREVO_API_KEY')
+    from_email = os.getenv('BREVO_FROM_EMAIL')
+    from_name = os.getenv('BREVO_FROM_NAME', 'JNTUK UCEN Results Portal')
+    subject = os.getenv('BREVO_NOTIFICATION_SUBJECT', 'JNTUK UCEN Results Portal - New Update')
     html_body = _notification_html(text, date_str)
 
-    try:
-        with _force_ipv4_dns():
-            if use_ssl:
-                # Port 465: implicit TLS from the start of the connection.
-                server = smtplib.SMTP_SSL(host, port, timeout=15, context=ssl.create_default_context())
-            else:
-                # Port 587 (or other): plaintext connection, then upgrade via STARTTLS.
-                server = smtplib.SMTP(host, port, timeout=15)
-                server.starttls()
-        server.login(username, password)
-    except Exception as e:
-        print(f"SMTP login failed: {e}")
-        return {'sent': 0, 'failed': 0, 'total': len(emails), 'skipped_reason': f'SMTP login failed: {e}'}
-
     sent, failed, errors = 0, 0, []
-    try:
-        for i, email in enumerate(emails):
-            msg = MIMEMultipart('alternative')
-            msg['Subject'] = subject
-            msg['From'] = formataddr((from_name, from_email))
-            msg['To'] = email
-            msg.attach(MIMEText(html_body, 'html'))
 
-            try:
-                server.sendmail(from_email, [email], msg.as_string())
-                sent += 1
-            except Exception as e:
-                failed += 1
-                errors.append(f'{email}: {e}')
-                print(f"SMTP send to {email} failed: {e}")
-
-            if i + 1 < len(emails):
-                time.sleep(SEND_INTERVAL_SECONDS)
-    finally:
+    for i, email in enumerate(emails):
+        payload = {
+            'sender': {'name': from_name, 'email': from_email},
+            'to': [{'email': email}],
+            'subject': subject,
+            'htmlContent': html_body,
+        }
         try:
-            server.quit()
-        except Exception:
-            pass
+            response = requests.post(
+                BREVO_SEND_URL,
+                headers={
+                    'api-key': api_key,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+                json=payload,
+                timeout=15,
+            )
+            if response.ok:
+                sent += 1
+            else:
+                failed += 1
+                error_text = f'{email}: {response.text[:200]}'
+                errors.append(error_text)
+                print(f"Brevo send to {email} failed ({response.status_code}): {response.text[:200]}")
+        except Exception as e:
+            failed += 1
+            errors.append(f'{email}: {e}')
+            print(f"Brevo send to {email} raised an exception: {e}")
+
+        if i + 1 < len(emails):
+            time.sleep(SEND_INTERVAL_SECONDS)
 
     return {'sent': sent, 'failed': failed, 'total': len(emails), 'errors': errors[:5]}
