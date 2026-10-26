@@ -5,7 +5,8 @@ const alternateRowColor = [240, 240, 240];
 
 export async function downloadCgpaPdf(student) {
   const { jsPDF } = await import('jspdf');
-  await import('jspdf-autotable');
+  const { applyPlugin } = await import('jspdf-autotable');
+  applyPlugin(jsPDF);
   const doc = new jsPDF();
   const summary = student.academicSummary || {};
   const hasName = Boolean(student.Name && String(student.Name).trim());
@@ -75,7 +76,8 @@ export async function downloadCgpaPdf(student) {
 
 export async function downloadSemesterPdf({ studentId, cgpaData, semester, summary, rows }) {
   const { jsPDF } = await import('jspdf');
-  await import('jspdf-autotable');
+  const { applyPlugin } = await import('jspdf-autotable');
+  applyPlugin(jsPDF);
   const doc = new jsPDF();
   const semesterLabel = semesterLabelFor(semester);
   const hasName = Boolean(cgpaData?.Name && String(cgpaData.Name).trim());
@@ -149,7 +151,8 @@ export async function downloadSemesterPdf({ studentId, cgpaData, semester, summa
 
 export async function downloadAllSemestersPdf({ studentId, cgpaData, semesterData, semesterSummaries, includeHonors = false }) {
   const { jsPDF } = await import('jspdf');
-  await import('jspdf-autotable');
+  const { applyPlugin } = await import('jspdf-autotable');
+  applyPlugin(jsPDF);
   const doc = new jsPDF({ margin: { top: 20, bottom: 20 } });
   const hasName = Boolean(cgpaData?.Name && String(cgpaData.Name).trim());
 

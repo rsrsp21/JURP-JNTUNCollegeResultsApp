@@ -12,9 +12,9 @@
   "dependencies": {
     "dotenv": "^16.4.7",
     "framer-motion": "^11.18.2",
-    "jspdf": "^2.5.2",
-    "jspdf-autotable": "^3.8.4",
-    "next": "^14.2.23",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.9",
+    "next": "^15.5.28",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-markdown": "^9.0.1",
@@ -23,6 +23,6 @@
   },
   "devDependencies": {
     "eslint": "^8.57.1",
-    "eslint-config-next": "^14.2.23"
+    "eslint-config-next": "^15.5.28"
   }
 }
